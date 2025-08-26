@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Poem Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    input, button { padding: 10px; width: 100%; margin-top: 10px; }
+    #poemOutput { margin-top: 20px; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h2>Poem Generator</h2>
+  <input type="text" id="userInput" placeholder="Enter your inspiration..." />
+  <button onclick="generatePoem()">Generate</button>
+  <p id="poemOutput"></p>
+
+  <script>
+    async function generatePoem() {
+      const inputText = document.getElementById('userInput').value;
+      const response = await fetch("https://092d146fb1af.ngrok-free.app/generate-response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: inputText })
+      });
+      const data = await response.json();
+      document.getElementById('poemOutput').innerText = data.response;
+    }
+  </script>
+</body>
+</html>
