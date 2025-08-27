@@ -3,21 +3,27 @@ import pandas as pd
 import os
 import io
 
-# Poetic response function
+# --- Poem generation placeholder (ML model simulation) ---
 def generate_response(user_input):
     return f"I'm feeling inspired by your words: '{user_input}'. Here's a poetic thought: 'Stars whisper secrets to the night.'"
 
-# Sidebar upload
+def ml_generate_poem(text):
+    return f"From memories and nature, a verse blooms: '{text[:30]}...'"
+
+
+# --- Sidebar Uploads ---
 st.sidebar.header("Upload Previous Session Files")
 uploaded_csv1 = st.sidebar.file_uploader("Upload CSV1.csv", type="csv")
 uploaded_csv2 = st.sidebar.file_uploader("Upload CSV2.csv", type="csv")
+uploaded_csv3 = st.sidebar.file_uploader("Upload CSV3.csv", type="csv")
 
-# Load uploaded or fallback to local
+# --- Load or initialize dataframes ---
 df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
 df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
+df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame(columns=["Generated_Poem"])
 
-# App title
-st.title("Poem Generator with Dual Input Sets")
+# --- App UI ---
+st.title("Poem Generator with Dual Input Sets and ML Output")
 
 # Input Set 1
 st.header("Input Set 1")
@@ -33,47 +39,55 @@ input2_2 = st.text_input("Name a place you want to visit", key="input2_2")
 input2_3 = st.text_input("Describe your favorite season", key="input2_3")
 input2_4 = st.text_input("Write a line about hope", key="input2_4")
 
-# Generate button
+# --- Generate Button ---
 if st.button("Generate Poetic Responses"):
     combined_input1 = " ".join([input1_1, input1_2, input1_3, input1_4])
     combined_input2 = " ".join([input2_1, input2_2, input2_3, input2_4])
+    full_input = combined_input1 + " " + combined_input2
 
+    # Generate responses
     response1 = generate_response(combined_input1)
     response2 = generate_response(combined_input2)
+    ml_poem = ml_generate_poem(full_input)
 
-    st.session_state["response1"] = response1
-    st.session_state["response2"] = response2
+    # Display
+    st.subheader("Poetic Response from Input Set 1")
+    st.write(response1)
+    st.subheader("Poetic Response from Input Set 2")
+    st.write(response2)
+    st.subheader("ML-Generated Poem Line")
+    st.write(ml_poem)
 
-    new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session_{len(df1.columns)+1}")
-    new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session_{len(df2.columns)+1}")
+    # Append to CSV1, CSV2, CSV3
+    df1 = pd.concat([df1, pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session_{len(df1.columns)+1}")], axis=1)
+    df2 = pd.concat([df2, pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session_{len(df2.columns)+1}")], axis=1)
+    df3.loc[len(df3)] = [ml_poem]
 
-    df1 = pd.concat([df1, new_col1], axis=1)
-    df2 = pd.concat([df2, new_col2], axis=1)
-
+    # Save locally
     df1.to_csv("CSV1.csv", index=False)
     df2.to_csv("CSV2.csv", index=False)
+    df3.to_csv("CSV3.csv", index=False)
 
+    # Store in session state for download
     st.session_state["csv1"] = df1
     st.session_state["csv2"] = df2
+    st.session_state["csv3"] = df3
 
-# Display responses if available
-if "response1" in st.session_state:
-    st.subheader("Poetic Response from Input Set 1")
-    st.write(st.session_state["response1"])
+# --- Download Buttons ---
+if "csv1" in st.session_state:
+    buffer1 = io.StringIO()
+    st.session_state["csv1"].to_csv(buffer1, index=False)
+    buffer1.seek(0)
+    st.download_button("Download CSV1", buffer1.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
 
-if "response2" in st.session_state:
-    st.subheader("Poetic Response from Input Set 2")
-    st.write(st.session_state["response2"])
+if "csv2" in st.session_state:
+    buffer2 = io.StringIO()
+    st.session_state["csv2"].to_csv(buffer2, index=False)
+    buffer2.seek(0)
+    st.download_button("Download CSV2", buffer2.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
 
-# Download buttons if data exists
-if "csv1" in st.session_state and "csv2" in st.session_state:
-    csv1_buffer = io.StringIO()
-    csv2_buffer = io.StringIO()
-    st.session_state["csv1"].to_csv(csv1_buffer, index=False)
-    st.session_state["csv2"].to_csv(csv2_buffer, index=False)
-    csv1_buffer.seek(0)
-    csv2_buffer.seek(0)
-
-    st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
-    st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
-
+if "csv3" in st.session_state:
+    buffer3 = io.StringIO()
+    st.session_state["csv3"].to_csv(buffer3, index=False)
+    buffer3.seek(0)
+    st.download_button("Download CSV3", buffer3.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
