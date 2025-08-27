@@ -12,12 +12,10 @@ def generate_response(user_input):
 st.sidebar.header("Upload Previous Session Files")
 uploaded_csv1 = st.sidebar.file_uploader("Upload CSV1.csv", type="csv")
 uploaded_csv2 = st.sidebar.file_uploader("Upload CSV2.csv", type="csv")
-uploaded_csv3 = st.sidebar.file_uploader("Upload CSV3.csv", type="csv")
 
 # Load uploaded or fallback to local
 df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
 df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
-df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame()
 
 # App title
 st.title("Poem Generator with Dual Input Sets")
@@ -37,15 +35,18 @@ input2_3 = st.text_input("Describe your favorite season")
 input2_4 = st.text_input("Write a line about hope")
 
 # Generate button
-if st.button("Generate Poetic Response"):
+if st.button("Generate Poetic Responses"):
     combined_input1 = " ".join([input1_1, input1_2, input1_3, input1_4])
     combined_input2 = " ".join([input2_1, input2_2, input2_3, input2_4])
 
-    full_input = combined_input1 + " " + combined_input2
-    response = generate_response(full_input)
+    response1 = generate_response(combined_input1)
+    response2 = generate_response(combined_input2)
 
-    st.subheader("Generated Poem")
-    st.write(response)
+    st.subheader("Poetic Response from Input Set 1")
+    st.write(response1)
+
+    st.subheader("Poetic Response from Input Set 2")
+    st.write(response2)
 
     # Append new session as a column
     new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session_{len(df1.columns)+1}")
@@ -54,34 +55,18 @@ if st.button("Generate Poetic Response"):
     df1 = pd.concat([df1, new_col1], axis=1)
     df2 = pd.concat([df2, new_col2], axis=1)
 
-    # Append poem as a new column in CSV3
-    df3[f"Poem_{len(df3.columns)+1}"] = [response]
-
-    # Save all CSVs
+    # Save to local CSV files
     df1.to_csv("CSV1.csv", index=False)
     df2.to_csv("CSV2.csv", index=False)
-    df3.to_csv("CSV3.csv", index=False)
 
-    st.success("Inputs and poem saved successfully!")
+    st.success("Inputs saved and responses generated!")
 
-# Prepare in-memory download buffers
+# Prepare in-memory download buffers outside the button block
 csv1_buffer = io.StringIO()
 csv2_buffer = io.StringIO()
-csv3_buffer = io.StringIO()
 df1.to_csv(csv1_buffer, index=False)
 df2.to_csv(csv2_buffer, index=False)
-df3.to_csv(csv3_buffer, index=False)
 
-# Download buttons
+# Download buttons with unique keys
 st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
 st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
-st.download_button("Download CSV3 (Poems)", csv3_buffer.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
-
-# Display CSV3 content cleanly
-st.subheader("Poem History")
-if not df3.empty:
-    for col in df3.columns:
-        st.markdown(f"**{col}:**")
-        st.write(df3[col].iloc[0])
-else:
-    st.write("No poems available yet.")
