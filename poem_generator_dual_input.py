@@ -6,7 +6,7 @@ import io
 
 # Poetic response function
 def generate_response(user_input):
-    return f"I'm feeling inspired by your words: '{user_input}'. Here's a poetic thought: 'Stars whisper secrets to the night.'"
+return f"I'm feeling inspired by your words: '{user_input}'. Here's a poetic thought: 'Stars whisper secrets to the night.'"
 
 # Sidebar upload
 st.sidebar.header("Upload Previous Session Files")
@@ -37,32 +37,32 @@ input2_3 = st.text_input("Describe your favorite season")
 input2_4 = st.text_input("Write a line about hope")
 
 # Generate button
-    if st.button("Generate Poetic Response"):
-    combined_input1 = " ".join([input1_1, input1_2, input1_3, input1_4])
-    combined_input2 = " ".join([input2_1, input2_2, input2_3, input2_4])
+if st.button("Generate Poetic Response"):
+combined_input1 = " ".join([input1_1, input1_2, input1_3, input1_4])
+combined_input2 = " ".join([input2_1, input2_2, input2_3, input2_4])
 
-    full_input = combined_input1 + " " + combined_input2
-    response = generate_response(full_input)
+full_input = combined_input1 + " " + combined_input2
+response = generate_response(full_input)
 
-    st.subheader("Generated Poem")
-    st.write(response)
+st.subheader("Generated Poem")
+st.write(response)
 
-    # Append new session as a column
-    new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session_{len(df1.columns)+1}")
-    new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session_{len(df2.columns)+1}")
+# Append new session as a column
+new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session_{len(df1.columns)+1}")
+new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session_{len(df2.columns)+1}")
 
-    df1 = pd.concat([df1, new_col1], axis=1)
-    df2 = pd.concat([df2, new_col2], axis=1)
+df1 = pd.concat([df1, new_col1], axis=1)
+df2 = pd.concat([df2, new_col2], axis=1)
 
-    # Append poem as a new column in CSV3
-    df3[f"Poem_{len(df3.columns)+1}"] = [response]
+# Append poem as a new column in CSV3
+df3[f"Poem_{len(df3.columns)+1}"] = [response]
 
-    # Save all CSVs
-    df1.to_csv("CSV1.csv", index=False)
-    df2.to_csv("CSV2.csv", index=False)
-    df3.to_csv("CSV3.csv", index=False)
+# Save all CSVs
+df1.to_csv("CSV1.csv", index=False)
+df2.to_csv("CSV2.csv", index=False)
+df3.to_csv("CSV3.csv", index=False)
 
-    st.success("Inputs and poem saved successfully!")
+st.success("Inputs and poem saved successfully!")
 
 # Prepare in-memory download buffers
 csv1_buffer = io.StringIO()
@@ -79,9 +79,9 @@ st.download_button("Download CSV3 (Poems)", csv3_buffer.getvalue(), "CSV3.csv", 
 
 # Display CSV3 content cleanly
 st.subheader("Poem History")
-    if not df3.empty:
+if not df3.empty:
     for col in df3.columns:
-        st.markdown(f"**{col}:**")
-        st.write(df3[col].iloc[0])
-    else:
-    st.write("No poems available yet.")
+    st.markdown(f"**{col}:**")
+    st.write(df3[col].iloc[0])
+else:
+st.write("No poems available yet.")
