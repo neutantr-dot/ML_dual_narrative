@@ -7,17 +7,16 @@ import io
 def ml_generate_poem(text):
     return f"From memories and nature, a verse blooms: '{text[:30]}...'"
 
-# Sidebar upload for CSV3
-st.sidebar.header("Upload Previous Poem Outputs")
+# Sidebar uploads
+st.sidebar.header("Upload Previous Session Files")
+uploaded_csv1 = st.sidebar.file_uploader("Upload CSV1.csv", type="csv")
+uploaded_csv2 = st.sidebar.file_uploader("Upload CSV2.csv", type="csv")
 uploaded_csv3 = st.sidebar.file_uploader("Upload CSV3.csv", type="csv")
 
-# Load or initialize CSV3
-if uploaded_csv3:
-    df3 = pd.read_csv(uploaded_csv3)
-elif os.path.exists("CSV3.csv"):
-    df3 = pd.read_csv("CSV3.csv")
-else:
-    df3 = pd.DataFrame(columns=["Generated_Poem"])
+# Load or initialize dataframes
+df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
+df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
+df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame(columns=["Generated_Poem"])
 
 # App title
 st.title("Poem Generator with Dual Input Sets")
@@ -38,23 +37,33 @@ input2_4 = st.text_input("Write a line about hope")
 
 # Generate button
 if st.button("Generate Poem Line"):
-    combined_input = " ".join([
-        input1_1, input1_2, input1_3, input1_4,
-        input2_1, input2_2, input2_3, input2_4
-    ])
+    combined_input1 = " ".join([input1_1, input1_2, input1_3, input1_4])
+    combined_input2 = " ".join([input2_1, input2_2, input2_3, input2_4])
+    full_input = combined_input1 + " " + combined_input2
 
-    poem_line = ml_generate_poem(combined_input)
+    poem_line = ml_generate_poem(full_input)
     st.subheader("Generated Poem Line")
     st.write(poem_line)
 
-    # Append to CSV3
+    # Append to CSV1, CSV2, CSV3
+    df1 = pd.concat([df1, pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session_{len(df1.columns)+1}")], axis=1)
+    df2 = pd.concat([df2, pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session_{len(df2.columns)+1}")], axis=1)
     df3 = pd.concat([df3, pd.DataFrame({"Generated_Poem": [poem_line]})], ignore_index=True)
+
+    # Save locally
+    df1.to_csv("CSV1.csv", index=False)
+    df2.to_csv("CSV2.csv", index=False)
     df3.to_csv("CSV3.csv", index=False)
+
+    # Store in session state
+    st.session_state["csv1"] = df1
+    st.session_state["csv2"] = df2
     st.session_state["csv3"] = df3
 
-# Download CSV3
-if "csv3" in st.session_state:
-    buffer = io.StringIO()
-    st.session_state["csv3"].to_csv(buffer, index=False)
-    buffer.seek(0)
-    st.download_button("Download CSV3", buffer.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
+# Download buttons
+for label, key in zip(["CSV1", "CSV2", "CSV3"], ["csv1", "csv2", "csv3"]):
+    if key in st.session_state:
+        buffer = io.StringIO()
+        st.session_state[key].to_csv(buffer, index=False)
+        buffer.seek(0)
+        st.download_button(f"Download {label}", buffer.getvalue(), f"{label}.csv", "text/csv", key=f"download_{key}")
