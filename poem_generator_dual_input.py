@@ -6,13 +6,14 @@ import os
 def generate_response(user_input):
     return f"I'm feeling inspired by your words: '{user_input}'. Here's a poetic thought: 'Stars whisper secrets to the night.'"
 
-# CSV file names
-csv1_file = "CSV1.csv"
-csv2_file = "CSV2.csv"
+# Sidebar upload
+st.sidebar.header("Upload Previous Session Files")
+uploaded_csv1 = st.sidebar.file_uploader("Upload CSV1.csv", type="csv")
+uploaded_csv2 = st.sidebar.file_uploader("Upload CSV2.csv", type="csv")
 
-# Load or initialize CSVs
-df1 = pd.read_csv(csv1_file) if os.path.exists(csv1_file) else pd.DataFrame()
-df2 = pd.read_csv(csv2_file) if os.path.exists(csv2_file) else pd.DataFrame()
+# Load uploaded or fallback to local
+df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
+df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
 
 # App title
 st.title("Poem Generator with Dual Input Sets")
@@ -52,8 +53,13 @@ if st.button("Generate Poetic Responses"):
     df1 = pd.concat([df1, new_col1], axis=1)
     df2 = pd.concat([df2, new_col2], axis=1)
 
-    df1.to_csv(csv1_file, index=False)
-    df2.to_csv(csv2_file, index=False)
+    df1.to_csv("CSV1.csv", index=False)
+    df2.to_csv("CSV2.csv", index=False)
 
     st.success("Inputs saved and responses generated!")
+
+    # Download buttons
+    st.download_button("Download CSV1", df1.to_csv(index=False), "CSV1.csv", "text/csv")
+    st.download_button("Download CSV2", df2.to_csv(index=False), "CSV2.csv", "text/csv")
+
 
