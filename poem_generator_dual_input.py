@@ -57,9 +57,23 @@ if st.button("Generate Poetic Responses"):
     df2.to_csv("CSV2.csv", index=False)
 
     st.success("Inputs saved and responses generated!")
+import io
 
-    # Download buttons
-    st.download_button("Download CSV1", df1.to_csv(index=False), "CSV1.csv", "text/csv")
-    st.download_button("Download CSV2", df2.to_csv(index=False), "CSV2.csv", "text/csv")
+# After saving to CSV locally
+df1.to_csv("CSV1.csv", index=False)
+df2.to_csv("CSV2.csv", index=False)
+
+# Prepare in-memory download
+csv1_buffer = io.StringIO()
+csv2_buffer = io.StringIO()
+df1.to_csv(csv1_buffer, index=False)
+df2.to_csv(csv2_buffer, index=False)
+
+st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv")
+st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv")
+
+# Download buttons
+st.download_button("Download CSV1", df1.to_csv(index=False), "CSV1.csv", "text/csv")
+st.download_button("Download CSV2", df2.to_csv(index=False), "CSV2.csv", "text/csv")
 
 
