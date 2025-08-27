@@ -56,17 +56,19 @@ if st.button("Generate Poetic Responses"):
     df2 = pd.concat([df2, new_col2], axis=1)
 
     # Save to local CSV files
-    df1.to_csv("CSV1.csv", index=False)
-    df2.to_csv("CSV2.csv", index=False)
+    with open("CSV1.csv", "w", encoding="utf-8") as f1:
+        df1.to_csv(f1, index=False)
+    with open("CSV2.csv", "w", encoding="utf-8") as f2:
+        df2.to_csv(f2, index=False)
 
     st.success("Inputs saved and responses generated!")
 
-# Prepare in-memory download buffers outside the button block
-csv1_buffer = io.StringIO()
-csv2_buffer = io.StringIO()
-df1.to_csv(csv1_buffer, index=False)
-df2.to_csv(csv2_buffer, index=False)
+    # Prepare in-memory download
+    csv1_buffer = io.StringIO()
+    csv2_buffer = io.StringIO()
+    df1.to_csv(csv1_buffer, index=False)
+    df2.to_csv(csv2_buffer, index=False)
 
-# Download buttons with unique keys
-st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
-st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
+    # Download buttons with unique keys
+    st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
+    st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
