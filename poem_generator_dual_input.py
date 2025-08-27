@@ -16,6 +16,7 @@ uploaded_csv2 = st.sidebar.file_uploader("Upload CSV2.csv", type="csv")
 # Load uploaded or fallback to local
 df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
 df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
+df3 = pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame(columns=["Poem1", "Poem2"])
 
 # App title
 st.title("Poem Generator with Dual Input Sets")
@@ -55,18 +56,25 @@ if st.button("Generate Poetic Responses"):
     df1 = pd.concat([df1, new_col1], axis=1)
     df2 = pd.concat([df2, new_col2], axis=1)
 
-    # Save to local CSV files
+    # Append poems to CSV3
+    df3.loc[len(df3)] = [response1, response2]
+
+    # Save all CSVs
     df1.to_csv("CSV1.csv", index=False)
     df2.to_csv("CSV2.csv", index=False)
+    df3.to_csv("CSV3.csv", index=False)
 
-    st.success("Inputs saved and responses generated!")
+    st.success("Inputs and poems saved successfully!")
 
-# Prepare in-memory download buffers outside the button block
+# Prepare in-memory download buffers
 csv1_buffer = io.StringIO()
 csv2_buffer = io.StringIO()
+csv3_buffer = io.StringIO()
 df1.to_csv(csv1_buffer, index=False)
 df2.to_csv(csv2_buffer, index=False)
+df3.to_csv(csv3_buffer, index=False)
 
-# Download buttons with unique keys
+# Download buttons
 st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
 st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
+st.download_button("Download CSV3 (Poems)", csv3_buffer.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
