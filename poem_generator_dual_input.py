@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import os
@@ -13,19 +14,8 @@ uploaded_csv1 = st.sidebar.file_uploader("Upload CSV1.csv", type="csv")
 uploaded_csv2 = st.sidebar.file_uploader("Upload CSV2.csv", type="csv")
 
 # Load uploaded or fallback to local
-if uploaded_csv1:
-    df1 = pd.read_csv(uploaded_csv1)
-elif os.path.exists("CSV1.csv"):
-    df1 = pd.read_csv("CSV1.csv")
-else:
-    df1 = pd.DataFrame()
-
-if uploaded_csv2:
-    df2 = pd.read_csv(uploaded_csv2)
-elif os.path.exists("CSV2.csv"):
-    df2 = pd.read_csv("CSV2.csv")
-else:
-    df2 = pd.DataFrame()
+df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
+df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
 
 # App title
 st.title("Poem Generator with Dual Input Sets")
@@ -65,8 +55,11 @@ if st.button("Generate Poetic Responses"):
     df1 = pd.concat([df1, new_col1], axis=1)
     df2 = pd.concat([df2, new_col2], axis=1)
 
-    df1.to_csv("CSV1.csv", index=False)
-    df2.to_csv("CSV2.csv", index=False)
+    # Save to local CSV files
+    with open("CSV1.csv", "w", encoding="utf-8") as f1:
+        df1.to_csv(f1, index=False)
+    with open("CSV2.csv", "w", encoding="utf-8") as f2:
+        df2.to_csv(f2, index=False)
 
     st.success("Inputs saved and responses generated!")
 
@@ -79,6 +72,3 @@ if st.button("Generate Poetic Responses"):
     # Download buttons with unique keys
     st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
     st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
-
-
-
