@@ -61,7 +61,7 @@ if st.button("Generate Poetic Responses"):
     # Append to CSV1, CSV2, CSV3
     df1 = pd.concat([df1, pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session_{len(df1.columns)+1}")], axis=1)
     df2 = pd.concat([df2, pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session_{len(df2.columns)+1}")], axis=1)
-    df3.loc[len(df3)] = [ml_poem]
+    df3 = pd.concat([df3, pd.DataFrame({"Generated_Poem": [ml_poem]})], ignore_index=True)
 
     # Save locally
     df1.to_csv("CSV1.csv", index=False)
@@ -91,3 +91,5 @@ if "csv3" in st.session_state:
     st.session_state["csv3"].to_csv(buffer3, index=False)
     buffer3.seek(0)
     st.download_button("Download CSV3", buffer3.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
+
+   
