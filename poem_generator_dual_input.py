@@ -76,12 +76,3 @@ df3.to_csv(csv3_buffer, index=False)
 st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
 st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
 st.download_button("Download CSV3 (Poems)", csv3_buffer.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
-
-# Display CSV3 content cleanly
-st.subheader("Poem History")
-if not df3.empty:
-    for col in df3.columns:
-        st.markdown(f"**{col}:**")
-        st.write(df3[col].iloc[0])
-else:
-    st.write("No poems available yet.")
