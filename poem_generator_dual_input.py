@@ -16,7 +16,7 @@ uploaded_csv3 = st.sidebar.file_uploader("Upload CSV3.csv", type="csv")
 # Load or initialize dataframes
 df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
 df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
-df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame(columns=["Generated_Poem"])
+df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame()
 
 # App title
 st.title("Poem Generator with Dual Input Sets")
@@ -35,6 +35,11 @@ input2_2 = st.text_input("Name a place you want to visit")
 input2_3 = st.text_input("Describe your favorite season")
 input2_4 = st.text_input("Write a line about hope")
 
+# Display previously generated poem line if available
+if "poem_line" in st.session_state:
+    st.subheader("Generated Poem Line")
+    st.write(st.session_state["poem_line"])
+
 # Generate button
 if st.button("Generate Poem Line"):
     combined_input1 = " ".join([input1_1, input1_2, input1_3, input1_4])
@@ -42,13 +47,16 @@ if st.button("Generate Poem Line"):
     full_input = combined_input1 + " " + combined_input2
 
     poem_line = ml_generate_poem(full_input)
+    st.session_state["poem_line"] = poem_line
+
     st.subheader("Generated Poem Line")
     st.write(poem_line)
 
-    # Append to CSV1, CSV2, CSV3
-    df1 = pd.concat([df1, pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session_{len(df1.columns)+1}")], axis=1)
-    df2 = pd.concat([df2, pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session_{len(df2.columns)+1}")], axis=1)
-    df3 = pd.concat([df3, pd.DataFrame({"Generated_Poem": [poem_line]})], ignore_index=True)
+    # Append to CSV1, CSV2, CSV3 as new columns
+    session_id = f"Session_{len(df1.columns)+1}"
+    df1[session_id] = [input1_1, input1_2, input1_3, input1_4]
+    df2[session_id] = [input2_1, input2_2, input2_3, input2_4]
+    df3[session_id] = [poem_line]
 
     # Save locally
     df1.to_csv("CSV1.csv", index=False)
