@@ -52,11 +52,15 @@ if st.button("Generate Poem Line"):
     st.subheader("Generated Poem Line")
     st.write(poem_line)
 
-    # Append to CSV1, CSV2, CSV3 as new columns
+    # Append to CSV1 and CSV2 as new columns
     session_id = f"Session_{len(df1.columns)+1}"
     df1[session_id] = [input1_1, input1_2, input1_3, input1_4]
     df2[session_id] = [input2_1, input2_2, input2_3, input2_4]
-    df3[session_id] = [poem_line]
+
+    # Append to CSV3 as a new column with padding
+    max_rows = max(len(df3), 1)
+    new_col_data = [poem_line] + [""] * (max_rows - 1)
+    df3[session_id] = new_col_data
 
     # Save locally
     df1.to_csv("CSV1.csv", index=False)
@@ -75,3 +79,4 @@ for label, key in zip(["CSV1", "CSV2", "CSV3"], ["csv1", "csv2", "csv3"]):
         st.session_state[key].to_csv(buffer, index=False)
         buffer.seek(0)
         st.download_button(f"Download {label}", buffer.getvalue(), f"{label}.csv", "text/csv", key=f"download_{key}")
+
