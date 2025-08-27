@@ -79,4 +79,3 @@ for label, key in zip(["CSV1", "CSV2", "CSV3"], ["csv1", "csv2", "csv3"]):
         st.session_state[key].to_csv(buffer, index=False)
         buffer.seek(0)
         st.download_button(f"Download {label}", buffer.getvalue(), f"{label}.csv", "text/csv", key=f"download_{key}")
-
