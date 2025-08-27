@@ -52,14 +52,15 @@ if st.button("Generate Poetic Response"):
     new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session_{len(df2.columns)+1}")
 
 
-    # Append poem as a new column in CSV3
-
     df1 = pd.concat([df1, new_col1], axis=1)
-
     if df2.empty:
         df2 = pd.DataFrame({new_col2.name: new_col2})
     else:
         df2 = pd.concat([df2, new_col2], axis=1)
+    if df3.empty:
+        df3 = pd.DataFrame({f"Poem_1": [response]})
+    else:
+        df3[f"Poem_{len(df3.columns)+1}"] = [response]
 
     if df3.empty:
         df3 = pd.DataFrame({f"Poem_1": [response]})
@@ -85,3 +86,5 @@ df3.to_csv(csv3_buffer, index=False)
 st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
 st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
 st.download_button("Download CSV3 (Poems)", csv3_buffer.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
+
+
