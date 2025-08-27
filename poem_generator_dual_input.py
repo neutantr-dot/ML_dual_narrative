@@ -17,7 +17,7 @@ uploaded_csv3 = st.sidebar.file_uploader("Upload CSV3.csv", type="csv")
 # Load uploaded or fallback to local
 df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
 df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
-df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame(columns=["CombinedPoem"])
+df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame()
 
 # App title
 st.title("Poem Generator with Dual Input Sets")
@@ -54,8 +54,8 @@ if st.button("Generate Poetic Response"):
     df1 = pd.concat([df1, new_col1], axis=1)
     df2 = pd.concat([df2, new_col2], axis=1)
 
-    # Append single poem to CSV3
-    df3.loc[len(df3)] = [response]
+    # Append poem as a new column in CSV3
+    df3[f"Poem_{len(df3.columns)+1}"] = [response]
 
     # Save all CSVs
     df1.to_csv("CSV1.csv", index=False)
@@ -76,3 +76,8 @@ df3.to_csv(csv3_buffer, index=False)
 st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
 st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
 st.download_button("Download CSV3 (Poems)", csv3_buffer.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
+
+# Display CSV3 content
+st.subheader("Poem History")
+st.dataframe(df3) if not df3.empty else st.write("No poems available yet.")
+
