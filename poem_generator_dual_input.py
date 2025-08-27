@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import os
@@ -67,7 +66,9 @@ if st.button("Generate Poetic Responses"):
     csv1_buffer = io.StringIO()
     csv2_buffer = io.StringIO()
     df1.to_csv(csv1_buffer, index=False)
+    csv1_buffer.seek(0)
     df2.to_csv(csv2_buffer, index=False)
+    csv2_buffer.seek(0)
 
     # Download buttons with unique keys
     st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
