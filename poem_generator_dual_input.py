@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import io
 from datetime import datetime
+
 # Poetic response function
 def generate_response(input1, input2):
     return (
@@ -55,13 +56,25 @@ if inputs_filled:
         poetic_output = generate_response(combined_input1, combined_input2)
         st.session_state["poetic_output"] = poetic_output
 
-        # Use formatted date for session naming
-        session_id = datetime.now().strftime("%a, %b %d, %Y")  # e.g., Thu, Aug 28, 2025
+        # Create readable date string
+        base_date = datetime.now().strftime("%a, %b %d, %Y")  # e.g., Thu, Aug 28, 2025
+
+        # Count existing columns with today's date
+        def count_existing(df, base_date):
+            return sum([1 for col in df.columns if col.startswith(f"Session {base_date}")])
+
+        count1 = count_existing(df1, base_date) + 1
+        count2 = count_existing(df2, base_date) + 1
+        count3 = count_existing(df3, base_date) + 1
+
+        col_name1 = f"Session {base_date} ({count1})"
+        col_name2 = f"Session {base_date} ({count2})"
+        col_name3 = f"Session {base_date} ({count3})"
 
         # Append inputs and output to respective DataFrames
-        new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session {session_id}")
-        new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session {session_id}")
-        new_col3 = pd.Series([poetic_output], name=f"Session {session_id}")
+        new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=col_name1)
+        new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=col_name2)
+        new_col3 = pd.Series([poetic_output], name=col_name3)
 
         df1 = pd.concat([df1, new_col1], axis=1)
         df2 = pd.concat([df2, new_col2], axis=1)
@@ -112,4 +125,3 @@ if "csv1" in st.session_state and "csv2" in st.session_state and "csv3" in st.se
     st.download_button("Download CSV1", csv1_buffer.getvalue(), "CSV1.csv", "text/csv", key="download_csv1")
     st.download_button("Download CSV2", csv2_buffer.getvalue(), "CSV2.csv", "text/csv", key="download_csv2")
     st.download_button("Download CSV3", csv3_buffer.getvalue(), "CSV3.csv", "text/csv", key="download_csv3")
-
