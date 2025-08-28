@@ -137,9 +137,9 @@ if inputs_filled:
         df3 = pd.concat([df3, new_col3], axis=1)
 
         # Save updated CSVs
-        df1.to_csv("CSV1.csv", index=False)
-        df2.to_csv("CSV2.csv", index=False)
-        df3.to_csv("CSV3.csv", index=False)
+        df1.to_csv("CSV1.csv", index=False, encoding='utf-8')
+        df2.to_csv("CSV2.csv", index=False, encoding='utf-8')
+        df3.to_csv("CSV3.csv", index=False, encoding='utf-8')
 
         # Store in session state
         st.session_state["csv1"] = df1
