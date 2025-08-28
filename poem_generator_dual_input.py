@@ -88,6 +88,24 @@ if inputs_filled:
     if st.button("Generate Poetic Response"):
         combined_input1 = " ".join(input1_values)
         combined_input2 = " ".join(input2_values)
+
+        # Simulate ML classification (replace with real model later)
+        main_category = "A"  # Placeholder
+        sub_category = "1"   # Placeholder
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Append classification to internal file
+        try:
+            class_df = pd.read_csv("classification.csv")
+        except:
+            class_df = pd.DataFrame(columns=["Timestamp", "MainCategory", "SubCategory"])
+        new_row = pd.DataFrame({
+            "Timestamp": [timestamp],
+            "MainCategory": [main_category],
+            "SubCategory": [sub_category]
+        })
+        class_df = pd.concat([class_df, new_row], ignore_index=True)
+        class_df.to_csv("classification.csv", index=False)
+
         poetic_output = generate_response(combined_input1, combined_input2)
         st.session_state["poetic_output"] = poetic_output
 
