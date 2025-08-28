@@ -20,38 +20,26 @@ uploaded_csv2 = st.sidebar.file_uploader("Upload CSV2.csv", type="csv")
 uploaded_csv3 = st.sidebar.file_uploader("Upload CSV3.csv", type="csv")
 
 # Load uploaded or fallback to local
-df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.DataFrame()
-df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.DataFrame()
+df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
+df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
 df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame()
-
-# Input mode toggle
-st.sidebar.markdown("---")
-input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"])
-
-# Prefill only if user uploaded CSVs and chose "Edit Last Session"
-if input_mode == "Edit Last Session" and not df1.empty and not df2.empty:
-    latest_input1 = df1.iloc[:, -1].tolist()
-    latest_input2 = df2.iloc[:, -1].tolist()
-else:
-    latest_input1 = [""] * 4
-    latest_input2 = [""] * 4
 
 # App title
 st.title("Poem Generator with Dual Input Sets")
 
 # Input Set 1
 st.header("Input Set 1")
-input1_1 = st.text_input("Enter a thought about nature", value=latest_input1[0], key="input1_1")
-input1_2 = st.text_input("Describe a feeling you had today", value=latest_input1[1], key="input1_2")
-input1_3 = st.text_input("Mention a color that inspires you", value=latest_input1[2], key="input1_3")
-input1_4 = st.text_input("Write a short phrase about dreams", value=latest_input1[3], key="input1_4")
+input1_1 = st.text_input("Enter a thought about nature", key="input1_1")
+input1_2 = st.text_input("Describe a feeling you had today", key="input1_2")
+input1_3 = st.text_input("Mention a color that inspires you", key="input1_3")
+input1_4 = st.text_input("Write a short phrase about dreams", key="input1_4")
 
 # Input Set 2
 st.header("Input Set 2")
-input2_1 = st.text_input("Share a memory from childhood", value=latest_input2[0], key="input2_1")
-input2_2 = st.text_input("Name a place you want to visit", value=latest_input2[1], key="input2_2")
-input2_3 = st.text_input("Describe your favorite season", value=latest_input2[2], key="input2_3")
-input2_4 = st.text_input("Write a line about hope", value=latest_input2[3], key="input2_4")
+input2_1 = st.text_input("Share a memory from childhood", key="input2_1")
+input2_2 = st.text_input("Name a place you want to visit", key="input2_2")
+input2_3 = st.text_input("Describe your favorite season", key="input2_3")
+input2_4 = st.text_input("Write a line about hope", key="input2_4")
 
 # Check if all inputs are filled
 inputs_filled = all([
@@ -68,25 +56,13 @@ if inputs_filled:
         poetic_output = generate_response(combined_input1, combined_input2)
         st.session_state["poetic_output"] = poetic_output
 
-        # Create readable date string
-        base_date = datetime.now().strftime("%a, %b %d, %Y")
-
-        # Count existing columns with today's date
-        def count_existing(df, base_date):
-            return sum([1 for col in df.columns if col.startswith(f"Session {base_date}")])
-
-        count1 = count_existing(df1, base_date) + 1
-        count2 = count_existing(df2, base_date) + 1
-        count3 = count_existing(df3, base_date) + 1
-
-        col_name1 = f"Session {base_date} ({count1})"
-        col_name2 = f"Session {base_date} ({count2})"
-        col_name3 = f"Session {base_date} ({count3})"
+        # Use full datetime for unique session naming
+        session_id = datetime.now().strftime("%a, %b %d, %Y - %H:%M:%S")
 
         # Append inputs and output to respective DataFrames
-        new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=col_name1)
-        new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=col_name2)
-        new_col3 = pd.Series([poetic_output], name=col_name3)
+        new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=f"Session {session_id}")
+        new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=f"Session {session_id}")
+        new_col3 = pd.Series([poetic_output], name=f"Session {session_id}")
 
         df1 = pd.concat([df1, new_col1], axis=1)
         df2 = pd.concat([df2, new_col2], axis=1)
@@ -109,15 +85,18 @@ if "poetic_output" in st.session_state:
     st.subheader("Generated Poetic Response")
     st.write(st.session_state["poetic_output"])
 
-# Display last 2 columns of session history
-def show_last_two(df, label):
-    if not df.empty:
-        st.subheader(label)
-        st.dataframe(df.iloc[:, -2:] if df.shape[1] >= 2 else df)
+# Display session history
+if not df1.empty:
+    st.subheader("Session History - Input Set 1")
+    st.dataframe(df1)
 
-show_last_two(df1, "Session History - Input Set 1 (Last 2)")
-show_last_two(df2, "Session History - Input Set 2 (Last 2)")
-show_last_two(df3, "Session History - Poetic Output (Last 2)")
+if not df2.empty:
+    st.subheader("Session History - Input Set 2")
+    st.dataframe(df2)
+
+if not df3.empty:
+    st.subheader("Session History - Poetic Output")
+    st.dataframe(df3)
 
 # Download buttons
 if "csv1" in st.session_state and "csv2" in st.session_state and "csv3" in st.session_state:
