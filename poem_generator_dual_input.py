@@ -36,7 +36,7 @@ uploaded_csv3 = st.sidebar.file_uploader("Upload CSV3.csv", type="csv")
 # Load uploaded or fallback to local
 df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.DataFrame()
 df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.DataFrame()
-df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame()
+df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.DataFrame()
 
 # Input mode toggle
 st.sidebar.markdown("---")
