@@ -10,6 +10,12 @@ if "initialized" not in st.session_state:
     st.session_state["initialized"] = True
 
 
+if st.sidebar.button("Clear Poetic History"):
+    df3 = pd.DataFrame()
+    df3.to_csv("CSV3.csv", index=False)
+    st.session_state["csv3"] = df3
+    st.experimental_rerun()
+
 headers_df = pd.read_csv("https://raw.githubusercontent.com/neutantr-dot/poem/main/headers.csv")
 
 # Poetic response function
