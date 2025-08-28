@@ -45,17 +45,22 @@ st.title("Poem Generator with Dual Input Sets")
 # Input Set 1
 st.header("Input Set 1")
 input1_values = []
-for _, row in headers_df[headers_df["InputSet"] == 1].iterrows():
-    val = st.text_input(row["Label"], value="", key=row["Field"])
+for i, row in headers_df[headers_df["InputSet"] == 1].reset_index(drop=True).iterrows():
+    default_val = latest_input1[i] if i < len(latest_input1) else ""
+    val = st.text_input(row["Label"], value=default_val, key=row["Field"])
     input1_values.append(val)
 
 
+
 # Input Set 2
+
 st.header("Input Set 2")
 input2_values = []
-for _, row in headers_df[headers_df["InputSet"] == 2].iterrows():
-    val = st.text_input(row["Label"], value="", key=row["Field"])
+for i, row in headers_df[headers_df["InputSet"] == 2].reset_index(drop=True).iterrows():
+    default_val = latest_input2[i] if i < len(latest_input2) else ""
+    val = st.text_input(row["Label"], value=default_val, key=row["Field"])
     input2_values.append(val)
+
 
 
 # Check if all inputs are filled
