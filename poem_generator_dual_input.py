@@ -117,6 +117,20 @@ if not df3.empty:
     st.text_area("Poetic Response", selected_poem, height=150)
 
 
+# Optional: Input Set 1 History Viewer
+if not df1.empty:
+    st.subheader("Browse Past Input Set 1 Sessions")
+    selected_col1 = st.selectbox("Select a session from CSV1", df1.columns[::-1])
+    selected_input1 = "\n".join(df1[selected_col1].dropna().astype(str))
+    st.text_area("Input Set 1", selected_input1, height=150)
+
+# Optional: Input Set 2 History Viewer
+if not df2.empty:
+    st.subheader("Browse Past Input Set 2 Sessions")
+    selected_col2 = st.selectbox("Select a session from CSV2", df2.columns[::-1])
+    selected_input2 = "\n".join(df2[selected_col2].dropna().astype(str))
+    st.text_area("Input Set 2", selected_input2, height=150)
+
 # Display last 2 columns of session history
 def show_last_two(df, label):
     if not df.empty:
