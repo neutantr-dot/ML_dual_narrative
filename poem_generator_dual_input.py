@@ -126,15 +126,20 @@ if inputs_filled:
         col_name2 = f"Session {base_date} ({count2})"
         col_name3 = f"Session {base_date} ({count3})"
 
-        # Append inputs and output to respective DataFrames
 
+        # Append inputs and output to respective DataFrames
         new_col1 = pd.Series(input1_values, name=col_name1)
         new_col2 = pd.Series(input2_values, name=col_name2)
         new_col3 = pd.Series([poetic_output], name=col_name3)
 
         df1 = pd.concat([df1, new_col1], axis=1)
         df2 = pd.concat([df2, new_col2], axis=1)
+
+        if df3.empty:
+            df3 = pd.DataFrame(index=[0])
+
         df3 = pd.concat([df3, new_col3], axis=1)
+
 
         # Save updated CSVs
         df1.to_csv("CSV1.csv", index=False, encoding='utf-8')
