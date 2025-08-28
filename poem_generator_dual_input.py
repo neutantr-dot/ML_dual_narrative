@@ -24,22 +24,26 @@ df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") i
 df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
 df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame()
 
+# Prefill latest session data if available
+latest_input1 = df1.iloc[:, -1].tolist() if not df1.empty else [""] * 4
+latest_input2 = df2.iloc[:, -1].tolist() if not df2.empty else [""] * 4
+
 # App title
 st.title("Poem Generator with Dual Input Sets")
 
 # Input Set 1
 st.header("Input Set 1")
-input1_1 = st.text_input("Enter a thought about nature", key="input1_1")
-input1_2 = st.text_input("Describe a feeling you had today", key="input1_2")
-input1_3 = st.text_input("Mention a color that inspires you", key="input1_3")
-input1_4 = st.text_input("Write a short phrase about dreams", key="input1_4")
+input1_1 = st.text_input("Enter a thought about nature", value=latest_input1[0], key="input1_1")
+input1_2 = st.text_input("Describe a feeling you had today", value=latest_input1[1], key="input1_2")
+input1_3 = st.text_input("Mention a color that inspires you", value=latest_input1[2], key="input1_3")
+input1_4 = st.text_input("Write a short phrase about dreams", value=latest_input1[3], key="input1_4")
 
 # Input Set 2
 st.header("Input Set 2")
-input2_1 = st.text_input("Share a memory from childhood", key="input2_1")
-input2_2 = st.text_input("Name a place you want to visit", key="input2_2")
-input2_3 = st.text_input("Describe your favorite season", key="input2_3")
-input2_4 = st.text_input("Write a line about hope", key="input2_4")
+input2_1 = st.text_input("Share a memory from childhood", value=latest_input2[0], key="input2_1")
+input2_2 = st.text_input("Name a place you want to visit", value=latest_input2[1], key="input2_2")
+input2_3 = st.text_input("Describe your favorite season", value=latest_input2[2], key="input2_3")
+input2_4 = st.text_input("Write a line about hope", value=latest_input2[3], key="input2_4")
 
 # Check if all inputs are filled
 inputs_filled = all([
