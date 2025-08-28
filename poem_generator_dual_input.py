@@ -35,6 +35,7 @@ if input_mode == "Edit Last Session" and not df1.empty and not df2.empty:
 else:
     latest_input1 = [""] * 4
     latest_input2 = [""] * 4
+
 # App title
 st.title("Poem Generator with Dual Input Sets")
 
@@ -108,18 +109,15 @@ if "poetic_output" in st.session_state:
     st.subheader("Generated Poetic Response")
     st.write(st.session_state["poetic_output"])
 
-# Display session history
-if not df1.empty:
-    st.subheader("Session History - Input Set 1")
-    st.dataframe(df1)
+# Display last 2 columns of session history
+def show_last_two(df, label):
+    if not df.empty:
+        st.subheader(label)
+        st.dataframe(df.iloc[:, -2:] if df.shape[1] >= 2 else df)
 
-if not df2.empty:
-    st.subheader("Session History - Input Set 2")
-    st.dataframe(df2)
-
-if not df3.empty:
-    st.subheader("Session History - Poetic Output")
-    st.dataframe(df3)
+show_last_two(df1, "Session History - Input Set 1 (Last 2)")
+show_last_two(df2, "Session History - Input Set 2 (Last 2)")
+show_last_two(df3, "Session History - Poetic Output (Last 2)")
 
 # Download buttons
 if "csv1" in st.session_state and "csv2" in st.session_state and "csv3" in st.session_state:
