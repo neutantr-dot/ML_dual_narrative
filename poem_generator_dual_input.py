@@ -132,14 +132,14 @@ if not df2.empty:
     st.text_area("Input Set 2", selected_input2, height=150)
 
 # Display last 2 columns of session history
-def show_last_two(df, label):
-    if not df.empty:
-        st.subheader(label)
-        st.dataframe(df.iloc[:, -2:] if df.shape[1] >= 2 else df)
+# def show_last_two(df, label):
+#    if not df.empty:
+#        st.subheader(label)
+#       st.dataframe(df.iloc[:, -2:] if df.shape[1] >= 2 else df)
 
-show_last_two(df1, "Session History - Input Set 1 (Last 2)")
-show_last_two(df2, "Session History - Input Set 2 (Last 2)")
-show_last_two(df3, "Session History - Poetic Output (Last 2)")
+# show_last_two(df1, "Session History - Input Set 1 (Last 2)")
+# show_last_two(df2, "Session History - Input Set 2 (Last 2)")
+# show_last_two(df3, "Session History - Poetic Output (Last 2)")
 
 # Download buttons
 if "csv1" in st.session_state and "csv2" in st.session_state and "csv3" in st.session_state:
