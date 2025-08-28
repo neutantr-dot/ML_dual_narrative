@@ -4,6 +4,9 @@ import os
 import io
 from datetime import datetime
 
+
+headers_df = pd.read_csv("https://raw.githubusercontent.com/neutantr-dot/poem/main/headers.csv")
+
 # Poetic response function
 def generate_response(input1, input2):
     return (
@@ -41,32 +44,37 @@ st.title("Poem Generator with Dual Input Sets")
 
 # Input Set 1
 st.header("Input Set 1")
-input1_1 = st.text_input("Enter a thought about nature", value=latest_input1[0], key="input1_1")
-input1_2 = st.text_input("Describe a feeling you had today", value=latest_input1[1], key="input1_2")
-input1_3 = st.text_input("Mention a color that inspires you", value=latest_input1[2], key="input1_3")
-input1_4 = st.text_input("Write a short phrase about dreams", value=latest_input1[3], key="input1_4")
+input1_values = []
+for _, row in headers_df[headers_df["InputSet"] == 1].iterrows():
+    val = st.text_input(row["Label"], value="", key=row["Field"])
+    input1_values.append(val)
+
 
 # Input Set 2
 st.header("Input Set 2")
-input2_1 = st.text_input("Share a memory from childhood", value=latest_input2[0], key="input2_1")
-input2_2 = st.text_input("Name a place you want to visit", value=latest_input2[1], key="input2_2")
-input2_3 = st.text_input("Describe your favorite season", value=latest_input2[2], key="input2_3")
-input2_4 = st.text_input("Write a line about hope", value=latest_input2[3], key="input2_4")
+input2_values = []
+for _, row in headers_df[headers_df["InputSet"] == 2].iterrows():
+    val = st.text_input(row["Label"], value="", key=row["Field"])
+    input2_values.append(val)
+
 
 # Check if all inputs are filled
-inputs_filled = all([
-    input1_1, input1_2, input1_3, input1_4,
-    input2_1, input2_2, input2_3, input2_4
-])
+# inputs_filled = all([
+#    input1_1, input1_2, input1_3, input1_4,
+#    input2_1, input2_2, input2_3, input2_4
+#])
 
 # Generate button
+
+inputs_filled = all(input1_values + input2_values)
+
 if inputs_filled:
     if st.button("Generate Poetic Response"):
-        combined_input1 = " ".join([input1_1, input1_2, input1_3, input1_4])
-        combined_input2 = " ".join([input2_1, input2_2, input2_3, input2_4])
-
+        combined_input1 = " ".join(input1_values)
+        combined_input2 = " ".join(input2_values)
         poetic_output = generate_response(combined_input1, combined_input2)
         st.session_state["poetic_output"] = poetic_output
+
 
         # Create readable date string
         base_date = datetime.now().strftime("%a, %b %d, %Y")
@@ -84,8 +92,9 @@ if inputs_filled:
         col_name3 = f"Session {base_date} ({count3})"
 
         # Append inputs and output to respective DataFrames
-        new_col1 = pd.Series([input1_1, input1_2, input1_3, input1_4], name=col_name1)
-        new_col2 = pd.Series([input2_1, input2_2, input2_3, input2_4], name=col_name2)
+
+        new_col1 = pd.Series(input1_values, name=col_name1)
+        new_col2 = pd.Series(input2_values, name=col_name2)
         new_col3 = pd.Series([poetic_output], name=col_name3)
 
         df1 = pd.concat([df1, new_col1], axis=1)
