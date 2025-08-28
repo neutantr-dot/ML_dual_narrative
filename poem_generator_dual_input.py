@@ -5,6 +5,11 @@ import io
 from datetime import datetime
 
 
+if "initialized" not in st.session_state:
+    st.session_state.clear()
+    st.session_state["initialized"] = True
+
+
 headers_df = pd.read_csv("https://raw.githubusercontent.com/neutantr-dot/poem/main/headers.csv")
 
 # Poetic response function
