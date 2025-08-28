@@ -24,10 +24,17 @@ df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.DataFrame()
 df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.DataFrame()
 df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame()
 
-# Prefill only if user uploaded CSV1 and CSV2
-latest_input1 = df1.iloc[:, -1].tolist() if not df1.empty else [""] * 4
-latest_input2 = df2.iloc[:, -1].tolist() if not df2.empty else [""] * 4
+# Input mode toggle
+st.sidebar.markdown("---")
+input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"])
 
+# Prefill only if user uploaded CSVs and chose "Edit Last Session"
+if input_mode == "Edit Last Session" and not df1.empty and not df2.empty:
+    latest_input1 = df1.iloc[:, -1].tolist()
+    latest_input2 = df2.iloc[:, -1].tolist()
+else:
+    latest_input1 = [""] * 4
+    latest_input2 = [""] * 4
 # App title
 st.title("Poem Generator with Dual Input Sets")
 
