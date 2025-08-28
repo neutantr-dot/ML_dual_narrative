@@ -20,11 +20,11 @@ uploaded_csv2 = st.sidebar.file_uploader("Upload CSV2.csv", type="csv")
 uploaded_csv3 = st.sidebar.file_uploader("Upload CSV3.csv", type="csv")
 
 # Load uploaded or fallback to local
-df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.read_csv("CSV1.csv") if os.path.exists("CSV1.csv") else pd.DataFrame()
-df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.read_csv("CSV2.csv") if os.path.exists("CSV2.csv") else pd.DataFrame()
+df1 = pd.read_csv(uploaded_csv1) if uploaded_csv1 else pd.DataFrame()
+df2 = pd.read_csv(uploaded_csv2) if uploaded_csv2 else pd.DataFrame()
 df3 = pd.read_csv(uploaded_csv3) if uploaded_csv3 else pd.read_csv("CSV3.csv") if os.path.exists("CSV3.csv") else pd.DataFrame()
 
-# Prefill latest session data if available
+# Prefill only if user uploaded CSV1 and CSV2
 latest_input1 = df1.iloc[:, -1].tolist() if not df1.empty else [""] * 4
 latest_input2 = df2.iloc[:, -1].tolist() if not df2.empty else [""] * 4
 
@@ -61,7 +61,7 @@ if inputs_filled:
         st.session_state["poetic_output"] = poetic_output
 
         # Create readable date string
-        base_date = datetime.now().strftime("%a, %b %d, %Y")  # e.g., Thu, Aug 28, 2025
+        base_date = datetime.now().strftime("%a, %b %d, %Y")
 
         # Count existing columns with today's date
         def count_existing(df, base_date):
