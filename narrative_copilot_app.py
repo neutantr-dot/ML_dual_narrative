@@ -57,11 +57,11 @@ for i, label in enumerate(background_labels):
 
 # --- Versioning Helper ---
 def get_session_label(existing_df):
-    today = datetime.now().strftime("%b %d, %Y")
+    today = datetime.now().strftime("%a, %b %d (%-I)")
     version = 1
     if existing_df is not None and not existing_df.empty:
         version = sum([1 for col in existing_df.columns if today in col]) + 1
-    return f"Session {today} (v{version})"
+    return f"{today} (v{version})"
 
 # --- Generate Story ---
 if st.button("Generate Storyline"):
@@ -76,11 +76,13 @@ if st.button("Generate Storyline"):
 
     session_label = get_session_label(st.session_state["story_output"])
 
-    # Insert session column into each input
+    # Append session column to each input
     for key in EXPECTED_FILES:
         df = inputs[key]
-        new_col = pd.Series(df.iloc[:, 0].tolist(), name=session_label)
-        inputs[key] = pd.concat([df, new_col], axis=1)
+        if df.shape[1] == 1:
+            df.columns = ["Initial"]
+        df[session_label] = pd.Series(df.iloc[:, 0].tolist())
+        inputs[key] = df
 
     # Save story output
     story_df = pd.DataFrame([story_output], columns=[session_label])
@@ -126,4 +128,3 @@ if "story_output" in st.session_state and not st.session_state["story_output"].e
         st.session_state["story_output"].columns[::-1]
     )
     st.text_area("Storyline Preview", st.session_state["story_output"][selected_col].iloc[0], height=300)
-
