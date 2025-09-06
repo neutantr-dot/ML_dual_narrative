@@ -17,8 +17,7 @@ uploaded_story = st.sidebar.file_uploader("Upload story_output.csv", type="csv")
 
 # --- Input Mode Toggle (must come before using input_mode) ---
 st.sidebar.markdown("---")
-input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"])
-
+input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"], key="input_mode_selector")
 # --- Load Uploaded or Fallback ---
 df_voice = pd.DataFrame()
 df_background = pd.DataFrame()
