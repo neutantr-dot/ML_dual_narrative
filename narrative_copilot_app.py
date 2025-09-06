@@ -3,17 +3,6 @@ import pandas as pd
 import io
 from datetime import datetime
 from dispatcher import orchestrate_story  # Your ML engine
-import os
-
-HEADER_PATH = os.path.join(os.path.dirname(__file__), "headers.csv")
-
-try:
-    header_df = pd.read_csv(HEADER_PATH)
-    voice_labels = header_df[header_df["InputSet"] == 1]["Label"].tolist()
-    background_labels = header_df[header_df["InputSet"] == 2]["Label"].tolist()
-except Exception as e:
-    st.error(f"⚠️ Failed to load headers.csv: {e}")
-    voice_labels, background_labels = [], []
 
 # --- Page Setup ---
 st.set_page_config(page_title="Narrative Copilot", layout="wide")
@@ -29,7 +18,7 @@ except Exception as e:
     voice_labels, background_labels = [], []
 
 # --- Sidebar: Upload + Prefill Toggle ---
-st.sidebar.header("Upload Your Previous Inputs")
+st.sidebar.header("Upload Previous Session Files")
 uploaded_files = st.sidebar.file_uploader(
     "Upload voice_input.csv and background.csv",
     type="csv",
