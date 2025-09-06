@@ -45,9 +45,6 @@ if input_mode == "Edit Last Session":
         except Exception:
             st.warning("⚠️ Could not load background.csv")
 
-# --- Input Mode Toggle ---
-st.sidebar.markdown("---")
-input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"])
 
 # --- Prefill Logic ---
 latest_voice = [""] * len(voice_labels)
