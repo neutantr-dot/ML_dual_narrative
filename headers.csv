@@ -1,4 +1,4 @@
-InputSet,Field,Label
+InputSet;Field;Label
 1;input1_1;Enter your thoughts, your inner voice duting argument
 1;input1_2;Describe what you actually said
 1;input1_3;Describe what your partner said
