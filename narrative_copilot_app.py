@@ -68,41 +68,39 @@ if st.button("Generate Storyline"):
     session_label = get_session_label(st.session_state.get("story_output", pd.DataFrame()))
     session_date = datetime.now().strftime("%a, %b %d")
 
-    # Build new columns with session label + inputs
-    voice_column = [session_date] + voice_inputs
-    background_column = [session_date] + background_inputs
+# Build new columns with session label + inputs
+voice_column = [session_date] + voice_inputs
+background_column = [session_date] + background_inputs
 
-    # Create DataFrames
-    voice_df = pd.DataFrame(voice_column)
-    background_df = pd.DataFrame(background_column)
+# Create DataFrames
+voice_df = pd.DataFrame(voice_column)
+background_df = pd.DataFrame(background_column)
 
-# --- Append session column to each input ---
-for key, column_data in zip(EXPECTED_FILES, [voice_column, background_column]):
+# Append session column to each input
+for key, df, column_data in zip(EXPECTED_FILES, [voice_df, background_df], [voice_column, background_column]):
     if key in inputs and not inputs[key].empty:
-        df = inputs[key]
-        if df.shape[1] == 1:
-            df.columns = ["Initial"]
-        df[session_label] = pd.Series(column_data)
-        inputs[key] = df
+        if inputs[key].shape[1] == 1:
+            inputs[key].columns = ["Initial"]
+        inputs[key][session_label] = pd.Series(column_data)
     else:
-        df = pd.DataFrame(column_data)
         df.columns = ["Initial"]
         df[session_label] = pd.Series(column_data)
         inputs[key] = df
 
-    # Run ML engine
-    inputs["clarification"] = "User clarification embedded in inputs"
-    story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
+# Run ML engine
+inputs["clarification"] = "User clarification embedded in inputs"
+story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
 
-    # Save story output
-    if "story_output" not in st.session_state:
-        st.session_state["story_output"] = pd.DataFrame()
+# Save story output
+if "story_output" not in st.session_state:
+     st.session_state["story_output"] = pd.DataFrame()
 
-    story_df = pd.DataFrame([story_output], columns=[session_label])
-    st.session_state["story_output"] = pd.concat([st.session_state["story_output"], story_df], axis=1)
+story_df = pd.DataFrame([story_output], columns=[session_label])
+st.session_state["story_output"] = pd.concat([st.session_state["story_output"], story_df], axis=1)
 
-    st.success("✅ Storyline generated successfully!")
-    st.text_area("Generated Storyline", story_output, height=400, key="story_output_area")
+st.success("✅ Storyline generated successfully!")
+st.text_area("Generated Storyline", story_output, height=400, key="story_output_area")
+
 
 # --- Download Buttons ---
 st.subheader("📁 Download Your Files")
