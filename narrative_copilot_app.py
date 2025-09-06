@@ -4,11 +4,6 @@ import io
 from datetime import datetime
 from dispatcher import orchestrate_story  # Your ML engine
 
-# --- Initialize Session ---
-if "initialized" not in st.session_state:
-    st.session_state.clear()
-    st.session_state["initialized"] = True
-
 # --- Load Header Labels ---
 headers_df = pd.read_csv("headers.csv", sep=";")
 voice_labels = headers_df[headers_df["InputSet"] == 1].reset_index(drop=True)
@@ -61,51 +56,50 @@ for i, row in background_labels.iterrows():
 # --- Generate Button ---
 inputs_filled = all(voice_inputs + background_inputs)
 
-if inputs_filled:
-    if st.button("Generate Storyline"):
-        session_date = datetime.now().strftime("%a, %b %d, %Y")
+if inputs_filled and st.button("Generate Storyline"):
+    session_date = datetime.now().strftime("%a, %b %d, %Y")
 
-        def count_existing(df, base_date):
-            return sum([1 for col in df.columns if str(col).startswith(f"Session {base_date}")])
+    def count_existing(df, base_date):
+        return sum([1 for col in df.columns if str(col).startswith(f"Session {base_date}")])
 
-        count_voice = count_existing(df_voice, session_date) + 1
-        count_background = count_existing(df_background, session_date) + 1
-        count_story = count_existing(df_story, session_date) + 1
+    count_voice = count_existing(df_voice, session_date) + 1
+    count_background = count_existing(df_background, session_date) + 1
+    count_story = count_existing(df_story, session_date) + 1
 
-        col_voice = f"Session {session_date} ({count_voice})"
-        col_background = f"Session {session_date} ({count_background})"
-        col_story = f"Session {session_date} ({count_story})"
+    col_voice = f"Session {session_date} ({count_voice})"
+    col_background = f"Session {session_date} ({count_background})"
+    col_story = f"Session {session_date} ({count_story})"
 
-        # Append new columns
-        new_voice = pd.Series(voice_inputs, name=col_voice)
-        new_background = pd.Series(background_inputs, name=col_background)
+    # Append new columns
+    new_voice = pd.Series(voice_inputs, name=col_voice)
+    new_background = pd.Series(background_inputs, name=col_background)
 
-        df_voice = pd.concat([df_voice, new_voice], axis=1)
-        df_background = pd.concat([df_background, new_background], axis=1)
+    df_voice = pd.concat([df_voice, new_voice], axis=1)
+    df_background = pd.concat([df_background, new_background], axis=1)
 
-        # Run ML engine
-        inputs = {
-            "voice_input": pd.DataFrame([[v] for v in voice_inputs]),
-            "background": pd.DataFrame([[b] for b in background_inputs]),
-            "clarification": "User clarification embedded in inputs"
-        }
-        story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
+    # Run ML engine
+    inputs = {
+        "voice_input": pd.DataFrame([[v] for v in voice_inputs]),
+        "background": pd.DataFrame([[b] for b in background_inputs]),
+        "clarification": "User clarification embedded in inputs"
+    }
+    story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
 
-        new_story = pd.Series([story_output], name=col_story)
-        df_story = pd.concat([df_story, new_story], axis=1)
+    new_story = pd.Series([story_output], name=col_story)
+    df_story = pd.concat([df_story, new_story], axis=1)
 
-        # Save updated CSVs
-        df_voice.to_csv("voice_input.csv", index=False, encoding="utf-8")
-        df_background.to_csv("background.csv", index=False, encoding="utf-8")
-        df_story.to_csv("story_output.csv", index=False, encoding="utf-8")
+    # Save updated CSVs
+    df_voice.to_csv("voice_input.csv", index=False, encoding="utf-8")
+    df_background.to_csv("background.csv", index=False, encoding="utf-8")
+    df_story.to_csv("story_output.csv", index=False, encoding="utf-8")
 
-        # Store in session
-        st.session_state["voice_input"] = df_voice
-        st.session_state["background"] = df_background
-        st.session_state["story_output"] = df_story
+    # Store in session
+    st.session_state["voice_input"] = df_voice
+    st.session_state["background"] = df_background
+    st.session_state["story_output"] = df_story
 
-        st.success("✅ Storyline generated successfully!")
-        st.text_area("Generated Storyline", story_output, height=400)
+    st.success("✅ Storyline generated successfully!")
+    st.text_area("Generated Storyline", story_output, height=400)
 
 # --- History Viewers ---
 if not df_story.empty:
