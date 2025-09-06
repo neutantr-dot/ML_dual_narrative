@@ -73,26 +73,28 @@ if st.button("Generate Storyline"):
     background_column = [session_date] + background_inputs
 
     # Create DataFrames
-    inputs["voice_input"] = pd.DataFrame(voice_column)
-    inputs["background"] = pd.DataFrame(background_column)
+    voice_df = pd.DataFrame(voice_column)
+    background_df = pd.DataFrame(background_column)
+
+    # Append session column to each input
+    for key, df, column_data in zip(EXPECTED_FILES, [voice_df, background_df], [voice_column, background_column]):
+        if key in inputs and not inputs[key].empty:
+            if inputs[key].shape[1] == 1:
+                inputs[key].columns = ["Initial"]
+            inputs[key][session_label] = pd.Series(column_data)
+        else:
+            df.columns = ["Initial"]
+            df[session_label] = pd.Series(column_data)
+            inputs[key] = df
 
     # Run ML engine
     inputs["clarification"] = "User clarification embedded in inputs"
     story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
 
-    # Initialize session state
+    # Save story output
     if "story_output" not in st.session_state:
         st.session_state["story_output"] = pd.DataFrame()
 
-    # Append session column to each input
-    for key, column_data in zip(EXPECTED_FILES, [voice_column, background_column]):
-        df = inputs[key]
-        if df.shape[1] == 1:
-            df.columns = ["Initial"]
-        df[session_label] = pd.Series(column_data)
-        inputs[key] = df
-
-    # Save story output
     story_df = pd.DataFrame([story_output], columns=[session_label])
     st.session_state["story_output"] = pd.concat([st.session_state["story_output"], story_df], axis=1)
 
@@ -136,4 +138,5 @@ if "story_output" in st.session_state and not st.session_state["story_output"].e
         st.session_state["story_output"].columns[::-1]
     )
     st.text_area("Storyline Preview", st.session_state["story_output"][selected_col].iloc[0], height=300)
+
 
