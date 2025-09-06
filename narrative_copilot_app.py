@@ -102,7 +102,7 @@ for key, column_data in zip(EXPECTED_FILES, [voice_column, background_column]):
     st.session_state["story_output"] = pd.concat([st.session_state["story_output"], story_df], axis=1)
 
     st.success("✅ Storyline generated successfully!")
-    st.text_area("Generated Storyline", story_output, height=400)
+    st.text_area("Generated Storyline", story_output, height=400, key="story_output_area")
 
 # --- Download Buttons ---
 st.subheader("📁 Download Your Files")
