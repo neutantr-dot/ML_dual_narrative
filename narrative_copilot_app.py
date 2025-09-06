@@ -57,10 +57,8 @@ for i, label in enumerate(background_labels):
 # --- Generate Story ---
 if st.button("Generate Storyline"):
     session_date = format_session_date()
-
     def count_existing(df, base_date):
-        return sum([1 for col in df.columns if col.startswith(f"Session {base_date}")])
-
+        return sum([1 for col in df.columns if str(col).startswith(f"Session {base_date}")])
     base_date = session_date
     count_voice = count_existing(inputs.get("voice_input", pd.DataFrame()), base_date) + 1
     count_bg = count_existing(inputs.get("background", pd.DataFrame()), base_date) + 1
