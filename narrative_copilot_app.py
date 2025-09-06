@@ -30,14 +30,14 @@ st.sidebar.markdown("---")
 input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"])
 
 # --- Prefill Logic ---
-if input_mode == "Edit Last Session" and not df_voice.empty and not df_background.empty:
+latest_voice = [""] * len(voice_labels)
+latest_background = [""] * len(background_labels)
+
+if input_mode == "Edit Last Session":
     if not df_voice.empty and df_voice.shape[0] >= len(voice_labels):
         latest_voice = df_voice.iloc[:, -1].fillna("").tolist()
     if not df_background.empty and df_background.shape[0] >= len(background_labels):
         latest_background = df_background.iloc[:, -1].fillna("").tolist()
-else:
-    latest_voice = [""] * len(voice_labels)
-    latest_background = [""] * len(background_labels)
 
 # --- App Title ---
 st.title("🧠 Narrative Copilot")
@@ -138,6 +138,7 @@ if "voice_input" in st.session_state and "background" in st.session_state and "s
     st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
     st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
     st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
+
 
 
 
