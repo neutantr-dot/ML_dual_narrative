@@ -16,9 +16,33 @@ uploaded_background = st.sidebar.file_uploader("Upload background.csv", type="cs
 uploaded_story = st.sidebar.file_uploader("Upload story_output.csv", type="csv")
 
 # --- Load Uploaded or Fallback ---
-df_voice = pd.read_csv(uploaded_voice) if uploaded_voice else pd.DataFrame()
-df_background = pd.read_csv(uploaded_background) if uploaded_background else pd.DataFrame()
+# --- Load Uploaded or Fallback ---
+df_voice = pd.DataFrame()
+df_background = pd.DataFrame()
 df_story = pd.read_csv(uploaded_story) if uploaded_story else pd.DataFrame(index=[0])
+
+latest_voice = [""] * len(voice_labels)
+latest_background = [""] * len(background_labels)
+
+if input_mode == "Edit Last Session":
+    if uploaded_voice is not None:
+        try:
+            raw_voice = pd.read_csv(uploaded_voice, header=None)
+            if raw_voice.shape[0] >= len(voice_labels) + 1:
+                df_voice = raw_voice
+                latest_voice = raw_voice.iloc[1:, -1].fillna("").tolist()
+        except Exception:
+            st.warning("⚠️ Could not load voice_input.csv")
+
+    if uploaded_background is not None:
+        try:
+            raw_background = pd.read_csv(uploaded_background, header=None)
+            if raw_background.shape[0] >= len(background_labels) + 1:
+                df_background = raw_background
+                latest_background = raw_background.iloc[1:, -1].fillna("").tolist()
+        except Exception:
+            st.warning("⚠️ Could not load background.csv")
+
 
 # --- Input Mode Toggle ---
 st.sidebar.markdown("---")
