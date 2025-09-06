@@ -31,18 +31,18 @@ latest_background = [""] * len(background_labels)
 if input_mode == "Edit Last Session":
     if uploaded_voice is not None:
         try:
-            df_voice = pd.read_csv(uploaded_voice)
-            if df_voice.shape[0] >= len(voice_labels):
-                latest_voice = df_voice.iloc[:, -1].fillna("").tolist()
-        except Exception as e:
+            df_voice = pd.read_csv(uploaded_voice, header=None)
+            if df_voice.shape[0] >= len(voice_labels) + 1:
+                latest_voice = df_voice.iloc[1:, -1].fillna("").tolist()
+        except Exception:
             st.warning("⚠️ Could not load voice_input.csv")
 
     if uploaded_background is not None:
         try:
-            df_background = pd.read_csv(uploaded_background)
-            if df_background.shape[0] >= len(background_labels):
-                latest_background = df_background.iloc[:, -1].fillna("").tolist()
-        except Exception as e:
+            df_background = pd.read_csv(uploaded_background, header=None)
+            if df_background.shape[0] >= len(background_labels) + 1:
+                latest_background = df_background.iloc[1:, -1].fillna("").tolist()
+        except Exception:
             st.warning("⚠️ Could not load background.csv")
 
 # --- App Title ---
