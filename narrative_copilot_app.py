@@ -74,18 +74,23 @@ if inputs_filled and st.button("Generate Storyline"):
     new_voice = [session_date] + voice_inputs
     new_background = [session_date] + background_inputs
 
-    # Ensure row alignment
-    max_rows_voice = max(len(new_voice), df_voice.shape[0])
-    max_rows_background = max(len(new_background), df_background.shape[0])
+    def insert_column_front(df, new_data, col_name):
+        new_series = pd.Series(new_data, name=col_name)
+        max_rows = max(len(new_series), df.shape[0])
 
-    while df_voice.shape[0] < max_rows_voice:
-        df_voice.loc[len(df_voice)] = ["" for _ in range(df_voice.shape[1])]
-    while df_background.shape[0] < max_rows_background:
-        df_background.loc[len(df_background)] = ["" for _ in range(df_background.shape[1])]
+        # Pad existing DataFrame
+        while df.shape[0] < max_rows:
+            df.loc[len(df)] = ["" for _ in range(df.shape[1])]
 
-    # Insert new session as first column
-    df_voice.insert(0, col_voice, pd.Series(new_voice))
-    df_background.insert(0, col_background, pd.Series(new_background))
+        # Pad new column
+        if len(new_series) < max_rows:
+            new_series = new_series.append(pd.Series([""] * (max_rows - len(new_series))), ignore_index=True)
+
+        df.insert(0, col_name, new_series)
+        return df
+
+    df_voice = insert_column_front(df_voice, new_voice, col_voice)
+    df_background = insert_column_front(df_background, new_background, col_background)
 
     # Run ML engine
     inputs = {
@@ -142,6 +147,7 @@ if "voice_input" in st.session_state and "background" in st.session_state and "s
     st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
     st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
     st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
+
 
 
 
