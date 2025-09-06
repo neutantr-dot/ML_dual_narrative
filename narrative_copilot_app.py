@@ -50,19 +50,22 @@ if all(voice_inputs + background_inputs) and st.button("Generate Storyline"):
     session_date = datetime.now().strftime("%a, %b %d, %Y")
     session_name = f"Session {session_date}"
 
-    # Insert new session as first column
+    # Ensure correct shape before inserting
+    if df_voice.shape[0] != len(voice_inputs):
+        df_voice = pd.DataFrame(index=range(len(voice_inputs)))
     df_voice.insert(0, session_name, voice_inputs)
+
+    if df_background.shape[0] != len(background_inputs):
+        df_background = pd.DataFrame(index=range(len(background_inputs)))
     df_background.insert(0, session_name, background_inputs)
 
-    # Run ML engine
-    inputs = {
+    if df_story.shape[0] != 1:
+        df_story = pd.DataFrame(index=[0])
+    df_story.insert(0, session_name, [orchestrate_story({
         "voice_input": pd.DataFrame([[v] for v in voice_inputs]),
         "background": pd.DataFrame([[b] for b in background_inputs]),
         "clarification": "User clarification embedded in inputs"
-    }
-    story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
-
-    df_story.insert(0, session_name, [story_output])
+    }, config_path="copilot_config.yaml")])
 
     # Save updated CSVs
     df_voice.to_csv("voice_input.csv", index=False, encoding="utf-8")
@@ -75,7 +78,7 @@ if all(voice_inputs + background_inputs) and st.button("Generate Storyline"):
     st.session_state["story_output"] = df_story
 
     st.success("✅ Storyline generated successfully!")
-    st.text_area("Generated Storyline", story_output, height=400)
+    st.text_area("Generated Storyline", df_story.iloc[0, 0], height=400)
 
 # --- History Viewers ---
 if not df_story.empty:
@@ -111,11 +114,6 @@ if not df_voice.empty and not df_background.empty and not df_story.empty:
     st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
     st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
     st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
-
-
-
-
-
 
 
 
