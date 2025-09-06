@@ -19,20 +19,30 @@ uploaded_story = st.sidebar.file_uploader("Upload story_output.csv", type="csv")
 st.sidebar.markdown("---")
 input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"], key="input_mode_selector")
 
-# --- Load Uploaded Files ---
-df_voice = pd.read_csv(uploaded_voice, header=None) if uploaded_voice else pd.DataFrame()
-df_background = pd.read_csv(uploaded_background, header=None) if uploaded_background else pd.DataFrame()
+# --- Load Uploaded Files Once ---
+df_voice = pd.DataFrame()
+df_background = pd.DataFrame()
 df_story = pd.read_csv(uploaded_story) if uploaded_story else pd.DataFrame(index=[0])
 
-# --- Prefill Logic ---
 latest_voice = [""] * len(voice_labels)
 latest_background = [""] * len(background_labels)
 
 if input_mode == "Edit Last Session":
-    if not df_voice.empty and df_voice.shape[0] >= len(voice_labels) + 1:
-        latest_voice = df_voice.iloc[1:, -1].fillna("").tolist()
-    if not df_background.empty and df_background.shape[0] >= len(background_labels) + 1:
-        latest_background = df_background.iloc[1:, -1].fillna("").tolist()
+    if uploaded_voice is not None:
+        try:
+            df_voice = pd.read_csv(uploaded_voice, header=None)
+            if df_voice.shape[0] >= len(voice_labels) + 1:
+                latest_voice = df_voice.iloc[1:, -1].fillna("").tolist()
+        except Exception:
+            st.warning("⚠️ Could not load voice_input.csv")
+
+    if uploaded_background is not None:
+        try:
+            df_background = pd.read_csv(uploaded_background, header=None)
+            if df_background.shape[0] >= len(background_labels) + 1:
+                latest_background = df_background.iloc[1:, -1].fillna("").tolist()
+        except Exception:
+            st.warning("⚠️ Could not load background.csv")
 
 # --- App Title ---
 st.title("🧠 Narrative Copilot")
@@ -139,6 +149,7 @@ if "voice_input" in st.session_state and "background" in st.session_state and "s
     st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
     st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
     st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
+
 
 
 
