@@ -8,35 +8,27 @@ from dispatcher import orchestrate_story  # Your ML engine
 st.set_page_config(page_title="Narrative Copilot", layout="wide")
 st.title("🧠 Narrative Copilot")
 
-# --- Load Header Labels from uploaded headers.csv ---
+# --- Load Header Labels from headers.csv ---
 try:
     header_df = pd.read_csv("headers.csv", sep=";")
-    header_labels = {
-        "voice_input": header_df[header_df["InputSet"] == 1]["Label"].tolist(),
-        "background": header_df[header_df["InputSet"] == 2]["Label"].tolist()
-    }
+    voice_labels = header_df[header_df["InputSet"] == 1]["Label"].tolist()
+    background_labels = header_df[header_df["InputSet"] == 2]["Label"].tolist()
 except Exception as e:
     st.error("⚠️ Failed to load headers.csv.")
-    header_labels = {"voice_input": [], "background": []}
+    voice_labels, background_labels = [], []
 
-# --- Upload Section ---
-st.sidebar.header("Upload Your Inputs")
+# --- Sidebar: Upload + Prefill Toggle ---
+st.sidebar.header("Upload Your Previous Inputs")
 uploaded_files = st.sidebar.file_uploader(
-    "Upload 2 CSV files: voice_input.csv and background.csv",
+    "Upload voice_input.csv and background.csv",
     type="csv",
     accept_multiple_files=True
 )
 
-# --- Clarification Input ---
-st.subheader("Clarify Your Voice Inputs")
-clarification = st.text_area(
-    "Add any clarifying notes, emotional tone, or narrative intent you'd like the story to reflect",
-    placeholder="e.g., Make the story emotionally layered and reflective..."
-)
+prefill_toggle = st.sidebar.checkbox("Prefill with uploaded session")
 
 # --- Parse Uploaded Files ---
 inputs = {}
-missing_keys = []
 EXPECTED_FILES = ["voice_input", "background"]
 
 if uploaded_files:
@@ -45,14 +37,23 @@ if uploaded_files:
         df = pd.read_csv(file, header=None)
         inputs[key] = df
 
-    for key in EXPECTED_FILES:
-        if key not in inputs:
-            missing_keys.append(key)
+# --- Voice Input Section ---
+st.subheader("Clarify Your Voice Inputs")
+voice_inputs = []
+for i, label in enumerate(voice_labels):
+    default_value = ""
+    if prefill_toggle and "voice_input" in inputs and i < len(inputs["voice_input"]):
+        default_value = inputs["voice_input"].iloc[i, 0]
+    voice_inputs.append(st.text_area(label, value=default_value, key=f"voice_{i}"))
 
-    if missing_keys:
-        st.warning(f"Missing required files: {', '.join(missing_keys)}")
-else:
-    st.info("Please upload both voice_input.csv and background.csv to proceed.")
+# --- Background Input Section ---
+st.subheader("Background Context")
+background_inputs = []
+for i, label in enumerate(background_labels):
+    default_value = ""
+    if prefill_toggle and "background" in inputs and i < len(inputs["background"]):
+        default_value = inputs["background"].iloc[i, 0]
+    background_inputs.append(st.text_area(label, value=default_value, key=f"background_{i}"))
 
 # --- Versioning Helper ---
 def get_session_label(existing_df):
@@ -63,8 +64,11 @@ def get_session_label(existing_df):
     return f"Session {today} (v{version})"
 
 # --- Generate Story ---
-if st.button("Generate Storyline") and not missing_keys:
-    inputs["clarification"] = clarification
+if st.button("Generate Storyline"):
+    inputs["voice_input"] = pd.DataFrame([[v] for v in voice_inputs])
+    inputs["background"] = pd.DataFrame([[b] for b in background_inputs])
+    inputs["clarification"] = "User clarification embedded in inputs"
+
     story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
 
     if "story_output" not in st.session_state:
@@ -72,12 +76,11 @@ if st.button("Generate Storyline") and not missing_keys:
 
     session_label = get_session_label(st.session_state["story_output"])
 
-    # Insert timestamped column into each input
+    # Insert session column into each input
     for key in EXPECTED_FILES:
         df = inputs[key]
         new_col = pd.Series(df.iloc[:, 0].tolist(), name=session_label)
-        updated_df = pd.concat([df, new_col], axis=1)
-        inputs[key] = updated_df
+        inputs[key] = pd.concat([df, new_col], axis=1)
 
     # Save story output
     story_df = pd.DataFrame([story_output], columns=[session_label])
@@ -85,17 +88,6 @@ if st.button("Generate Storyline") and not missing_keys:
 
     st.success("✅ Storyline generated successfully!")
     st.text_area("Generated Storyline", story_output, height=400)
-
-# --- Display Inputs with Row Labels ---
-st.subheader("📋 Input Previews")
-for key in EXPECTED_FILES:
-    if key in inputs:
-        st.markdown(f"**{key.replace('_', ' ').title()}**")
-        labels = header_labels.get(key, [])
-        df = inputs[key]
-        for i in range(len(df)):
-            label = labels[i] if i < len(labels) else f"Row {i+1}"
-            st.caption(f"{label}: {df.iloc[i, 0]}")
 
 # --- Download Buttons ---
 st.subheader("📁 Download Your Files")
@@ -134,3 +126,4 @@ if "story_output" in st.session_state and not st.session_state["story_output"].e
         st.session_state["story_output"].columns[::-1]
     )
     st.text_area("Storyline Preview", st.session_state["story_output"][selected_col].iloc[0], height=300)
+
