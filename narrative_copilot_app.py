@@ -76,16 +76,19 @@ if st.button("Generate Storyline"):
     voice_df = pd.DataFrame(voice_column)
     background_df = pd.DataFrame(background_column)
 
-    # Append session column to each input
-    for key, df, column_data in zip(EXPECTED_FILES, [voice_df, background_df], [voice_column, background_column]):
-        if key in inputs and not inputs[key].empty:
-            if inputs[key].shape[1] == 1:
-                inputs[key].columns = ["Initial"]
-            inputs[key][session_label] = pd.Series(column_data)
-        else:
+# --- Append session column to each input ---
+for key, column_data in zip(EXPECTED_FILES, [voice_column, background_column]):
+    if key in inputs and not inputs[key].empty:
+        df = inputs[key]
+        if df.shape[1] == 1:
             df.columns = ["Initial"]
-            df[session_label] = pd.Series(column_data)
-            inputs[key] = df
+        df[session_label] = pd.Series(column_data)
+        inputs[key] = df
+    else:
+        df = pd.DataFrame(column_data)
+        df.columns = ["Initial"]
+        df[session_label] = pd.Series(column_data)
+        inputs[key] = df
 
     # Run ML engine
     inputs["clarification"] = "User clarification embedded in inputs"
