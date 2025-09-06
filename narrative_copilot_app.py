@@ -20,8 +20,8 @@ st.sidebar.markdown("---")
 input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"], key="input_mode_selector")
 
 # --- Load Uploaded Files with pipe delimiter ---
-df_voice = pd.read_csv(uploaded_voice, header=None, sep="|") if uploaded_voice else pd.DataFrame()
-df_background = pd.read_csv(uploaded_background, header=None, sep="|") if uploaded_background else pd.DataFrame()
+df_voice = pd.read_csv(uploaded_voice, sep="|") if uploaded_voice else pd.DataFrame()
+df_background = pd.read_csv(uploaded_background, sep="|") if uploaded_background else pd.DataFrame()
 df_story = pd.read_csv(uploaded_story, sep="|") if uploaded_story else pd.DataFrame(index=[0])
 
 # --- Prefill Logic (read first column, skip date row) ---
@@ -70,25 +70,28 @@ if inputs_filled and st.button("Generate Storyline"):
     col_background = f"Session {session_date} ({count_background})"
     col_story = f"Session {session_date} ({count_story})"
 
-    # Build new session as a column
-    new_voice_column = [session_date] + voice_inputs
-    new_background_column = [session_date] + background_inputs
+    # Build new session as Series
+    new_voice_series = pd.Series([session_date] + voice_inputs, name=col_voice)
+    new_background_series = pd.Series([session_date] + background_inputs, name=col_background)
 
-    # Convert to DataFrame with one column
-    new_voice_df = pd.DataFrame(new_voice_column)
-    new_background_df = pd.DataFrame(new_background_column)
+    # Pad existing DataFrames
+    max_voice_rows = max(len(new_voice_series), df_voice.shape[0])
+    max_background_rows = max(len(new_background_series), df_background.shape[0])
 
-    # Pad existing DataFrames to match new column length
-    while df_voice.shape[0] < new_voice_df.shape[0]:
+    while df_voice.shape[0] < max_voice_rows:
         df_voice.loc[len(df_voice)] = ["" for _ in range(df_voice.shape[1])]
-    while df_background.shape[0] < new_background_df.shape[0]:
+    while df_background.shape[0] < max_background_rows:
         df_background.loc[len(df_background)] = ["" for _ in range(df_background.shape[1])]
 
-    # Concatenate horizontally with new column first
-    df_voice = pd.concat([new_voice_df, df_voice], axis=1)
-    df_voice.columns = [col_voice] + list(df_voice.columns[1:])
-    df_background = pd.concat([new_background_df, df_background], axis=1)
-    df_background.columns = [col_background] + list(df_background.columns[1:])
+    # Pad new Series
+    if len(new_voice_series) < max_voice_rows:
+        new_voice_series = new_voice_series.append(pd.Series([""] * (max_voice_rows - len(new_voice_series))), ignore_index=True)
+    if len(new_background_series) < max_background_rows:
+        new_background_series = new_background_series.append(pd.Series([""] * (max_background_rows - len(new_background_series))), ignore_index=True)
+
+    # Insert new session as first column
+    df_voice.insert(0, col_voice, new_voice_series)
+    df_background.insert(0, col_background, new_background_series)
 
     # Run ML engine
     inputs = {
@@ -101,10 +104,10 @@ if inputs_filled and st.button("Generate Storyline"):
     new_story = pd.Series([story_output], name=col_story)
     df_story = pd.concat([new_story, df_story], axis=1)
 
-    # Save updated CSVs with pipe delimiter
-    df_voice.to_csv("voice_input.csv", index=False, header=False, sep="|", encoding="utf-8")
-    df_background.to_csv("background.csv", index=False, header=False, sep="|", encoding="utf-8")
-    df_story.to_csv("story_output.csv", index=False, sep="|", encoding="utf-8")
+    # Save updated CSVs with headers and pipe delimiter
+    df_voice.to_csv("voice_input.csv", index=False, header=True, sep="|", encoding="utf-8")
+    df_background.to_csv("background.csv", index=False, header=True, sep="|", encoding="utf-8")
+    df_story.to_csv("story_output.csv", index=False, header=True, sep="|", encoding="utf-8")
 
     # Store in session
     st.session_state["voice_input"] = df_voice
@@ -141,9 +144,9 @@ if "voice_input" in st.session_state and "background" in st.session_state and "s
     buffer_voice = io.StringIO()
     buffer_background = io.StringIO()
     buffer_story = io.StringIO()
-    st.session_state["voice_input"].to_csv(buffer_voice, index=False, header=False, sep="|")
-    st.session_state["background"].to_csv(buffer_background, index=False, header=False, sep="|")
-    st.session_state["story_output"].to_csv(buffer_story, index=False, sep="|")
+    st.session_state["voice_input"].to_csv(buffer_voice, index=False, header=True, sep="|")
+    st.session_state["background"].to_csv(buffer_background, index=False, header=True, sep="|")
+    st.session_state["story_output"].to_csv(buffer_story, index=False, header=True, sep="|")
     buffer_voice.seek(0)
     buffer_background.seek(0)
     buffer_story.seek(0)
@@ -151,6 +154,7 @@ if "voice_input" in st.session_state and "background" in st.session_state and "s
     st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
     st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
     st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
+
 
 
 
