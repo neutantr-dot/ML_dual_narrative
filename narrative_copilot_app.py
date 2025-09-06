@@ -15,7 +15,10 @@ uploaded_voice = st.sidebar.file_uploader("Upload voice_input.csv", type="csv")
 uploaded_background = st.sidebar.file_uploader("Upload background.csv", type="csv")
 uploaded_story = st.sidebar.file_uploader("Upload story_output.csv", type="csv")
 
-# --- Load Uploaded or Fallback ---
+# --- Input Mode Toggle (must come before using input_mode) ---
+st.sidebar.markdown("---")
+input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"])
+
 # --- Load Uploaded or Fallback ---
 df_voice = pd.DataFrame()
 df_background = pd.DataFrame()
@@ -42,7 +45,6 @@ if input_mode == "Edit Last Session":
                 latest_background = raw_background.iloc[1:, -1].fillna("").tolist()
         except Exception:
             st.warning("⚠️ Could not load background.csv")
-
 
 # --- Input Mode Toggle ---
 st.sidebar.markdown("---")
