@@ -37,6 +37,14 @@ if uploaded_files:
         df = pd.read_csv(file, header=None)
         inputs[key] = df
 
+# --- Ordinal Date Formatter ---
+def format_session_date():
+    now = datetime.now()
+    day = now.day
+    suffix = "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+    formatted = now.strftime(f"%a %b {day}{suffix}, %Y")
+    return formatted
+
 # --- Voice Input Section ---
 st.subheader("Clarify Your Voice Inputs")
 voice_inputs = []
@@ -57,7 +65,7 @@ for i, label in enumerate(background_labels):
 
 # --- Versioning Helper ---
 def get_session_label(existing_df):
-    today = datetime.now().strftime("%a, %b %d")
+    today = format_session_date()
     version = 1
     if existing_df is not None and not existing_df.empty:
         version = sum([1 for col in existing_df.columns if today in col]) + 1
@@ -65,42 +73,41 @@ def get_session_label(existing_df):
 
 # --- Generate Story ---
 if st.button("Generate Storyline"):
+    session_date = format_session_date()
     session_label = get_session_label(st.session_state.get("story_output", pd.DataFrame()))
-    session_date = datetime.now().strftime("%a, %b %d")
 
-# Build new columns with session label + inputs
-voice_column = [session_date] + voice_inputs
-background_column = [session_date] + background_inputs
+    # Build new columns with session date + inputs
+    voice_column = [session_date] + voice_inputs
+    background_column = [session_date] + background_inputs
 
-# Create DataFrames
-voice_df = pd.DataFrame(voice_column)
-background_df = pd.DataFrame(background_column)
+    # Create DataFrames
+    voice_df = pd.DataFrame(voice_column)
+    background_df = pd.DataFrame(background_column)
 
-# Append session column to each input
-for key, df, column_data in zip(EXPECTED_FILES, [voice_df, background_df], [voice_column, background_column]):
-    if key in inputs and not inputs[key].empty:
-        if inputs[key].shape[1] == 1:
-            inputs[key].columns = ["Initial"]
-        inputs[key][session_label] = pd.Series(column_data)
-    else:
-        df.columns = ["Initial"]
-        df[session_label] = pd.Series(column_data)
-        inputs[key] = df
+    # Append session column to each input
+    for key, df, column_data in zip(EXPECTED_FILES, [voice_df, background_df], [voice_column, background_column]):
+        if key in inputs and not inputs[key].empty:
+            if inputs[key].shape[1] == 1:
+                inputs[key].columns = ["Initial"]
+            inputs[key][session_label] = pd.Series(column_data)
+        else:
+            df.columns = ["Initial"]
+            df[session_label] = pd.Series(column_data)
+            inputs[key] = df
 
-# Run ML engine
-inputs["clarification"] = "User clarification embedded in inputs"
-story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
+    # Run ML engine
+    inputs["clarification"] = "User clarification embedded in inputs"
+    story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
 
-# Save story output
-if "story_output" not in st.session_state:
-     st.session_state["story_output"] = pd.DataFrame()
+    # Save story output
+    if "story_output" not in st.session_state:
+        st.session_state["story_output"] = pd.DataFrame()
 
-story_df = pd.DataFrame([story_output], columns=[session_label])
-st.session_state["story_output"] = pd.concat([st.session_state["story_output"], story_df], axis=1)
+    story_df = pd.DataFrame([story_output], columns=[session_label])
+    st.session_state["story_output"] = pd.concat([st.session_state["story_output"], story_df], axis=1)
 
-st.success("✅ Storyline generated successfully!")
-st.text_area("Generated Storyline", story_output, height=400, key="story_output_area")
-
+    st.success("✅ Storyline generated successfully!")
+    st.text_area("Generated Storyline", story_output, height=400, key="story_output_area")
 
 # --- Download Buttons ---
 st.subheader("📁 Download Your Files")
@@ -139,5 +146,6 @@ if "story_output" in st.session_state and not st.session_state["story_output"].e
         st.session_state["story_output"].columns[::-1]
     )
     st.text_area("Storyline Preview", st.session_state["story_output"][selected_col].iloc[0], height=300)
+
 
 
