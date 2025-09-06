@@ -70,27 +70,23 @@ if inputs_filled and st.button("Generate Storyline"):
     col_background = f"Session {session_date} ({count_background})"
     col_story = f"Session {session_date} ({count_story})"
 
-    # Build new columns with date + inputs
-    new_voice = [session_date] + voice_inputs
-    new_background = [session_date] + background_inputs
+    # Build new session as a column
+    new_voice_column = [session_date] + voice_inputs
+    new_background_column = [session_date] + background_inputs
 
-    def insert_column_front(df, new_data, col_name):
-        new_series = pd.Series(new_data, name=col_name)
-        max_rows = max(len(new_series), df.shape[0])
+    # Convert to DataFrame with one column
+    new_voice_df = pd.DataFrame(new_voice_column)
+    new_background_df = pd.DataFrame(new_background_column)
 
-        # Pad existing DataFrame
-        while df.shape[0] < max_rows:
-            df.loc[len(df)] = ["" for _ in range(df.shape[1])]
+    # Pad existing DataFrames to match new column length
+    while df_voice.shape[0] < new_voice_df.shape[0]:
+        df_voice.loc[len(df_voice)] = ["" for _ in range(df_voice.shape[1])]
+    while df_background.shape[0] < new_background_df.shape[0]:
+        df_background.loc[len(df_background)] = ["" for _ in range(df_background.shape[1])]
 
-        # Pad new column
-        if len(new_series) < max_rows:
-            new_series = new_series.append(pd.Series([""] * (max_rows - len(new_series))), ignore_index=True)
-
-        df.insert(0, col_name, new_series)
-        return df
-
-    df_voice = insert_column_front(df_voice, new_voice, col_voice)
-    df_background = insert_column_front(df_background, new_background, col_background)
+    # Concatenate horizontally with new column first
+    df_voice = pd.concat([new_voice_df, df_voice], axis=1)
+    df_background = pd.concat([new_background_df, df_background], axis=1)
 
     # Run ML engine
     inputs = {
@@ -147,6 +143,7 @@ if "voice_input" in st.session_state and "background" in st.session_state and "s
     st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
     st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
     st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
+
 
 
 
