@@ -1,7 +1,7 @@
-import io
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import io
 from dispatcher import orchestrate_story  # Your ML engine
 
 # --- Load Header Labels ---
@@ -24,7 +24,7 @@ df_voice = pd.read_csv(uploaded_voice) if uploaded_voice else pd.DataFrame(index
 df_background = pd.read_csv(uploaded_background) if uploaded_background else pd.DataFrame(index=range(len(background_labels)))
 df_story = pd.read_csv(uploaded_story) if uploaded_story else pd.DataFrame(index=[0])
 
-# --- Prefetch Logic ---
+# --- Prefetch Logic (from first column) ---
 latest_voice = df_voice.iloc[:, 0].fillna("").astype(str).tolist() if input_mode == "Edit Last Session" and not df_voice.empty else [""] * len(voice_labels)
 latest_background = df_background.iloc[:, 0].fillna("").astype(str).tolist() if input_mode == "Edit Last Session" and not df_background.empty else [""] * len(background_labels)
 
@@ -50,7 +50,7 @@ if all(voice_inputs + background_inputs) and st.button("Generate Storyline"):
     session_date = datetime.now().strftime("%a, %b %d, %Y")
     session_name = f"Session {session_date}"
 
-    # Insert new column at position 0 (first column)
+    # Insert new session as first column
     df_voice.insert(0, session_name, voice_inputs)
     df_background.insert(0, session_name, background_inputs)
 
@@ -68,6 +68,11 @@ if all(voice_inputs + background_inputs) and st.button("Generate Storyline"):
     df_voice.to_csv("voice_input.csv", index=False, encoding="utf-8")
     df_background.to_csv("background.csv", index=False, encoding="utf-8")
     df_story.to_csv("story_output.csv", index=False, encoding="utf-8")
+
+    # Store in session
+    st.session_state["voice_input"] = df_voice
+    st.session_state["background"] = df_background
+    st.session_state["story_output"] = df_story
 
     st.success("✅ Storyline generated successfully!")
     st.text_area("Generated Storyline", story_output, height=400)
@@ -106,6 +111,7 @@ if not df_voice.empty and not df_background.empty and not df_story.empty:
     st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
     st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
     st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
+
 
 
 
