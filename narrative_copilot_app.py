@@ -4,11 +4,18 @@ import io
 from datetime import datetime
 from dispatcher import orchestrate_story  # Your ML engine
 
+# --- Ordinal Date Formatter ---
+def format_session_date():
+    now = datetime.now()
+    day = now.day
+    suffix = "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+    return now.strftime(f"%a %b {day}{suffix}, %Y")
+
 # --- Page Setup ---
 st.set_page_config(page_title="Narrative Copilot", layout="wide")
 st.title("🧠 Narrative Copilot")
 
-# --- Load Header Labels from headers.csv ---
+# --- Load Header Labels ---
 try:
     header_df = pd.read_csv("headers.csv", sep=";")
     voice_labels = header_df[header_df["InputSet"] == 1]["Label"].tolist()
@@ -17,94 +24,74 @@ except Exception as e:
     st.error("⚠️ Failed to load headers.csv.")
     voice_labels, background_labels = [], []
 
-# --- Sidebar: Upload + Prefill Toggle ---
+# --- Sidebar Upload ---
 st.sidebar.header("Upload Previous Session Files")
 uploaded_files = st.sidebar.file_uploader(
     "Upload voice_input.csv and background.csv",
     type="csv",
     accept_multiple_files=True
 )
-
 prefill_toggle = st.sidebar.checkbox("Prefill with uploaded session")
 
 # --- Parse Uploaded Files ---
 inputs = {}
 EXPECTED_FILES = ["voice_input", "background"]
+for file in uploaded_files or []:
+    key = file.name.replace(".csv", "").replace(" (2)", "").replace(" (3)", "")
+    df = pd.read_csv(file, header=None)
+    inputs[key] = df
 
-if uploaded_files:
-    for file in uploaded_files:
-        key = file.name.replace(".csv", "").replace(" (2)", "").replace(" (3)", "")
-        df = pd.read_csv(file, header=None)
-        inputs[key] = df
-
-# --- Ordinal Date Formatter ---
-def format_session_date():
-    now = datetime.now()
-    day = now.day
-    suffix = "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
-    formatted = now.strftime(f"%a %b {day}{suffix}, %Y")
-    return formatted
-
-# --- Voice Input Section ---
+# --- Input Sections ---
 st.subheader("Clarify Your Voice Inputs")
 voice_inputs = []
 for i, label in enumerate(voice_labels):
-    default_value = ""
-    if prefill_toggle and "voice_input" in inputs and i + 1 < len(inputs["voice_input"]):
-        default_value = inputs["voice_input"].iloc[i + 1, 0]
-    voice_inputs.append(st.text_area(label, value=default_value, key=f"voice_{i}"))
+    default = inputs.get("voice_input").iloc[i + 1, 0] if prefill_toggle and "voice_input" in inputs else ""
+    voice_inputs.append(st.text_area(label, value=default, key=f"voice_{i}"))
 
-# --- Background Input Section ---
 st.subheader("Background Context")
 background_inputs = []
 for i, label in enumerate(background_labels):
-    default_value = ""
-    if prefill_toggle and "background" in inputs and i + 1 < len(inputs["background"]):
-        default_value = inputs["background"].iloc[i + 1, 0]
-    background_inputs.append(st.text_area(label, value=default_value, key=f"background_{i}"))
-
-# --- Versioning Helper ---
-def get_session_label(existing_df):
-    today = format_session_date()
-    version = 1
-    if existing_df is not None and not existing_df.empty:
-        version = sum([1 for col in existing_df.columns if today in col]) + 1
-    return f"{today} (v{version})"
+    default = inputs.get("background").iloc[i + 1, 0] if prefill_toggle and "background" in inputs else ""
+    background_inputs.append(st.text_area(label, value=default, key=f"background_{i}"))
 
 # --- Generate Story ---
 if st.button("Generate Storyline"):
     session_date = format_session_date()
-    session_label = get_session_label(st.session_state.get("story_output", pd.DataFrame()))
 
-    # Build new columns with session date + inputs
-    voice_column = [session_date] + voice_inputs
-    background_column = [session_date] + background_inputs
+    def count_existing(df, base_date):
+        return sum([1 for col in df.columns if col.startswith(f"Session {base_date}")])
 
-    # Create DataFrames
-    voice_df = pd.DataFrame(voice_column)
-    background_df = pd.DataFrame(background_column)
+    base_date = session_date
+    count_voice = count_existing(inputs.get("voice_input", pd.DataFrame()), base_date) + 1
+    count_bg = count_existing(inputs.get("background", pd.DataFrame()), base_date) + 1
+    count_story = count_existing(st.session_state.get("story_output", pd.DataFrame()), base_date) + 1
 
-    # Append session column to each input
-    for key, df, column_data in zip(EXPECTED_FILES, [voice_df, background_df], [voice_column, background_column]):
-        if key in inputs and not inputs[key].empty:
-            if inputs[key].shape[1] == 1:
-                inputs[key].columns = ["Initial"]
-            inputs[key][session_label] = pd.Series(column_data)
+    label_voice = f"Session {base_date} ({count_voice})"
+    label_bg = f"Session {base_date} ({count_bg})"
+    label_story = f"Session {base_date} ({count_story})"
+
+    # Build new columns
+    voice_column = pd.Series([session_date] + voice_inputs, name=label_voice)
+    background_column = pd.Series([session_date] + background_inputs, name=label_bg)
+
+    # Append to inputs
+    for key, new_col in zip(EXPECTED_FILES, [voice_column, background_column]):
+        df = inputs.get(key, pd.DataFrame())
+        if df.empty:
+            df = pd.DataFrame({new_col.name: new_col})
         else:
-            df.columns = ["Initial"]
-            df[session_label] = pd.Series(column_data)
-            inputs[key] = df
+            df = pd.concat([df, new_col], axis=1)
+        inputs[key] = df
 
     # Run ML engine
     inputs["clarification"] = "User clarification embedded in inputs"
     story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
 
-    # Save story output
+    # Append story output
     if "story_output" not in st.session_state:
-        st.session_state["story_output"] = pd.DataFrame()
-
-    story_df = pd.DataFrame([story_output], columns=[session_label])
-    st.session_state["story_output"] = pd.concat([st.session_state["story_output"], story_df], axis=1)
+        st.session_state["story_output"] = pd.DataFrame(index=[0])
+    story_col = pd.Series([story_output], name=label_story)
+    st.session_state["story_output"] = pd.concat([st.session_state["story_output"], story_col], axis=1)
 
     st.success("✅ Storyline generated successfully!")
     st.text_area("Generated Storyline", story_output, height=400, key="story_output_area")
@@ -126,7 +113,6 @@ for key in EXPECTED_FILES:
 
 # --- Download Story Output ---
 if "story_output" in st.session_state and not st.session_state["story_output"].empty:
-    st.markdown("**Story Output**")
     buffer = io.StringIO()
     st.session_state["story_output"].to_csv(buffer, index=False)
     buffer.seek(0)
@@ -146,6 +132,7 @@ if "story_output" in st.session_state and not st.session_state["story_output"].e
         st.session_state["story_output"].columns[::-1]
     )
     st.text_area("Storyline Preview", st.session_state["story_output"][selected_col].iloc[0], height=300)
+
 
 
 
