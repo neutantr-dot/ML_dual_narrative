@@ -1,9 +1,10 @@
 InputSet,Field,Label
-1,input1_1,Enter a thought about nature
-1,input1_2,Describe a feeling you had today
-1,input1_3,Mention a color that inspires you
-1,input1_4,Write a short phrase about dreams
-2,input2_1,Share a memory from childhood
-2,input2_2,Name a place you want to visit
-2,input2_3,Describe your favorite season
-2,input2_4,Write a line about hope
+1,input1_1,Enter your thoughts, your inner voice duting argument
+1,input1_2,Describe what you actually said
+1,input1_3,Describe what your partner said
+1,input1_4,Describe location where argument happened like at home, outside e.g. dinner, outing, or on the way
+2,input2_1,Describe about your work, hobbies 
+2,input2_2,Describe how you feel about money to live, work/life balance, your energy feeling exhausted?
+2,input2_3,Describe about ambitions, distractions, social media scrolling, friends, family 
+2,input2_4,Describe about your mood, how you want you and your partner to be together
+2,input2_5,Describe your overall feeling and how you want it to be
