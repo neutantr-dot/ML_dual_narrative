@@ -33,7 +33,7 @@ EXPECTED_FILES = ["voice_input", "background"]
 
 if uploaded_files:
     for file in uploaded_files:
-        key = file.name.replace(".csv", "")
+        key = file.name.replace(".csv", "").replace(" (2)", "").replace(" (3)", "")
         df = pd.read_csv(file, header=None)
         inputs[key] = df
 
@@ -42,8 +42,8 @@ st.subheader("Clarify Your Voice Inputs")
 voice_inputs = []
 for i, label in enumerate(voice_labels):
     default_value = ""
-    if prefill_toggle and "voice_input" in inputs and i < len(inputs["voice_input"]):
-        default_value = inputs["voice_input"].iloc[i+1, 0]
+    if prefill_toggle and "voice_input" in inputs and i + 1 < len(inputs["voice_input"]):
+        default_value = inputs["voice_input"].iloc[i + 1, 0]
     voice_inputs.append(st.text_area(label, value=default_value, key=f"voice_{i}"))
 
 # --- Background Input Section ---
@@ -51,13 +51,13 @@ st.subheader("Background Context")
 background_inputs = []
 for i, label in enumerate(background_labels):
     default_value = ""
-    if prefill_toggle and "background" in inputs and i < len(inputs["background"]):
-        default_value = inputs["background"].iloc[i+1, 0]
+    if prefill_toggle and "background" in inputs and i + 1 < len(inputs["background"]):
+        default_value = inputs["background"].iloc[i + 1, 0]
     background_inputs.append(st.text_area(label, value=default_value, key=f"background_{i}"))
 
 # --- Versioning Helper ---
 def get_session_label(existing_df):
-    today = datetime.now().strftime("%a, %b %d (%-I)")
+    today = datetime.now().strftime("%a, %b %d")
     version = 1
     if existing_df is not None and not existing_df.empty:
         version = sum([1 for col in existing_df.columns if today in col]) + 1
@@ -65,23 +65,31 @@ def get_session_label(existing_df):
 
 # --- Generate Story ---
 if st.button("Generate Storyline"):
-    inputs["voice_input"] = pd.DataFrame([[v] for v in voice_inputs])
-    inputs["background"] = pd.DataFrame([[b] for b in background_inputs])
-    inputs["clarification"] = "User clarification embedded in inputs"
+    session_label = get_session_label(st.session_state.get("story_output", pd.DataFrame()))
+    session_date = datetime.now().strftime("%a, %b %d")
 
+    # Build new columns with session label + inputs
+    voice_column = [session_date] + voice_inputs
+    background_column = [session_date] + background_inputs
+
+    # Create DataFrames
+    inputs["voice_input"] = pd.DataFrame(voice_column)
+    inputs["background"] = pd.DataFrame(background_column)
+
+    # Run ML engine
+    inputs["clarification"] = "User clarification embedded in inputs"
     story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
 
+    # Initialize session state
     if "story_output" not in st.session_state:
         st.session_state["story_output"] = pd.DataFrame()
 
-    session_label = get_session_label(st.session_state["story_output"])
-
     # Append session column to each input
-    for key in EXPECTED_FILES:
+    for key, column_data in zip(EXPECTED_FILES, [voice_column, background_column]):
         df = inputs[key]
         if df.shape[1] == 1:
             df.columns = ["Initial"]
-        df[session_label] = pd.Series(df.iloc[:, 0].tolist())
+        df[session_label] = pd.Series(column_data)
         inputs[key] = df
 
     # Save story output
@@ -128,3 +136,4 @@ if "story_output" in st.session_state and not st.session_state["story_output"].e
         st.session_state["story_output"].columns[::-1]
     )
     st.text_area("Storyline Preview", st.session_state["story_output"][selected_col].iloc[0], height=300)
+
