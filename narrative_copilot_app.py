@@ -19,30 +19,20 @@ uploaded_story = st.sidebar.file_uploader("Upload story_output.csv", type="csv")
 st.sidebar.markdown("---")
 input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"], key="input_mode_selector")
 
-# --- Load Uploaded Files Once ---
-df_voice = pd.DataFrame()
-df_background = pd.DataFrame()
+# --- Load Uploaded Files ---
+df_voice = pd.read_csv(uploaded_voice, header=None) if uploaded_voice else pd.DataFrame()
+df_background = pd.read_csv(uploaded_background, header=None) if uploaded_background else pd.DataFrame()
 df_story = pd.read_csv(uploaded_story) if uploaded_story else pd.DataFrame(index=[0])
 
+# --- Prefill Logic (read first column, skip date row) ---
 latest_voice = [""] * len(voice_labels)
 latest_background = [""] * len(background_labels)
 
 if input_mode == "Edit Last Session":
-    if uploaded_voice is not None:
-        try:
-            df_voice = pd.read_csv(uploaded_voice, header=None)
-            if df_voice.shape[0] >= len(voice_labels) + 1:
-                latest_voice = df_voice.iloc[1:, -1].fillna("").tolist()
-        except Exception:
-            st.warning("⚠️ Could not load voice_input.csv")
-
-    if uploaded_background is not None:
-        try:
-            df_background = pd.read_csv(uploaded_background, header=None)
-            if df_background.shape[0] >= len(background_labels) + 1:
-                latest_background = df_background.iloc[1:, -1].fillna("").tolist()
-        except Exception:
-            st.warning("⚠️ Could not load background.csv")
+    if not df_voice.empty and df_voice.shape[0] >= len(voice_labels) + 1:
+        latest_voice = df_voice.iloc[1:, 0].fillna("").tolist()
+    if not df_background.empty and df_background.shape[0] >= len(background_labels) + 1:
+        latest_background = df_background.iloc[1:, 0].fillna("").tolist()
 
 # --- App Title ---
 st.title("🧠 Narrative Copilot")
@@ -80,19 +70,20 @@ if inputs_filled and st.button("Generate Storyline"):
     col_background = f"Session {session_date} ({count_background})"
     col_story = f"Session {session_date} ({count_story})"
 
-    # Append new columns
+    # Build new columns with date + inputs
     new_voice = pd.Series([session_date] + voice_inputs, name=col_voice)
     new_background = pd.Series([session_date] + background_inputs, name=col_background)
 
+    # Insert new session as first column
     if df_voice.empty:
         df_voice = pd.DataFrame({col_voice: new_voice})
     else:
-        df_voice = pd.concat([df_voice, new_voice], axis=1)
+        df_voice.insert(0, col_voice, new_voice)
 
     if df_background.empty:
         df_background = pd.DataFrame({col_background: new_background})
     else:
-        df_background = pd.concat([df_background, new_background], axis=1)
+        df_background.insert(0, col_background, new_background)
 
     # Run ML engine
     inputs = {
@@ -103,7 +94,7 @@ if inputs_filled and st.button("Generate Storyline"):
     story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
 
     new_story = pd.Series([story_output], name=col_story)
-    df_story = pd.concat([df_story, new_story], axis=1)
+    df_story = pd.concat([new_story, df_story], axis=1)
 
     # Save updated CSVs
     df_voice.to_csv("voice_input.csv", index=False, header=False, encoding="utf-8")
@@ -121,17 +112,17 @@ if inputs_filled and st.button("Generate Storyline"):
 # --- History Viewers ---
 if not df_story.empty:
     st.subheader("🕰️ Browse Past Story Sessions")
-    selected_col = st.selectbox("Select a session to view its storyline", df_story.columns[::-1])
+    selected_col = st.selectbox("Select a session to view its storyline", df_story.columns)
     st.text_area("Storyline Preview", df_story[selected_col].iloc[0], height=300)
 
 if not df_voice.empty:
     st.subheader("📜 Browse Past Voice Inputs")
-    selected_col = st.selectbox("Select a session from voice_input.csv", df_voice.columns[::-1])
+    selected_col = st.selectbox("Select a session from voice_input.csv", df_voice.columns)
     st.text_area("Voice Input", "\n".join(df_voice[selected_col].dropna().astype(str)), height=150)
 
 if not df_background.empty:
     st.subheader("📘 Browse Past Background Inputs")
-    selected_col = st.selectbox("Select a session from background.csv", df_background.columns[::-1])
+    selected_col = st.selectbox("Select a session from background.csv", df_background.columns)
     st.text_area("Background Input", "\n".join(df_background[selected_col].dropna().astype(str)), height=150)
 
 # --- Download Buttons ---
