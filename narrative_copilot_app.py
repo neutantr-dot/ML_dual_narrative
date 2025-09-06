@@ -1,3 +1,4 @@
+import io
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -87,6 +88,24 @@ if not df_background.empty:
     selected_col = st.selectbox("Select a session from background.csv", df_background.columns)
     st.text_area("Background Input", "\n".join(df_background[selected_col].dropna().astype(str)), height=150)
 
+# --- Download Buttons ---
+if not df_voice.empty and not df_background.empty and not df_story.empty:
+    buffer_voice = io.StringIO()
+    buffer_background = io.StringIO()
+    buffer_story = io.StringIO()
+
+    df_voice.to_csv(buffer_voice, index=False, encoding="utf-8")
+    df_background.to_csv(buffer_background, index=False, encoding="utf-8")
+    df_story.to_csv(buffer_story, index=False, encoding="utf-8")
+
+    buffer_voice.seek(0)
+    buffer_background.seek(0)
+    buffer_story.seek(0)
+
+    st.subheader("📥 Download Your Updated Files")
+    st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
+    st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
+    st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
 
 
 
