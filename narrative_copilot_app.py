@@ -61,24 +61,23 @@ if all(voice_inputs + background_inputs) and st.button("Generate Storyline"):
 
     if df_story.shape[0] != 1:
         df_story = pd.DataFrame(index=[0])
-    df_story.insert(0, session_name, [orchestrate_story({
+
+    # Run ML engine
+    inputs = {
         "voice_input": pd.DataFrame([[v] for v in voice_inputs]),
         "background": pd.DataFrame([[b] for b in background_inputs]),
         "clarification": "User clarification embedded in inputs"
-    }, config_path="copilot_config.yaml")])
+    }
+    story_output = orchestrate_story(inputs, config_path="copilot_config.yaml")
+    df_story.insert(0, session_name, [story_output])
 
-    # Save updated CSVs
-    df_voice.to_csv("voice_input.csv", index=False, encoding="utf-8")
-    df_background.to_csv("background.csv", index=False, encoding="utf-8")
-    df_story.to_csv("story_output.csv", index=False, encoding="utf-8")
-
-    # Store in session
+    # Store updated DataFrames in session_state
     st.session_state["voice_input"] = df_voice
     st.session_state["background"] = df_background
     st.session_state["story_output"] = df_story
 
     st.success("✅ Storyline generated successfully!")
-    st.text_area("Generated Storyline", df_story.iloc[0, 0], height=400)
+    st.text_area("Generated Storyline", story_output, height=400)
 
 # --- History Viewers ---
 if not df_story.empty:
@@ -96,15 +95,15 @@ if not df_background.empty:
     selected_col = st.selectbox("Select a session from background.csv", df_background.columns)
     st.text_area("Background Input", "\n".join(df_background[selected_col].dropna().astype(str)), height=150)
 
-# --- Download Buttons ---
-if not df_voice.empty and not df_background.empty and not df_story.empty:
+# --- Download Buttons (from session_state) ---
+if "voice_input" in st.session_state and "background" in st.session_state and "story_output" in st.session_state:
     buffer_voice = io.StringIO()
     buffer_background = io.StringIO()
     buffer_story = io.StringIO()
 
-    df_voice.to_csv(buffer_voice, index=False, encoding="utf-8")
-    df_background.to_csv(buffer_background, index=False, encoding="utf-8")
-    df_story.to_csv(buffer_story, index=False, encoding="utf-8")
+    st.session_state["voice_input"].to_csv(buffer_voice, index=False, encoding="utf-8")
+    st.session_state["background"].to_csv(buffer_background, index=False, encoding="utf-8")
+    st.session_state["story_output"].to_csv(buffer_story, index=False, encoding="utf-8")
 
     buffer_voice.seek(0)
     buffer_background.seek(0)
@@ -114,8 +113,6 @@ if not df_voice.empty and not df_background.empty and not df_story.empty:
     st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
     st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
     st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
-
-
 
 
 
