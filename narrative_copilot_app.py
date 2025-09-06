@@ -43,7 +43,7 @@ voice_inputs = []
 for i, label in enumerate(voice_labels):
     default_value = ""
     if prefill_toggle and "voice_input" in inputs and i < len(inputs["voice_input"]):
-        default_value = inputs["voice_input"].iloc[i, 0]
+        default_value = inputs["voice_input"].iloc[i+1, 0]
     voice_inputs.append(st.text_area(label, value=default_value, key=f"voice_{i}"))
 
 # --- Background Input Section ---
@@ -52,7 +52,7 @@ background_inputs = []
 for i, label in enumerate(background_labels):
     default_value = ""
     if prefill_toggle and "background" in inputs and i < len(inputs["background"]):
-        default_value = inputs["background"].iloc[i, 0]
+        default_value = inputs["background"].iloc[i+1, 0]
     background_inputs.append(st.text_area(label, value=default_value, key=f"background_{i}"))
 
 # --- Versioning Helper ---
