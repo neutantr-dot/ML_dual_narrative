@@ -28,17 +28,15 @@ def parse_input_file(uploaded_file):
     content = uploaded_file.getvalue().decode("utf-8").splitlines()
     return [line.split(DELIMITER) for line in content]
 
-# Extract rows as individual fields
-def extract_prefill_rows(data, start_row, num_fields, enabled):
-    if enabled:
-        values = []
-        for i in range(num_fields):
-            row_index = start_row + i
-            if len(data) > row_index and len(data[row_index]) > 0:
-                values.append(data[row_index][0])
-            else:
-                values.append("")
-        return values
+# Extract available versions from uploaded files
+def extract_versions(data):
+    return [row[0] for row in data if len(row) > 0]
+
+# Prefill from selected version
+def prefill_from_version(data, version, num_fields):
+    for row in data:
+        if row[0] == version:
+            return (row[1:] + [""] * num_fields)[:num_fields]
     return [""] * num_fields
 
 # Append new row to file
@@ -70,9 +68,20 @@ st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 voice_data = parse_input_file(voice_file)
 background_data = parse_input_file(background_file)
 
-# Prefill from rows 2–5 and 2–6
-voice_prefill = extract_prefill_rows(voice_data, start_row=1, num_fields=4, enabled=prefill)
-background_prefill = extract_prefill_rows(background_data, start_row=1, num_fields=5, enabled=prefill)
+# Extract versions
+voice_versions = extract_versions(voice_data)
+background_versions = extract_versions(background_data)
+
+# Dropdown for version selection
+selected_version = None
+if prefill and voice_versions and background_versions:
+    common_versions = sorted(set(voice_versions) & set(background_versions), reverse=True)
+    if common_versions:
+        selected_version = st.sidebar.selectbox("📅 Choose version to prefill", common_versions)
+
+# Prefill logic
+voice_prefill = prefill_from_version(voice_data, selected_version, 4) if selected_version else [""] * 4
+background_prefill = prefill_from_version(background_data, selected_version, 5) if selected_version else [""] * 5
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
@@ -123,6 +132,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
