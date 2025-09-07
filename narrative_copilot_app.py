@@ -56,9 +56,6 @@ voice_file = st.sidebar.file_uploader("Upload voice_input.txt", type="txt")
 background_file = st.sidebar.file_uploader("Upload background.txt", type="txt")
 storyline_file = st.sidebar.file_uploader("Upload storyline.txt", type="txt")
 
-# Toggle for prefill
-prefill = st.sidebar.toggle("Enable Prefill", value=False)
-
 # Load headers
 headers_df = load_headers()
 
@@ -72,26 +69,14 @@ background_data = parse_input_file(background_file)
 voice_versions = extract_versions(voice_data)
 background_versions = extract_versions(background_data)
 
-# Main page dropdowns
-selected_voice_version = None
-selected_background_version = None
-
-if prefill:
-    st.markdown("### 📅 Choose Version to Prefill")
-    col1, col2 = st.columns(2)
-    with col1:
-        if voice_versions:
-            selected_voice_version = st.selectbox("Voice Input Version", sorted(voice_versions, reverse=True))
-    with col2:
-        if background_versions:
-            selected_background_version = st.selectbox("Background Version", sorted(background_versions, reverse=True))
-
-# Prefill logic
-voice_prefill = prefill_from_version(voice_data, selected_voice_version, 4) if selected_voice_version else [""] * 4
-background_prefill = prefill_from_version(background_data, selected_background_version, 5) if selected_background_version else [""] * 5
-
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
+selected_voice_version = None
+voice_prefill = [""] * 4
+if voice_versions:
+    selected_voice_version = st.selectbox("📅 Voice Input Version", sorted(voice_versions, reverse=True))
+    voice_prefill = prefill_from_version(voice_data, selected_voice_version, 4)
+
 voice_inputs = []
 for i in range(4):
     label_row = headers_df[
@@ -104,6 +89,12 @@ for i in range(4):
 
 # Section 2: Background
 st.subheader("🌄 Describe Your Background")
+selected_background_version = None
+background_prefill = [""] * 5
+if background_versions:
+    selected_background_version = st.selectbox("📅 Background Version", sorted(background_versions, reverse=True))
+    background_prefill = prefill_from_version(background_data, selected_background_version, 5)
+
 background_inputs = []
 for i in range(5):
     label_row = headers_df[
@@ -139,6 +130,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
