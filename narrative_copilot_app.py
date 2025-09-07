@@ -7,11 +7,11 @@ HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/
 NGROK_API_URL = "https://your-ngrok-url.ngrok.io/generate_story"  # Replace with your actual ngrok endpoint
 DATEVERSION = "Sun, Sept 7, 2025"
 
-# Load headers from GitHub (only first column)
+# Load headers from GitHub (use 3rd column)
 @st.cache_data
 def load_headers():
     df = pd.read_csv(HEADERS_URL, delimiter="|", header=None)
-    return df.iloc[:, 0]  # Only use the first column
+    return df.iloc[:, 2]  # Use third column for labels
 
 # Load uploaded CSVs
 def load_csv(file, delimiter="|"):
@@ -100,6 +100,7 @@ if st.button("Generate Story"):
 
     except requests.exceptions.RequestException as e:
         st.error(f"❌ Failed to generate story: {e}")
+
 
 
 
