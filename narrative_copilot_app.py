@@ -48,13 +48,19 @@ def parse_transposed_file(file_text):
                 data_by_version[versions[i]].append(value)
     return data_by_version, versions
 
-# Append new column to transposed file
-def append_column_to_transposed_file(file_text, new_column):
+# Generate version label with (1), (2), etc.
+def generate_version_label(existing_versions):
+    today = datetime.now().strftime("%a %b %d, %Y")
+    count = sum(1 for v in existing_versions if v.startswith(today))
+    return f"{today} ({count + 1})"
+
+# Insert new column at the beginning of transposed file
+def insert_column_to_transposed_file(file_text, new_column):
     rows = [line.split(DELIMITER) for line in file_text.splitlines()] if file_text else []
     while len(rows) < len(new_column):
         rows.append([])
     for i, value in enumerate(new_column):
-        rows[i].append(value)
+        rows[i].insert(0, value)
     return "\n".join([DELIMITER.join(row) for row in rows])
 
 # Streamlit UI
@@ -82,6 +88,7 @@ st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 # Parse transposed files
 voice_blocks, voice_versions = parse_transposed_file(st.session_state["voice_file_data"])
 background_blocks, background_versions = parse_transposed_file(st.session_state["background_file_data"])
+storyline_versions = parse_transposed_file(st.session_state["storyline_file_data"])[1]
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
@@ -126,29 +133,27 @@ if st.button("✨ Generate Dual Narrative Storyline"):
     st.text_area("Scroll through your story:", value="\n".join(storyline), height=400)
 
     # Prepare new columns and store in session state
-    timestamp = datetime.now().strftime("%a %b %d, %Y (%H:%M)")
-    st.session_state["new_voice_column"] = [timestamp] + voice_inputs
-    st.session_state["new_background_column"] = [timestamp] + background_inputs
-    st.session_state["new_storyline_column"] = [timestamp] + storyline
+    st.session_state["new_voice_column"] = [generate_version_label(voice_versions)] + voice_inputs
+    st.session_state["new_background_column"] = [generate_version_label(background_versions)] + background_inputs
+    st.session_state["new_storyline_column"] = [generate_version_label(storyline_versions)] + storyline
     st.session_state["story_generated"] = True
 
 # Persistent download buttons
 if st.session_state.get("story_generated"):
     st.download_button("⬇️ Save Updated Voice Input",
-        data=append_column_to_transposed_file(
+        data=insert_column_to_transposed_file(
             st.session_state["voice_file_data"], st.session_state["new_voice_column"]),
         file_name="voice_input.txt", mime="text/plain")
 
     st.download_button("⬇️ Save Updated Background",
-        data=append_column_to_transposed_file(
+        data=insert_column_to_transposed_file(
             st.session_state["background_file_data"], st.session_state["new_background_column"]),
         file_name="background.txt", mime="text/plain")
 
     st.download_button("⬇️ Save New Storyline",
-        data=append_column_to_transposed_file(
+        data=insert_column_to_transposed_file(
             st.session_state["storyline_file_data"], st.session_state["new_storyline_column"]),
         file_name="storyline.txt", mime="text/plain")
-
 
 
 
