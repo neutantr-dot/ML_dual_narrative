@@ -11,9 +11,14 @@ DELIMITER = "|"
 # Load headers from GitHub
 @st.cache_data
 def load_headers():
-    response = requests.get(HEADERS_URL)
-    df = pd.read_csv(StringIO(response.text))
-    return df
+    try:
+        response = requests.get(HEADERS_URL)
+        response.raise_for_status()
+        df = pd.read_csv(StringIO(response.text))
+        return df
+    except Exception as e:
+        st.error(f"⚠️ Could not load headers.csv: {e}")
+        return pd.DataFrame(columns=["file", "field", "label"])
 
 # Parse uploaded input file
 def parse_input_file(uploaded_file):
@@ -24,20 +29,22 @@ def parse_input_file(uploaded_file):
 
 # Append new row to file
 def append_to_file(existing_file, new_row):
+    if existing_file is None:
+        return DELIMITER.join(new_row)
     content = existing_file.getvalue().decode("utf-8").splitlines()
     content.insert(1, DELIMITER.join(new_row))  # Insert after header
     return "\n".join(content)
 
-# UI starts here
+# Streamlit UI
 st.set_page_config(page_title="Dual Narrative Co-Pilot", layout="wide")
-st.sidebar.title("📁 File Upload & Controls")
+st.sidebar.title("📁 Upload & Controls")
 
 # Upload files
 voice_file = st.sidebar.file_uploader("Upload voice_input.txt", type="txt")
 background_file = st.sidebar.file_uploader("Upload background.txt", type="txt")
 storyline_file = st.sidebar.file_uploader("Upload storyline.txt", type="txt")
 
-# Toggle
+# Toggle for prefill
 prefill = st.sidebar.toggle("Prefill from uploaded files", value=False)
 
 # Load headers
@@ -57,7 +64,7 @@ background_prefill = background_data[0][1:] if prefill and background_data else 
 st.subheader("🗣️ Describe Argument That Happened")
 voice_inputs = []
 for i in range(4):
-    label = headers_df[(headers_df["file"] == "voice_input") & (headers_df["field"] == f"input{i+1}")]["label"].values
+    label = headers_df.query("file == 'voice_input' and field == 'input{}'".format(i+1))["label"].values
     label_text = label[0] if len(label) > 0 else f"Voice Input {i+1}"
     value = st.text_input(label_text, value=voice_prefill[i])
     voice_inputs.append(value)
@@ -66,7 +73,7 @@ for i in range(4):
 st.subheader("🌄 Describe Your Background")
 background_inputs = []
 for i in range(5):
-    label = headers_df[(headers_df["file"] == "background") & (headers_df["field"] == f"input{i+1}")]["label"].values
+    label = headers_df.query("file == 'background' and field == 'input{}'".format(i+1))["label"].values
     label_text = label[0] if len(label) > 0 else f"Background Input {i+1}"
     value = st.text_input(label_text, value=background_prefill[i])
     background_inputs.append(value)
@@ -80,6 +87,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
         "Imagine a story that weaves emotional tension with personal history.",
         "Each line adds depth, empathy, and perspective.",
     ] + [f"Story line {i+1}" for i in range(16)]
+
     st.subheader("📜 Generated Storyline")
     st.text_area("Scroll through your story:", value="\n".join(storyline), height=400)
 
