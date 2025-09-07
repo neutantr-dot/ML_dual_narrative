@@ -14,7 +14,7 @@ def load_headers():
     try:
         response = requests.get(HEADERS_URL)
         response.raise_for_status()
-        df = pd.read_csv(StringIO(response.text))
+        df = pd.read_csv(StringIO(response.text), sep=DELIMITER, engine="python", quotechar='"', on_bad_lines='skip')
         return df
     except Exception as e:
         st.error(f"⚠️ Could not load headers.csv: {e}")
@@ -64,7 +64,7 @@ background_prefill = background_data[0][1:] if prefill and background_data else 
 st.subheader("🗣️ Describe Argument That Happened")
 voice_inputs = []
 for i in range(4):
-    label = headers_df.query("file == 'voice_input' and field == 'input{}'".format(i+1))["label"].values
+    label = headers_df.query("file == 'voic_input' and field == 'input{}'".format(i+1))["label"].values
     label_text = label[0] if len(label) > 0 else f"Voice Input {i+1}"
     value = st.text_input(label_text, value=voice_prefill[i])
     voice_inputs.append(value)
@@ -104,6 +104,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
