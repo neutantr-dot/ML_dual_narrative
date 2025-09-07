@@ -28,6 +28,12 @@ def parse_input_file(uploaded_file):
     content = uploaded_file.getvalue().decode("utf-8").splitlines()
     return [line.split(DELIMITER) for line in content]
 
+# Ensure prefill is safe and padded
+def safe_prefill(data, expected_fields):
+    if data and len(data[0]) > 1:
+        return (data[0][1:] + [""] * expected_fields)[:expected_fields]
+    return [""] * expected_fields
+
 # Append new row to file
 def append_to_file(existing_file, new_row):
     if existing_file is None:
@@ -57,9 +63,9 @@ st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 voice_data = parse_input_file(voice_file)
 background_data = parse_input_file(background_file)
 
-# Prefill logic
-voice_prefill = voice_data[0][1:] if prefill and voice_data else [""] * 4
-background_prefill = background_data[0][1:] if prefill and background_data else [""] * 5
+# Safe prefill
+voice_prefill = safe_prefill(voice_data, 4)
+background_prefill = safe_prefill(background_data, 5)
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
@@ -111,6 +117,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
