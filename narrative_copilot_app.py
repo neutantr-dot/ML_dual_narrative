@@ -19,11 +19,11 @@ def load_headers():
         response.raise_for_status()
         df = pd.read_csv(StringIO(response.text), sep=DELIMITER, engine="python", quotechar='"', on_bad_lines='skip')
         df.columns = df.columns.str.strip()
+        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
         return df
     except Exception as e:
         st.error(f"⚠️ Could not load headers.csv: {e}")
         return pd.DataFrame(columns=["Input_file", "Field", "Label"])
-
 # Cache uploaded file contents and objects in session state
 def cache_file(name, uploaded_file):
     if uploaded_file:
