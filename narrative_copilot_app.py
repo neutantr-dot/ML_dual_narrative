@@ -64,13 +64,11 @@ background_prefill = background_data[0][1:] if prefill and background_data else 
 st.subheader("🗣️ Describe Argument That Happened")
 voice_inputs = []
 for i in range(4):
-    file_val = "voic_input"
-    field_val = f"input{i+1}"
-    label = headers_df.query("file == @file_val and field == @field_val", local_dict={
-        "file_val": file_val,
-        "field_val": field_val
-    })["label"].values
-    label_text = label[0] if len(label) > 0 else f"Voice Input {i+1}"
+    label_row = headers_df[
+        (headers_df["file"] == "voic_input") &
+        (headers_df["field"] == f"input{i+1}")
+    ]
+    label_text = label_row["label"].values[0] if not label_row.empty else f"Voice Input {i+1}"
     value = st.text_input(label_text, value=voice_prefill[i])
     voice_inputs.append(value)
 
@@ -78,13 +76,11 @@ for i in range(4):
 st.subheader("🌄 Describe Your Background")
 background_inputs = []
 for i in range(5):
-    file_val = "background"
-    field_val = f"input{i+1}"
-    label = headers_df.query("file == @file_val and field == @field_val", local_dict={
-        "file_val": file_val,
-        "field_val": field_val
-    })["label"].values
-    label_text = label[0] if len(label) > 0 else f"Background Input {i+1}"
+    label_row = headers_df[
+        (headers_df["file"] == "background") &
+        (headers_df["field"] == f"input{i+1}")
+    ]
+    label_text = label_row["label"].values[0] if not label_row.empty else f"Background Input {i+1}"
     value = st.text_input(label_text, value=background_prefill[i])
     background_inputs.append(value)
 
