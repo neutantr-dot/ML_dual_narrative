@@ -41,10 +41,10 @@ def parse_transposed_file(uploaded_file):
 def append_to_file(existing_file, new_row):
     if existing_file is None:
         return DELIMITER.join(new_row)
-    content = uploaded_file.getvalue().decode("utf-8").splitlines()
+    content = existing_file.getvalue().decode("utf-8").splitlines()
     content.insert(1, DELIMITER.join(new_row))
     return "\n".join(content)
-
+    
 # Streamlit UI
 st.set_page_config(page_title="Dual Narrative Co-Pilot", layout="wide")
 st.sidebar.title("📁 Upload Files")
@@ -95,7 +95,7 @@ for i in range(5):
     label_text = label_row["Label"].values[0] if not label_row.empty else f"Background Input {i+1}"
     value = st.text_input(label_text, value=background_prefill[i])
     background_inputs.append(value)
-
+    
 # Generate storyline
 if st.button("✨ Generate Dual Narrative Storyline"):
     storyline = [
