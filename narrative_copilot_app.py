@@ -64,7 +64,12 @@ background_prefill = background_data[0][1:] if prefill and background_data else 
 st.subheader("🗣️ Describe Argument That Happened")
 voice_inputs = []
 for i in range(4):
-    label = headers_df.query("file == 'voic_input' and field == 'input{}'".format(i+1))["label"].values
+    file_val = "voic_input"
+    field_val = f"input{i+1}"
+    label = headers_df.query("file == @file_val and field == @field_val", local_dict={
+        "file_val": file_val,
+        "field_val": field_val
+    })["label"].values
     label_text = label[0] if len(label) > 0 else f"Voice Input {i+1}"
     value = st.text_input(label_text, value=voice_prefill[i])
     voice_inputs.append(value)
@@ -73,7 +78,12 @@ for i in range(4):
 st.subheader("🌄 Describe Your Background")
 background_inputs = []
 for i in range(5):
-    label = headers_df.query("file == 'background' and field == 'input{}'".format(i+1))["label"].values
+    file_val = "background"
+    field_val = f"input{i+1}"
+    label = headers_df.query("file == @file_val and field == @field_val", local_dict={
+        "file_val": file_val,
+        "field_val": field_val
+    })["label"].values
     label_text = label[0] if len(label) > 0 else f"Background Input {i+1}"
     value = st.text_input(label_text, value=background_prefill[i])
     background_inputs.append(value)
@@ -104,6 +114,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
