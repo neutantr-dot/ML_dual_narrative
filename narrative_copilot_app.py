@@ -63,6 +63,15 @@ def insert_column_to_transposed_file(file_text, new_column):
         rows[i].insert(0, value)
     return "\n".join([DELIMITER.join(row) for row in rows])
 
+# === ML Copilot Logic ===
+def ml_copilot(inputs):
+    story = [f"a dual narrative story line {i+1}" for i in range(STORYLINE_LINES)]
+    if not story or len(" ".join(story).strip()) < 20:
+        classification = "N/A"
+    else:
+        classification = "M3"  # Replace with real ML output
+    return story, classification
+
 # Streamlit UI
 st.set_page_config(page_title="Dual Narrative Co-Pilot", layout="wide")
 st.sidebar.title("📁 Upload Files")
@@ -98,7 +107,7 @@ voice_prefill = voice_blocks.get(selected_voice_version, [""] * VOICE_FIELDS) if
 voice_inputs = []
 for i in range(VOICE_FIELDS):
     label_row = headers_df[
-        (headers_df["Input_file"] == "voic_input") &
+        (headers_df["Input_file"] == "voice_input") &
         (headers_df["Field"] == f"input{i+1}")
     ]
     label_text = label_row["Label"].values[0] if not label_row.empty else f"Voice Input {i+1}"
@@ -122,21 +131,21 @@ for i in range(BACKGROUND_FIELDS):
 
 # Generate storyline
 if st.button("✨ Generate Dual Narrative Storyline"):
-    storyline = [
-        "This is a placeholder for your dual narrative.",
-        "It will reflect both the argument and your background.",
-        "Imagine a story that weaves emotional tension with personal history.",
-        "Each line adds depth, empathy, and perspective.",
-    ] + [f"Story line {i+1}" for i in range(STORYLINE_LINES)]
+    all_inputs = voice_inputs + background_inputs
+    storyline, classification = ml_copilot(all_inputs)
 
     st.subheader("📜 Generated Storyline")
     st.text_area("Scroll through your story:", value="\n".join(storyline), height=400)
 
-    # Prepare new columns and store in session state
-    st.session_state["new_voice_column"] = [generate_version_label(voice_versions)] + voice_inputs
-    st.session_state["new_background_column"] = [generate_version_label(background_versions)] + background_inputs
-    st.session_state["new_storyline_column"] = [generate_version_label(storyline_versions)] + storyline
+    version_label = generate_version_label(storyline_versions)
+    st.session_state["new_voice_column"] = [version_label] + voice_inputs
+    st.session_state["new_background_column"] = [version_label] + background_inputs
+    st.session_state["new_storyline_column"] = [version_label] + storyline
     st.session_state["story_generated"] = True
+
+    # Optional: log classification
+    with open("classification.csv", "a") as f:
+        f.write(f"{version_label}, user 1, {classification}\n")
 
 # Persistent download buttons
 if st.session_state.get("story_generated"):
@@ -154,6 +163,7 @@ if st.session_state.get("story_generated"):
         data=insert_column_to_transposed_file(
             st.session_state["storyline_file_data"], st.session_state["new_storyline_column"]),
         file_name="storyline.txt", mime="text/plain")
+
 
 
 
