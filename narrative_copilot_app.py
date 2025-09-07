@@ -1,66 +1,72 @@
 import streamlit as st
 import pandas as pd
-import requests
 from datetime import datetime
+import requests
+import io
 
-# 📥 Load headers from GitHub
+# Load headers from GitHub
 headers_url = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
-headers_df = pd.read_csv(headers_url)
-voice_headers = headers_df.iloc[1:5, 0].tolist()
-background_headers = headers_df.iloc[6:11, 0].tolist()
+headers_response = requests.get(headers_url)
+headers_df = pd.read_csv(io.StringIO(headers_response.text), delimiter="|", header=None)
 
-# 📤 Sidebar
-st.sidebar.title("📂 Upload Files")
+# Sidebar
+st.sidebar.title("📂 File Upload")
 voice_file = st.sidebar.file_uploader("Upload voice_input.csv", type="csv")
 background_file = st.sidebar.file_uploader("Upload background.csv", type="csv")
-output_file = st.sidebar.file_uploader("Upload output.csv", type="csv")
+story_file = st.sidebar.file_uploader("Upload story_line.csv", type="csv")
 
-toggle = st.sidebar.radio("Session Mode", ["🔄 Fresh Start", "📦 Fetch Last"])
+session_mode = st.sidebar.radio("Session Mode", ["🆕 Fresh Start", "📜 Fetch Last"])
 
-# 🧠 Load Data
-if voice_file and background_file:
-    voice_df = pd.read_csv(voice_file)
-    background_df = pd.read_csv(background_file)
-    output_df = pd.read_csv(output_file) if output_file else pd.DataFrame()
+# Main UI
+st.title("🧠 Dual Narrative ML Story Generator")
 
-    # 🗓️ Dateversion
-    today = datetime.now().strftime("%a, %b %d, %Y (1)")
-    st.markdown(f"### 📅 Dateversion: `{today}`")
+# Input Fields
+st.subheader("🎙️ Voice Input")
+voice_inputs = {}
+voice_labels = ["Inner Voice", "Self Voice", "Partner Voice", "Location"]
+for label in voice_labels:
+    voice_inputs[label] = st.text_input(label)
 
-    # 🎙️ Voice Input Fields
-    st.subheader("🎧 Voice Input")
-    voice_inputs = {}
-    for i, header in enumerate(voice_headers):
-        voice_inputs[header] = st.text_input(f"{header}", value=voice_df.iloc[0, i+1] if toggle == "📦 Fetch Last" else "")
+st.subheader("🌐 Background Input")
+background_inputs = {}
+background_labels = ["Work Related", "Money/Time Related", "Ambition/Free Time", "Feeling Related", "Overall Well-being"]
+for label in background_labels:
+    background_inputs[label] = st.text_input(label)
 
-    # 🧩 Background Fields
-    st.subheader("🧠 Background Input")
-    background_inputs = {}
-    for i, header in enumerate(background_headers):
-        background_inputs[header] = st.text_input(f"{header}", value=background_df.iloc[0, i+1] if toggle == "📦 Fetch Last" else "")
+# Generate Story
+if st.button("✨ Generate Story"):
+    dateversion = datetime.now().strftime("%a, %b %d, %Y (1)")
+    
+    # Combine inputs
+    input_data = {**voice_inputs, **background_inputs}
+    input_df = pd.DataFrame([input_data])
+    input_df.insert(0, "DateVersion", dateversion)
 
-    # 🧬 ML Story Generation (Placeholder logic)
+    # Placeholder ML story generation
+    story_text = f"On {dateversion}, a narrative unfolds where {voice_inputs['Inner Voice']} meets ambition and {background_inputs['Feeling Related']} in the heart of {voice_inputs['Location']}."
+    story_df = pd.DataFrame([[dateversion, story_text]], columns=["DateVersion", "Story"])
+
+    # Display story
     st.subheader("📖 Generated Story")
-    if st.button("Generate Story"):
-        story = f"On {today}, you reflected on your inner world and external context. Your inner voice said '{voice_inputs[voice_headers[0]]}', while your partner voice echoed '{voice_inputs[voice_headers[2]]}'. You were located at '{voice_inputs[voice_headers[3]]}', contemplating work, money, and ambition. You felt '{background_inputs[background_headers[3]]}', and your overall well-being was '{background_inputs[background_headers[4]]}'."
-        st.text_area("Your Story", story, height=200)
+    st.write(story_text)
 
-        # 📊 Append and shift history
-        new_voice_row = [today] + list(voice_inputs.values())
-        new_background_row = [today] + list(background_inputs.values())
-        new_output_row = [today, story]
+    # Append history (shift columns right)
+    if voice_file:
+        old_voice_df = pd.read_csv(voice_file, delimiter="|", header=None)
+        voice_history = pd.concat([input_df, old_voice_df], axis=1)
+        st.download_button("⬇️ Download Updated Voice Input", voice_history.to_csv(sep="|", index=False), "updated_voice_input.csv")
 
-        voice_df.loc[len(voice_df)] = new_voice_row
-        background_df.loc[len(background_df)] = new_background_row
-        output_df.loc[len(output_df)] = new_output_row
+    if background_file:
+        old_background_df = pd.read_csv(background_file, delimiter="|", header=None)
+        background_history = pd.concat([input_df, old_background_df], axis=1)
+        st.download_button("⬇️ Download Updated Background Input", background_history.to_csv(sep="|", index=False), "updated_background.csv")
 
-        # 📥 Download buttons
-        st.download_button("⬇️ Download Updated Voice Input", voice_df.to_csv(index=False), "updated_voice_input.csv")
-        st.download_button("⬇️ Download Updated Background", background_df.to_csv(index=False), "updated_background.csv")
-        st.download_button("⬇️ Download Generated Output", output_df.to_csv(index=False), "generated_output.csv")
+    if story_file:
+        old_story_df = pd.read_csv(story_file, delimiter="|", header=None)
+        story_history = pd.concat([story_df, old_story_df], axis=1)
+        st.download_button("⬇️ Download Updated Story Output", story_history.to_csv(sep="|", index=False), "updated_story_line.csv")
 
-else:
-    st.warning("Please upload all three files to begin.")
+
 
 
 
