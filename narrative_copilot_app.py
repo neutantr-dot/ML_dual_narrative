@@ -28,12 +28,8 @@ def parse_input_file(uploaded_file):
     content = uploaded_file.getvalue().decode("utf-8").splitlines()
     return [line.split(DELIMITER) for line in content]
 
-# Extract available versions (row 0 values)
-def extract_versions(data):
-    return [row[0] for row in data if len(row) > 0]
-
 # Extract fixed rows for prefill
-def extract_prefill_rows(data, start_row, num_fields, enabled):
+def extract_prefill(data, start_row, num_fields, enabled):
     return [data[i][0] if enabled and len(data) > i and len(data[i]) > 0 else "" for i in range(start_row, start_row + num_fields)]
 
 # Append new row to file
@@ -65,19 +61,18 @@ st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 voice_data = parse_input_file(voice_file)
 background_data = parse_input_file(background_file)
 
-# Extract version options
-voice_versions = extract_versions(voice_data)
-background_versions = extract_versions(background_data)
+# Extract version labels from first row
+voice_version = voice_data[0][0] if len(voice_data) > 0 and len(voice_data[0]) > 0 else ""
+background_version = background_data[0][0] if len(background_data) > 0 and len(background_data[0]) > 0 else ""
+
+# Extract prefill rows
+voice_prefill = extract_prefill(voice_data, start_row=1, num_fields=4, enabled=prefill_enabled)
+background_prefill = extract_prefill(background_data, start_row=1, num_fields=5, enabled=prefill_enabled)
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
-selected_voice_version = None
-voice_prefill = [""] * 4
-if prefill_enabled and voice_versions:
-    selected_voice_version = st.selectbox("📅 Voice Input Version", voice_versions)
-    if selected_voice_version == voice_data[0][0]:
-        voice_prefill = extract_prefill_rows(voice_data, start_row=1, num_fields=4, enabled=True)
-
+if voice_version:
+    st.markdown(f"**📅 Voice Input Version:** {voice_version}")
 voice_inputs = []
 for i in range(4):
     label_row = headers_df[
@@ -90,13 +85,8 @@ for i in range(4):
 
 # Section 2: Background
 st.subheader("🌄 Describe Your Background")
-selected_background_version = None
-background_prefill = [""] * 5
-if prefill_enabled and background_versions:
-    selected_background_version = st.selectbox("📅 Background Version", background_versions)
-    if selected_background_version == background_data[0][0]:
-        background_prefill = extract_prefill_rows(background_data, start_row=1, num_fields=5, enabled=True)
-
+if background_version:
+    st.markdown(f"**📅 Background Version:** {background_version}")
 background_inputs = []
 for i in range(5):
     label_row = headers_df[
@@ -132,6 +122,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
