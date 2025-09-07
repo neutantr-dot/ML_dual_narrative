@@ -5,8 +5,11 @@ from io import StringIO
 from datetime import datetime
 
 # Constants
-HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
 DELIMITER = "|"
+VOICE_FIELDS = 4
+BACKGROUND_FIELDS = 5
+STORYLINE_LINES = 20
+HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
 
 # Load headers from GitHub
 @st.cache_data
@@ -21,12 +24,18 @@ def load_headers():
         st.error(f"⚠️ Could not load headers.csv: {e}")
         return pd.DataFrame(columns=["Input_file", "Field", "Label"])
 
+# Cache uploaded file contents in session state
+def cache_file(name, uploaded_file):
+    if uploaded_file:
+        st.session_state[name] = uploaded_file.getvalue().decode("utf-8")
+    elif name not in st.session_state:
+        st.session_state[name] = None
+
 # Parse transposed input file
-def parse_transposed_file(uploaded_file):
-    if uploaded_file is None:
+def parse_transposed_file(file_text):
+    if not file_text:
         return {}, []
-    content = uploaded_file.getvalue().decode("utf-8").splitlines()
-    rows = [line.split(DELIMITER) for line in content]
+    rows = [line.split(DELIMITER) for line in file_text.splitlines()]
     if not rows or len(rows) < 2:
         return {}, []
     versions = rows[0]
@@ -38,23 +47,12 @@ def parse_transposed_file(uploaded_file):
     return data_by_version, versions
 
 # Append new column to transposed file
-def append_column_to_transposed_file(existing_file, new_column):
-    lines = []
-    if existing_file is not None:
-        lines = existing_file.getvalue().decode("utf-8").splitlines()
-        rows = [line.split(DELIMITER) for line in lines]
-    else:
-        rows = []
-
-    # Ensure enough rows exist
+def append_column_to_transposed_file(file_text, new_column):
+    rows = [line.split(DELIMITER) for line in file_text.splitlines()] if file_text else []
     while len(rows) < len(new_column):
         rows.append([])
-
-    # Append new column
     for i, value in enumerate(new_column):
         rows[i].append(value)
-
-    # Reconstruct file
     return "\n".join([DELIMITER.join(row) for row in rows])
 
 # Streamlit UI
@@ -66,6 +64,11 @@ voice_file = st.sidebar.file_uploader("Upload voice_input.txt", type="txt")
 background_file = st.sidebar.file_uploader("Upload background.txt", type="txt")
 storyline_file = st.sidebar.file_uploader("Upload storyline.txt", type="txt")
 
+# Cache uploaded files
+cache_file("voice_file_data", voice_file)
+cache_file("background_file_data", background_file)
+cache_file("storyline_file_data", storyline_file)
+
 # Toggle for prefill
 prefill_enabled = st.sidebar.toggle("Enable Prefill", value=False)
 
@@ -75,16 +78,16 @@ headers_df = load_headers()
 st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 
 # Parse transposed files
-voice_blocks, voice_versions = parse_transposed_file(voice_file)
-background_blocks, background_versions = parse_transposed_file(background_file)
+voice_blocks, voice_versions = parse_transposed_file(st.session_state.get("voice_file_data", ""))
+background_blocks, background_versions = parse_transposed_file(st.session_state.get("background_file_data", ""))
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
 selected_voice_version = st.selectbox("📅 Voice Input Version", voice_versions) if voice_versions else None
-voice_prefill = voice_blocks.get(selected_voice_version, [""] * 4) if prefill_enabled else [""] * 4
+voice_prefill = voice_blocks.get(selected_voice_version, [""] * VOICE_FIELDS) if prefill_enabled else [""] * VOICE_FIELDS
 
 voice_inputs = []
-for i in range(4):
+for i in range(VOICE_FIELDS):
     label_row = headers_df[
         (headers_df["Input_file"] == "voic_input") &
         (headers_df["Field"] == f"input{i+1}")
@@ -96,10 +99,10 @@ for i in range(4):
 # Section 2: Background
 st.subheader("🌄 Describe Your Background")
 selected_background_version = st.selectbox("📅 Background Version", background_versions) if background_versions else None
-background_prefill = background_blocks.get(selected_background_version, [""] * 5) if prefill_enabled else [""] * 5
+background_prefill = background_blocks.get(selected_background_version, [""] * BACKGROUND_FIELDS) if prefill_enabled else [""] * BACKGROUND_FIELDS
 
 background_inputs = []
-for i in range(5):
+for i in range(BACKGROUND_FIELDS):
     label_row = headers_df[
         (headers_df["Input_file"] == "background") &
         (headers_df["Field"] == f"input{i+1}")
@@ -115,7 +118,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
         "It will reflect both the argument and your background.",
         "Imagine a story that weaves emotional tension with personal history.",
         "Each line adds depth, empathy, and perspective.",
-    ] + [f"Story line {i+1}" for i in range(16)]
+    ] + [f"Story line {i+1}" for i in range(STORYLINE_LINES)]
 
     st.subheader("📜 Generated Storyline")
     st.text_area("Scroll through your story:", value="\n".join(storyline), height=400)
@@ -128,15 +131,15 @@ if st.button("✨ Generate Dual Narrative Storyline"):
 
     # Download buttons
     st.download_button("⬇️ Save Updated Voice Input",
-        data=append_column_to_transposed_file(voice_file, new_voice_column),
+        data=append_column_to_transposed_file(st.session_state.get("voice_file_data", ""), new_voice_column),
         file_name="voice_input.txt", mime="text/plain")
 
     st.download_button("⬇️ Save Updated Background",
-        data=append_column_to_transposed_file(background_file, new_background_column),
+        data=append_column_to_transposed_file(st.session_state.get("background_file_data", ""), new_background_column),
         file_name="background.txt", mime="text/plain")
 
     st.download_button("⬇️ Save New Storyline",
-        data=append_column_to_transposed_file(storyline_file, new_storyline_column),
+        data=append_column_to_transposed_file(st.session_state.get("storyline_file_data", ""), new_storyline_column),
         file_name="storyline.txt", mime="text/plain")
 
 
