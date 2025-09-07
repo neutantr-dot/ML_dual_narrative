@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import requests
-from io import StringIO
 
 # Constants
 HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
@@ -49,7 +48,7 @@ if voice_file:
 
 new_voice = []
 for i, label in enumerate(voice_labels):
-    val = st.text_input(label, value=voice_inputs[i] if i < len(voice_inputs) else "")
+    val = st.text_input(label, value=voice_inputs[i] if i < len(voice_inputs) else "", key=f"voice_{i}")
     new_voice.append(val)
 
 # Background Input Section
@@ -62,7 +61,7 @@ if bg_file:
 
 new_bg = []
 for i, label in enumerate(bg_labels):
-    val = st.text_input(label, value=bg_inputs[i] if i < len(bg_inputs) else "")
+    val = st.text_input(label, value=bg_inputs[i] if i < len(bg_inputs) else "", key=f"bg_{i}")
     new_bg.append(val)
 
 # Submit to ML model
