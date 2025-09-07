@@ -7,10 +7,11 @@ HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/
 NGROK_API_URL = "https://your-ngrok-url.ngrok.io/generate_story"  # Replace with your actual ngrok endpoint
 DATEVERSION = "Sun, Sept 7, 2025"
 
-# Load headers from GitHub
+# Load headers from GitHub (only first column)
 @st.cache_data
 def load_headers():
-    return pd.read_csv(HEADERS_URL, delimiter="|", header=None)
+    df = pd.read_csv(HEADERS_URL, delimiter="|", header=None)
+    return df.iloc[:, 0]  # Only use the first column
 
 # Load uploaded CSVs
 def load_csv(file, delimiter="|"):
@@ -34,9 +35,9 @@ story_file = st.sidebar.file_uploader("Upload story_line.csv", type="csv")
 mode = st.sidebar.radio("Start Mode", ["Fresh Start", "Fetch Last Used"])
 
 # Load headers
-headers_df = load_headers()
-voice_labels = headers_df.iloc[:4, 0].tolist()
-bg_labels = headers_df.iloc[4:, 0].tolist()
+headers = load_headers()
+voice_labels = headers[:4].tolist()
+bg_labels = headers[4:9].tolist()
 
 # Voice Input Section
 st.subheader("🎙️ Voice Input")
