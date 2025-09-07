@@ -7,8 +7,6 @@ from datetime import datetime
 # Constants
 HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
 DELIMITER = "|"
-VOICE_BLOCK_SIZE = 5  # 1 version line + 4 input lines
-BACKGROUND_BLOCK_SIZE = 6  # 1 version line + 5 input lines
 
 # Load headers from GitHub
 @st.cache_data
@@ -23,29 +21,27 @@ def load_headers():
         st.error(f"⚠️ Could not load headers.csv: {e}")
         return pd.DataFrame(columns=["Input_file", "Field", "Label"])
 
-# Parse uploaded input file into blocks
-def parse_blocks(data, block_size):
-    blocks = {}
-    i = 0
-    while i + block_size - 1 < len(data):
-        version = data[i][0]
-        inputs = [data[i + j][0] if len(data[i + j]) > 0 else "" for j in range(1, block_size)]
-        blocks[version] = inputs
-        i += block_size
-    return blocks
-
-# Parse uploaded input file
-def parse_input_file(uploaded_file):
+# Parse transposed input file
+def parse_transposed_file(uploaded_file):
     if uploaded_file is None:
-        return []
+        return {}, []
     content = uploaded_file.getvalue().decode("utf-8").splitlines()
-    return [line.split(DELIMITER) for line in content]
+    rows = [line.split(DELIMITER) for line in content]
+    if not rows or len(rows) < 2:
+        return {}, []
+    versions = rows[0]
+    data_by_version = {version: [] for version in versions}
+    for row in rows[1:]:
+        for i, value in enumerate(row):
+            if i < len(versions):
+                data_by_version[versions[i]].append(value)
+    return data_by_version, versions
 
 # Append new row to file
 def append_to_file(existing_file, new_row):
     if existing_file is None:
         return DELIMITER.join(new_row)
-    content = existing_file.getvalue().decode("utf-8").splitlines()
+    content = uploaded_file.getvalue().decode("utf-8").splitlines()
     content.insert(1, DELIMITER.join(new_row))
     return "\n".join(content)
 
@@ -66,17 +62,12 @@ headers_df = load_headers()
 
 st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 
-# Parse input files
-voice_data = parse_input_file(voice_file)
-background_data = parse_input_file(background_file)
-
-# Parse blocks
-voice_blocks = parse_blocks(voice_data, VOICE_BLOCK_SIZE)
-background_blocks = parse_blocks(background_data, BACKGROUND_BLOCK_SIZE)
+# Parse transposed files
+voice_blocks, voice_versions = parse_transposed_file(voice_file)
+background_blocks, background_versions = parse_transposed_file(background_file)
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
-voice_versions = list(voice_blocks.keys())
 selected_voice_version = st.selectbox("📅 Voice Input Version", voice_versions) if voice_versions else None
 voice_prefill = voice_blocks.get(selected_voice_version, [""] * 4) if prefill_enabled else [""] * 4
 
@@ -92,7 +83,6 @@ for i in range(4):
 
 # Section 2: Background
 st.subheader("🌄 Describe Your Background")
-background_versions = list(background_blocks.keys())
 selected_background_version = st.selectbox("📅 Background Version", background_versions) if background_versions else None
 background_prefill = background_blocks.get(selected_background_version, [""] * 5) if prefill_enabled else [""] * 5
 
