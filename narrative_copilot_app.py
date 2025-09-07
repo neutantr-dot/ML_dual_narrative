@@ -40,9 +40,18 @@ df_voice = st.session_state["voice_input"]
 df_background = st.session_state["background"]
 df_story = st.session_state["story_output"]
 
-# --- Prefetch Logic (from first column) ---
-latest_voice = df_voice.iloc[:, 0].fillna("").astype(str).tolist() if input_mode == "Edit Last Session" else [""] * len(voice_labels)
-latest_background = df_background.iloc[:, 0].fillna("").astype(str).tolist() if input_mode == "Edit Last Session" else [""] * len(background_labels)
+# --- Prefetch Logic (safe from IndexError) ---
+latest_voice = (
+    df_voice.iloc[:, 0].fillna("").astype(str).tolist()
+    if input_mode == "Edit Last Session" and not df_voice.empty and df_voice.shape[1] > 0
+    else [""] * len(voice_labels)
+)
+
+latest_background = (
+    df_background.iloc[:, 0].fillna("").astype(str).tolist()
+    if input_mode == "Edit Last Session" and not df_background.empty and df_background.shape[1] > 0
+    else [""] * len(background_labels)
+)
 
 # --- App Title ---
 st.title("🧠 Narrative Copilot")
@@ -120,4 +129,5 @@ st.subheader("📥 Download Your Updated Files")
 st.download_button("Download voice_input.csv", buffer_voice.getvalue(), "voice_input.csv", "text/csv", key="download_voice")
 st.download_button("Download background.csv", buffer_background.getvalue(), "background.csv", "text/csv", key="download_background")
 st.download_button("Download story_output.csv", buffer_story.getvalue(), "story_output.csv", "text/csv", key="download_story")
+
 
