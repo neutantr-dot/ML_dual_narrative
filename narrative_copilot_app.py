@@ -15,10 +15,11 @@ def load_headers():
         response = requests.get(HEADERS_URL)
         response.raise_for_status()
         df = pd.read_csv(StringIO(response.text), sep=DELIMITER, engine="python", quotechar='"', on_bad_lines='skip')
+        df.columns = df.columns.str.strip()  # Clean column names
         return df
     except Exception as e:
         st.error(f"⚠️ Could not load headers.csv: {e}")
-        return pd.DataFrame(columns=["file", "field", "label"])
+        return pd.DataFrame(columns=["Input_file", "Field", "Label"])
 
 # Parse uploaded input file
 def parse_input_file(uploaded_file):
@@ -65,10 +66,10 @@ st.subheader("🗣️ Describe Argument That Happened")
 voice_inputs = []
 for i in range(4):
     label_row = headers_df[
-        (headers_df["file"] == "voic_input") &
-        (headers_df["field"] == f"input{i+1}")
+        (headers_df["Input_file"] == "voic_input") &
+        (headers_df["Field"] == f"input{i+1}")
     ]
-    label_text = label_row["label"].values[0] if not label_row.empty else f"Voice Input {i+1}"
+    label_text = label_row["Label"].values[0] if not label_row.empty else f"Voice Input {i+1}"
     value = st.text_input(label_text, value=voice_prefill[i])
     voice_inputs.append(value)
 
@@ -77,10 +78,10 @@ st.subheader("🌄 Describe Your Background")
 background_inputs = []
 for i in range(5):
     label_row = headers_df[
-        (headers_df["file"] == "background") &
-        (headers_df["field"] == f"input{i+1}")
+        (headers_df["Input_file"] == "background") &
+        (headers_df["Field"] == f"input{i+1}")
     ]
-    label_text = label_row["label"].values[0] if not label_row.empty else f"Background Input {i+1}"
+    label_text = label_row["Label"].values[0] if not label_row.empty else f"Background Input {i+1}"
     value = st.text_input(label_text, value=background_prefill[i])
     background_inputs.append(value)
 
