@@ -1,8 +1,8 @@
 Input_file|Field|Label
-voic_input|input1|Enter your thoughts, your inner voice during argument
-voic_input|input2|Describe what you actually said
-voic_input|input3|Describe what your partner said
-voic_input|input4|Describe location where argument happened like at home, outside (e.g. dinner, outing, or on the way)
+voice_input|input1|Enter your thoughts, your inner voice during argument
+voice_input|input2|Describe what you actually said
+voice_input|input3|Describe what your partner said
+voice_input|input4|Describe location where argument happened like at home, outside (e.g. dinner, outing, or on the way)
 background|input1|Describe about your work, hobbies 
 background|input2|Describe how you feel about money to live, work/life balance, your energy feeling exhausted?
 background|input3|Describe about ambitions, distractions, social media scrolling, friends, family 
