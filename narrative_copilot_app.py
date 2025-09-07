@@ -15,7 +15,7 @@ def load_headers():
         response = requests.get(HEADERS_URL)
         response.raise_for_status()
         df = pd.read_csv(StringIO(response.text), sep=DELIMITER, engine="python", quotechar='"', on_bad_lines='skip')
-        df.columns = df.columns.str.strip()  # Clean column names
+        df.columns = df.columns.str.strip()
         return df
     except Exception as e:
         st.error(f"⚠️ Could not load headers.csv: {e}")
@@ -28,19 +28,18 @@ def parse_input_file(uploaded_file):
     content = uploaded_file.getvalue().decode("utf-8").splitlines()
     return [line.split(DELIMITER) for line in content]
 
-# Ensure prefill is safe and skips first row
-def safe_prefill(data, expected_fields):
-    if len(data) > 1:
-        row = data[1]  # Skip date/version row
-        return (row + [""] * expected_fields)[:expected_fields]
-    return [""] * expected_fields
+# Extract rows 2–5 or 2–6 as individual fields
+def extract_prefill_rows(data, start_row, num_fields, enabled):
+    if enabled and len(data) >= start_row + num_fields:
+        return [data[start_row + i][0] if len(data[start_row + i]) > 0 else "" for i in range(num_fields)]
+    return [""] * num_fields
 
 # Append new row to file
 def append_to_file(existing_file, new_row):
     if existing_file is None:
         return DELIMITER.join(new_row)
     content = existing_file.getvalue().decode("utf-8").splitlines()
-    content.insert(1, DELIMITER.join(new_row))  # Insert after header
+    content.insert(1, DELIMITER.join(new_row))
     return "\n".join(content)
 
 # Streamlit UI
@@ -64,9 +63,9 @@ st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 voice_data = parse_input_file(voice_file)
 background_data = parse_input_file(background_file)
 
-# Safe prefill
-voice_prefill = safe_prefill(voice_data, 4)
-background_prefill = safe_prefill(background_data, 5)
+# Prefill from rows 2–5 and 2–6
+voice_prefill = extract_prefill_rows(voice_data, start_row=1, num_fields=4, enabled=prefill)
+background_prefill = extract_prefill_rows(background_data, start_row=1, num_fields=5, enabled=prefill)
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
@@ -94,7 +93,6 @@ for i in range(5):
 
 # Generate storyline
 if st.button("✨ Generate Dual Narrative Storyline"):
-    # Placeholder ML logic
     storyline = [
         "This is a placeholder for your dual narrative.",
         "It will reflect both the argument and your background.",
@@ -118,6 +116,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
