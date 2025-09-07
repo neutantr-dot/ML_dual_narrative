@@ -24,12 +24,14 @@ def load_headers():
         st.error(f"⚠️ Could not load headers.csv: {e}")
         return pd.DataFrame(columns=["Input_file", "Field", "Label"])
 
-# Cache uploaded file contents in session state
+# Cache uploaded file contents and objects in session state
 def cache_file(name, uploaded_file):
     if uploaded_file:
-        st.session_state[name] = uploaded_file.getvalue().decode("utf-8")
-    elif name not in st.session_state:
-        st.session_state[name] = None
+        st.session_state[name + "_data"] = uploaded_file.getvalue().decode("utf-8")
+        st.session_state[name + "_obj"] = uploaded_file
+    else:
+        st.session_state.setdefault(name + "_data", "")
+        st.session_state.setdefault(name + "_obj", None)
 
 # Parse transposed input file
 def parse_transposed_file(file_text):
@@ -65,9 +67,9 @@ background_file = st.sidebar.file_uploader("Upload background.txt", type="txt")
 storyline_file = st.sidebar.file_uploader("Upload storyline.txt", type="txt")
 
 # Cache uploaded files
-cache_file("voice_file_data", voice_file)
-cache_file("background_file_data", background_file)
-cache_file("storyline_file_data", storyline_file)
+cache_file("voice_file", voice_file)
+cache_file("background_file", background_file)
+cache_file("storyline_file", storyline_file)
 
 # Toggle for prefill
 prefill_enabled = st.sidebar.toggle("Enable Prefill", value=False)
@@ -78,8 +80,8 @@ headers_df = load_headers()
 st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 
 # Parse transposed files
-voice_blocks, voice_versions = parse_transposed_file(st.session_state.get("voice_file_data", ""))
-background_blocks, background_versions = parse_transposed_file(st.session_state.get("background_file_data", ""))
+voice_blocks, voice_versions = parse_transposed_file(st.session_state["voice_file_data"])
+background_blocks, background_versions = parse_transposed_file(st.session_state["background_file_data"])
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
@@ -131,16 +133,20 @@ if st.button("✨ Generate Dual Narrative Storyline"):
 
     # Download buttons
     st.download_button("⬇️ Save Updated Voice Input",
-        data=append_column_to_transposed_file(st.session_state.get("voice_file_data", ""), new_voice_column),
+        data=append_column_to_transposed_file(
+            st.session_state["voice_file_data"], new_voice_column),
         file_name="voice_input.txt", mime="text/plain")
 
     st.download_button("⬇️ Save Updated Background",
-        data=append_column_to_transposed_file(st.session_state.get("background_file_data", ""), new_background_column),
+        data=append_column_to_transposed_file(
+            st.session_state["background_file_data"], new_background_column),
         file_name="background.txt", mime="text/plain")
 
     st.download_button("⬇️ Save New Storyline",
-        data=append_column_to_transposed_file(st.session_state.get("storyline_file_data", ""), new_storyline_column),
+        data=append_column_to_transposed_file(
+            st.session_state["storyline_file_data"], new_storyline_column),
         file_name="storyline.txt", mime="text/plain")
+
 
 
 
