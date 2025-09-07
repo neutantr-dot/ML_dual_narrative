@@ -37,14 +37,26 @@ def parse_transposed_file(uploaded_file):
                 data_by_version[versions[i]].append(value)
     return data_by_version, versions
 
-# Append new row to file
-def append_to_file(existing_file, new_row):
-    if existing_file is None:
-        return DELIMITER.join(new_row)
-    content = existing_file.getvalue().decode("utf-8").splitlines()
-    content.insert(1, DELIMITER.join(new_row))
-    return "\n".join(content)
-    
+# Append new column to transposed file
+def append_column_to_transposed_file(existing_file, new_column):
+    lines = []
+    if existing_file is not None:
+        lines = existing_file.getvalue().decode("utf-8").splitlines()
+        rows = [line.split(DELIMITER) for line in lines]
+    else:
+        rows = []
+
+    # Ensure enough rows exist
+    while len(rows) < len(new_column):
+        rows.append([])
+
+    # Append new column
+    for i, value in enumerate(new_column):
+        rows[i].append(value)
+
+    # Reconstruct file
+    return "\n".join([DELIMITER.join(row) for row in rows])
+
 # Streamlit UI
 st.set_page_config(page_title="Dual Narrative Co-Pilot", layout="wide")
 st.sidebar.title("📁 Upload Files")
@@ -95,7 +107,7 @@ for i in range(5):
     label_text = label_row["Label"].values[0] if not label_row.empty else f"Background Input {i+1}"
     value = st.text_input(label_text, value=background_prefill[i])
     background_inputs.append(value)
-    
+
 # Generate storyline
 if st.button("✨ Generate Dual Narrative Storyline"):
     storyline = [
@@ -108,19 +120,25 @@ if st.button("✨ Generate Dual Narrative Storyline"):
     st.subheader("📜 Generated Storyline")
     st.text_area("Scroll through your story:", value="\n".join(storyline), height=400)
 
-    # Prepare new rows
+    # Prepare new columns
     timestamp = datetime.now().strftime("%a %b %d, %Y (%H:%M)")
-    new_voice_row = [timestamp] + voice_inputs
-    new_background_row = [timestamp] + background_inputs
-    new_storyline_row = [timestamp] + storyline
+    new_voice_column = [timestamp] + voice_inputs
+    new_background_column = [timestamp] + background_inputs
+    new_storyline_column = [timestamp] + storyline
 
     # Download buttons
-    st.download_button("⬇️ Save Updated Voice Input", data=append_to_file(voice_file, new_voice_row),
-                       file_name="voice_input.txt", mime="text/plain")
-    st.download_button("⬇️ Save Updated Background", data=append_to_file(background_file, new_background_row),
-                       file_name="background.txt", mime="text/plain")
-    st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
-                       file_name="storyline.txt", mime="text/plain")
+    st.download_button("⬇️ Save Updated Voice Input",
+        data=append_column_to_transposed_file(voice_file, new_voice_column),
+        file_name="voice_input.txt", mime="text/plain")
+
+    st.download_button("⬇️ Save Updated Background",
+        data=append_column_to_transposed_file(background_file, new_background_column),
+        file_name="background.txt", mime="text/plain")
+
+    st.download_button("⬇️ Save New Storyline",
+        data=append_column_to_transposed_file(storyline_file, new_storyline_column),
+        file_name="storyline.txt", mime="text/plain")
+
 
 
 
