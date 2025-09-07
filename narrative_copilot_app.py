@@ -29,8 +29,8 @@ def parse_input_file(uploaded_file):
     return [line.split(DELIMITER) for line in content]
 
 # Extract fixed rows for prefill
-def extract_fixed_prefill(data, start_row, num_fields):
-    return [data[i][0] if len(data) > i and len(data[i]) > 0 else "" for i in range(start_row, start_row + num_fields)]
+def extract_fixed_prefill(data, start_row, num_fields, enabled):
+    return [data[i][0] if enabled and len(data) > i and len(data[i]) > 0 else "" for i in range(start_row, start_row + num_fields)]
 
 # Append new row to file
 def append_to_file(existing_file, new_row):
@@ -49,6 +49,9 @@ voice_file = st.sidebar.file_uploader("Upload voice_input.txt", type="txt")
 background_file = st.sidebar.file_uploader("Upload background.txt", type="txt")
 storyline_file = st.sidebar.file_uploader("Upload storyline.txt", type="txt")
 
+# Toggle for prefill
+prefill = st.sidebar.toggle("Enable Prefill", value=True)
+
 # Load headers
 headers_df = load_headers()
 
@@ -63,8 +66,8 @@ voice_version = voice_data[0][0] if len(voice_data) > 0 and len(voice_data[0]) >
 background_version = background_data[0][0] if len(background_data) > 0 and len(background_data[0]) > 0 else ""
 
 # Extract prefill rows
-voice_prefill = extract_fixed_prefill(voice_data, start_row=1, num_fields=4)
-background_prefill = extract_fixed_prefill(background_data, start_row=1, num_fields=5)
+voice_prefill = extract_fixed_prefill(voice_data, start_row=1, num_fields=4, enabled=prefill)
+background_prefill = extract_fixed_prefill(background_data, start_row=1, num_fields=5, enabled=prefill)
 
 # Section 1: Argument
 st.subheader("🗣️ Describe Argument That Happened")
@@ -119,6 +122,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
