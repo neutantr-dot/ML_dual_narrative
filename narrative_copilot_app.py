@@ -1,88 +1,110 @@
 import streamlit as st
 import pandas as pd
 import requests
-from io import StringIO
-from datetime import datetime
 
 # Constants
-GITHUB_HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
-DELIMITER = "|"
+HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
+NGROK_API_URL = "https://your-ngrok-url.ngrok.io/generate_story"  # Replace with your actual ngrok endpoint
 
 # Load headers from GitHub
 @st.cache_data
 def load_headers():
-    try:
-        response = requests.get(GITHUB_HEADERS_URL)
-        response.raise_for_status()
-        headers_df = pd.read_csv(StringIO(response.text))
-        return headers_df.iloc[0].tolist()
-    except Exception as e:
-        st.warning("Failed to load headers from GitHub.")
-        return ["inner_voice", "self_voice", "partner_voice", "location",
-                "work_related", "money_time_related", "ambition_related",
-                "feeling_related", "overall_wellbeing"]
+    return pd.read_csv(HEADERS_URL)
+
+# Load uploaded CSVs
+def load_csv(file, delimiter="|"):
+    return pd.read_csv(file, delimiter=delimiter, index_col=0)
+
+# Append new column to left
+def append_column(df, new_data, col_name):
+    df.insert(0, col_name, new_data)
+    return df
+
+# UI Layout
+st.set_page_config(page_title="Dual Narrative Generator", layout="wide")
+st.title("🧠 ML Dual Narrative Generator")
 
 # Sidebar
-st.sidebar.title("🧭 Navigation")
-fresh_start = st.sidebar.toggle("Fresh Start", value=True)
+st.sidebar.header("📁 File Uploads")
 voice_file = st.sidebar.file_uploader("Upload voice_input.csv", type="csv")
-background_file = st.sidebar.file_uploader("Upload background.csv", type="csv")
+bg_file = st.sidebar.file_uploader("Upload background.csv", type="csv")
 story_file = st.sidebar.file_uploader("Upload story_line.csv", type="csv")
 
+mode = st.sidebar.radio("Start Mode", ["Fresh Start", "Fetch Last Used"])
+
 # Load headers
-headers = load_headers()
+headers_df = load_headers()
+voice_labels = headers_df.iloc[:4, 0].tolist()
+bg_labels = headers_df.iloc[4:, 0].tolist()
 
-# Prefill logic
-voice_inputs = [""] * 4
-background_inputs = [""] * 5
+# Main Input Fields
+st.subheader("🎙️ Voice Input")
+voice_inputs = []
+if voice_file:
+    voice_df = load_csv(voice_file)
+    if mode == "Fetch Last Used":
+        voice_inputs = voice_df.iloc[:, 0].tolist()
+    else:
+        voice_inputs = [""] * 4
+else:
+    voice_inputs = [""] * 4
 
-if not fresh_start and voice_file and background_file:
-    voice_df = pd.read_csv(voice_file, delimiter=DELIMITER, header=None)
-    background_df = pd.read_csv(background_file, delimiter=DELIMITER, header=None)
-    voice_inputs = voice_df.iloc[1:5, 0].tolist()
-    background_inputs = background_df.iloc[1:6, 0].tolist()
+new_voice = []
+for i, label in enumerate(voice_labels):
+    val = st.text_input(label, value=voice_inputs[i] if i < len(voice_inputs) else "")
+    new_voice.append(val)
 
-# Main UI
-st.title("🎙️ ML Dual Narrative Generator")
+st.subheader("🌍 Background Input")
+bg_inputs = []
+if bg_file:
+    bg_df = load_csv(bg_file)
+    if mode == "Fetch Last Used":
+        bg_inputs = bg_df.iloc[:, 0].tolist()
+    else:
+        bg_inputs = [""] * 5
+else:
+    bg_inputs = [""] * 5
 
-st.subheader("Voice Inputs")
-voice_inputs[0] = st.text_input(headers[0], value=voice_inputs[0])
-voice_inputs[1] = st.text_input(headers[1], value=voice_inputs[1])
-voice_inputs[2] = st.text_input(headers[2], value=voice_inputs[2])
-voice_inputs[3] = st.text_input(headers[3], value=voice_inputs[3])
+new_bg = []
+for i, label in enumerate(bg_labels):
+    val = st.text_input(label, value=bg_inputs[i] if i < len(bg_inputs) else "")
+    new_bg.append(val)
 
-st.subheader("Background Inputs")
-background_inputs[0] = st.text_input(headers[4], value=background_inputs[0])
-background_inputs[1] = st.text_input(headers[5], value=background_inputs[1])
-background_inputs[2] = st.text_input(headers[6], value=background_inputs[2])
-background_inputs[3] = st.text_input(headers[7], value=background_inputs[3])
-background_inputs[4] = st.text_input(headers[8], value=background_inputs[4])
-
-# Generate story
-def generate_story(voice, background):
-    # Placeholder ML logic
-    return f"On {datetime.now().strftime('%a, %b %d, %Y')}, a story unfolds:\n" + \
-           f"Inner thoughts: {voice[0]}. Self-reflection: {voice[1]}. " + \
-           f"Partner's voice: {voice[2]}. Location: {voice[3]}. " + \
-           f"Work: {background[0]}, Money/Time: {background[1]}, " + \
-           f"Ambition: {background[2]}, Feelings: {background[3]}, " + \
-           f"Well-being: {background[4]}."
-
+# Submit to ML model
 if st.button("Generate Story"):
-    story = generate_story(voice_inputs, background_inputs)
-    st.subheader("📘 Generated Story")
-    st.text_area("Story Output", story, height=300)
+    payload = {
+        "voice_input": new_voice,
+        "background_input": new_bg
+    }
+    response = requests.post(NGROK_API_URL, json=payload)
+    if response.status_code == 200:
+        story_text = response.json().get("story", "")
+        st.success("✅ Story Generated")
+        st.text_area("📖 Story Output", story_text, height=300)
 
-    # Prepare output file
-    output_df = pd.DataFrame([[datetime.now().strftime('%a, %b %d, %Y'), story]])
-    st.download_button("Download story_line.csv", output_df.to_csv(sep=DELIMITER, index=False), "story_line.csv")
+        # Append to story file
+        if story_file:
+            story_df = load_csv(story_file)
+        else:
+            story_df = pd.DataFrame()
 
-    # Append logic for input files
-    voice_appended = pd.DataFrame([[datetime.now().strftime('%a, %b %d, %Y')] + voice_inputs])
-    background_appended = pd.DataFrame([[datetime.now().strftime('%a, %b %d, %Y')] + background_inputs])
+        story_df = append_column(story_df, [story_text], "Sun, Sept 7, 2025")
+        st.download_button("⬇️ Download Updated Story File", story_df.to_csv(sep="|"), file_name="story_line.csv")
 
-    st.download_button("Download updated voice_input.csv", voice_appended.to_csv(sep=DELIMITER, index=False), "voice_input.csv")
-    st.download_button("Download updated background.csv", background_appended.to_csv(sep=DELIMITER, index=False), "background.csv")
+        # Append to input files
+        if voice_file:
+            voice_df = load_csv(voice_file)
+            voice_df = append_column(voice_df, new_voice, "Sun, Sept 7, 2025")
+            st.download_button("⬇️ Download Updated Voice File", voice_df.to_csv(sep="|"), file_name="voice_input.csv")
+
+        if bg_file:
+            bg_df = load_csv(bg_file)
+            bg_df = append_column(bg_df, new_bg, "Sun, Sept 7, 2025")
+            st.download_button("⬇️ Download Updated Background File", bg_df.to_csv(sep="|"), file_name="background.csv")
+    else:
+        st.error("❌ Failed to generate story. Check ngrok or ML backend.")
+
+
 
 
 
