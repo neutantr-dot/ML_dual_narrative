@@ -28,10 +28,17 @@ def parse_input_file(uploaded_file):
     content = uploaded_file.getvalue().decode("utf-8").splitlines()
     return [line.split(DELIMITER) for line in content]
 
-# Extract rows 2–5 or 2–6 as individual fields
+# Extract rows as individual fields
 def extract_prefill_rows(data, start_row, num_fields, enabled):
-    if enabled and len(data) >= start_row + num_fields:
-        return [data[start_row + i][0] if len(data[start_row + i]) > 0 else "" for i in range(num_fields)]
+    if enabled:
+        values = []
+        for i in range(num_fields):
+            row_index = start_row + i
+            if len(data) > row_index and len(data[row_index]) > 0:
+                values.append(data[row_index][0])
+            else:
+                values.append("")
+        return values
     return [""] * num_fields
 
 # Append new row to file
@@ -116,6 +123,7 @@ if st.button("✨ Generate Dual Narrative Storyline"):
                        file_name="background.txt", mime="text/plain")
     st.download_button("⬇️ Save New Storyline", data=append_to_file(storyline_file, new_storyline_row),
                        file_name="storyline.txt", mime="text/plain")
+
 
 
 
