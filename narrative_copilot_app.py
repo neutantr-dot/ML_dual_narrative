@@ -19,7 +19,7 @@ uploaded_story = st.sidebar.file_uploader("Upload story_output.csv", type="csv")
 st.sidebar.markdown("---")
 input_mode = st.sidebar.radio("Input Mode", ["Start Fresh", "Edit Last Session"])
 
-# --- Load or Initialize DataFrames ---
+# --- Initialize or Load DataFrames into session_state ---
 if "voice_input" not in st.session_state:
     if uploaded_voice:
         st.session_state["voice_input"] = pd.read_csv(uploaded_voice)
@@ -118,9 +118,9 @@ buffer_voice = io.StringIO()
 buffer_background = io.StringIO()
 buffer_story = io.StringIO()
 
-df_voice.to_csv(buffer_voice, index=False, encoding="utf-8")
-df_background.to_csv(buffer_background, index=False, encoding="utf-8")
-df_story.to_csv(buffer_story, index=False, encoding="utf-8")
+st.session_state["voice_input"].to_csv(buffer_voice, index=False, encoding="utf-8")
+st.session_state["background"].to_csv(buffer_background, index=False, encoding="utf-8")
+st.session_state["story_output"].to_csv(buffer_story, index=False, encoding="utf-8")
 
 buffer_voice.seek(0)
 buffer_background.seek(0)
