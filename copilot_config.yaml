@@ -22,11 +22,8 @@ classification:
   output_file: "classification.csv"
   fallback_label: "N/A"
   user_tracking: true
-
-versioning:
+  session_label_format: "%a %b %d, %Y (%H:%M)"
   label_prefix: "Generated on"
-  timestamp_format: "%a %b %d, %Y (%H:%M)"
-  include_version_tag: true
 
 emotional_grammar:
   enabled: true
@@ -36,6 +33,7 @@ emotional_grammar:
 
 reflex_logic:
   enabled: true
+  path: "reflex_logic.py"
   mode: "archetype_shift"
   strategy: "dual_narrative"
   intensity: "moderate"
@@ -44,4 +42,6 @@ logging:
   enabled: true
   log_file: "copilot_log.txt"
   log_level: "info"
+  anonymize: true
+
 
