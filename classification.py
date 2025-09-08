@@ -1,64 +1,48 @@
-import requests
-import csv
-import os
-from datetime import datetime
+model:
+  name: "openai-gpt4"
+  temperature: 0.7
+  max_tokens: 800
+  system_prompt: "You are a storytelling assistant."
 
-# GitHub raw URL for classification.csv
-GITHUB_RAW_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/classification.csv"
+storyline:
+  lines: 20
+  format: "dual narrative"
+  include_classification: true
+  classification_labels:
+    - F1
+    - F2
+    - F3
+    - M1
+    - M2
+    - M3
+    - N/A
 
-# Allowed classification labels
-ALLOWED_LABELS = ["F1", "F2", "F3", "M1", "M2", "M3", "N/A"]
+classification:
+  enabled: true
+  output_file: "classification.csv"
+  fallback_label: "N/A"
+  user_tracking: true
+  session_label_format: "%a %b %d, %Y (%H:%M)"
+  label_prefix: "Generated on"
 
-# Default header if GitHub fetch fails
-DEFAULT_HEADER = ["F1", "F2", "F3", "M1", "M2", "M3", "1=naieve", "2=in the know", "3=in transition"]
+emotional_grammar:
+  enabled: true
+  path: "emotional_grammar.json"
+  grammar_mode: "semantic"
+  use_expectation_map: true
 
-def validate_classification(label):
-    """Ensures the label is valid; returns 'N/A' if not."""
-    return label if label in ALLOWED_LABELS else "N/A"
+reflex_logic:
+  enabled: true
+  path: "reflex_logic.py"
+  mode: "archetype_shift"
+  strategy: "dual_narrative"
+  intensity: "moderate"
 
-def fetch_classification_csv():
-    """Fetches classification.csv from GitHub or returns default header."""
-    try:
-        response = requests.get(GITHUB_RAW_URL)
-        response.raise_for_status()
-        lines = response.text.splitlines()
-        return [line.strip().split(",") for line in lines]
-    except Exception:
-        print("⚠️ Could not fetch from GitHub. Using default header.")
-        return [DEFAULT_HEADER]
+logging:
+  enabled: true
+  log_file: "copilot_log.txt"
+  log_level: "info"
+  anonymize: true
 
-def generate_session_label(existing_rows):
-    """Generates a session label like 'Mon Sep 08, 2025 (3)'."""
-    today = datetime.now().strftime("%a %b %d, %Y")
-    count = sum(1 for row in existing_rows[1:] if row and row[0].startswith(today))
-    return f"{today} ({count + 1})"
-
-def append_classification_row(session_label, user_id, raw_label, local_path="classification.csv"):
-    """Appends a new classification row to the local file."""
-    rows = fetch_classification_csv()
-    validated_label = validate_classification(raw_label)
-    new_row = [session_label, user_id, validated_label]
-
-    # If file doesn't exist locally, write header first
-    if not os.path.exists(local_path):
-        with open(local_path, "w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            writer.writerow(DEFAULT_HEADER)
-
-    # Append new row
-    with open(local_path, "a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(new_row)
-
-    print(f"✅ Classification saved: {new_row}")
-
-# Example usage
-if __name__ == "__main__":
-    existing_rows = fetch_classification_csv()
-    session_label = generate_session_label(existing_rows)
-    user_id = "user 1"
-    raw_label = "M3"  # Replace with actual output from your copilot
-
-    append_classification_row(session_label, user_id, raw_label)
 
 
