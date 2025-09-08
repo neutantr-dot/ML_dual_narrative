@@ -1,0 +1,29 @@
+# copilot_config.yaml
+
+model:
+  name: "openai-gpt4"
+  temperature: 0.7
+  max_tokens: 800
+  system_prompt: "You are a storytelling assistant."
+
+storyline:
+  lines: 20
+  format: "dual narrative"
+  include_classification: true
+  classification_labels:
+    - F1
+    - F2
+    - F3
+    - M1
+    - M2
+    - M3
+    - N/A
+
+versioning:
+  label_prefix: "Generated on"
+  timestamp_format: "%a %b %d, %Y (%H:%M)"
+  include_version_tag: true
+
+logging:
+  enabled: true
+  log_file: "copilot_log.txt"
