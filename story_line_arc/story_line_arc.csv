@@ -1,0 +1,8 @@
+stage_id,stage_name,description,male_state,female_state,archetype_entry,narrative_function,output_trigger
+1,Lead-up to Argument,"Female guesses male's thoughts, tension builds",#0 or #1,green,None,Pre-rupture tension,voice_input.txt
+2,Argument,"Paraphrasing inputs, male hints suggest #0 or #1",red,red,None,Rupture detection,voice_input.txt
+3,Separation,"They go separate ways, emotional drift begins",yellow,blue,None,Polarity drift,background.txt
+4a,Male 'What Now',"Male collapses or loops, Stranger enters",blue,blue,Male Stranger,Containment trigger,reflex_logic.csv
+4b,Female 'I Was Right',"Female confirms her interpretation, Older Woman enters",red,green,Female Wisdom,Containment trigger,reflex_logic.csv
+5,Silent Hug,"Male reaches out, no apology, silent containment",blue,green,None,Containment success,storyline.txt
+6,Male Leads,"Side-by-side walk, leads to blue or yellow depending on location",blue or yellow,green,None,Resolution path,storyline.txt
