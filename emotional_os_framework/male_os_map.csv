@@ -1,0 +1,11 @@
+phase_id,neuro_state,archetype_trigger,male_judgment,emotional_intensity,wheel_state,reflex_trigger,narrative_role,rupture_phase,emotional_outcome
+1,PFC overload,None,"Mental fatigue",high,blue,None,pre-rupture,lead-up,"Cognitive drift; loss of purpose"
+2,Fight/Flight,None,"Triggered by female red",high,red,stranger_reflex,rupture,argument,"Over-caring begins; cortisol spike"
+3,HPA Axis,None,"Avoidance or shutdown",medium,yellow,stranger_reflex,rupture,argument,"Distraction loop; loss of polarity"
+4,Amygdala surge,None,"Impulse collapse",critical,green,stranger_reflex,rupture,argument,"Performs care; skips emotional center"
+5,Reward loop,Bad Guy,"Extracts her green",high,green,stranger_reflex,rupture,appart,"Addictive loop; skips we-centre"
+6,Containment,Real Man,"Holds space",medium,blue,older_woman_reflex,repair,reach-out,"Guides her from red to green via we-protocol"
+7,Genital readiness,None,"Misreads cues",medium,green,None,repair,reach-out,"Sexual readiness without emotional clarity"
+8,Non-concordance,Bad Guy,"Forces green",critical,green,stranger_reflex,rupture,appart,"Manipulates we-centre; short-term gain"
+8A,Immersion,Real Man,"Centers her",high,blue,older_woman_reflex,repair,hug,"Delayed reward; emotional fusion"
+9,Cognitive override,Nice Guy,"Tries to please",low,green,None,recursion,loop_restart,"Power/respect imbalance worsens each cycle"

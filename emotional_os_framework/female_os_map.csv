@@ -1,0 +1,12 @@
+phase_id,neuro_state,archetype_trigger,female_judgment,emotional_intensity,wheel_state,reflex_trigger,narrative_role,rupture_phase,emotional_outcome
+1,PFC overload,None,"Cognitive overload",high,appart_individual,None,pre-rupture,lead-up,"Suppressed desire, mental fatigue"
+2,Fight/Flight,None,"Heightened vigilance",high,appart_we,stranger_reflex,rupture,argument,"Hyperarousal, no containment"
+3,HPA Axis,None,"Stress encoding",medium,appart_we,stranger_reflex,rupture,argument,"Somatic stress, no emotional anchor"
+4,Amygdala surge,None,"Impulse collapse",critical,appart_we,stranger_reflex,rupture,argument,"Executive function loss, trauma imprint"
+5,Reward loop,Bad Guy,"Threat response",high,appart_we,stranger_reflex,rupture,argument,"Addictive if orgasmic; skips emotional center"
+6,Containment,Strong Man,"Containment response",medium,hug_we,older_woman_reflex,repair,reach-out,"Centers her; increases 'we' feeling"
+7,Genital readiness,None,"Misinterpreted cues",medium,hug_we,None,repair,reach-out,"Physical readiness without emotional safety"
+8,Non-concordance,Bad Guy,"Exploited vulnerability",critical,appart_we,stranger_reflex,rupture,appart,"Body-mind mismatch; addictive loop"
+8A,Immersion,Real Man,"Deep bonding",high,hug_we,older_woman_reflex,repair,hug,"Delayed reward; emotional fusion"
+9,Cognitive override,Nice Guy,"He bypassed rupture",low,appart_side_we,None,recursion,loop_restart,"Power/respect imbalance worsens each cycle"
+
