@@ -1,0 +1,27 @@
+category,key,value
+paradigm,male_cortisol_depletion,"Male cortisol depletion leads to exhaustion leads to emotional flattening"
+paradigm,female_tantrum_as_care,"Tantrum reframed as act of love"
+paradigm,male_orgasm_chase_skips_centre,"Nice Guy pulls her into green; Bad Guy forces her into green—both skip her emotional centre"
+paradigm,female_chase_centre_we,"She never reaches her centre with Nice Guy (oblivious) or Bad Guy (manipulative)"
+paradigm,male_crying_doesnt_work,"When crying fails, male needs to enter his blue and red flow, involve female to put color on point A to point B and point B itself, to resolve trade-offs occupying his thought process, his PFC"
+paradigm,female_crying_doesnt_work,"When crying fails, she enters observer singularity—seen but not felt, exposed but not contained"
+paradigm,female_circumvents_singularity,"She shifts from collapse to invitation—asks for shared logistics, reframes emotion into 'we'"
+
+rupture_context,domestic_blue,"Argument occurs in private space; male blue is disrupted"
+rupture_context,public_yellow,"Argument occurs in public space; female yellow is activated"
+
+resolution_path,blue_rebuild,"Side-side to blue: pickup, rebuild life"
+resolution_path,yellow_celebrate,"Side-side to yellow: celebrate life"
+
+we_protocol,stage_1,appart_individual
+we_protocol,stage_2,appart_we
+we_protocol,stage_3,hug_we
+we_protocol,stage_4,appart_side_we
+
+story_arc,phase_1,"Lead-up to argument"
+story_arc,phase_2,"Argument itself"
+story_arc,phase_3,"Appart: observer singularity"
+story_arc,phase_4,"Male reaches out"
+story_arc,phase_5,"Silent hug"
+story_arc,phase_6,"Side-side to blue, pickup, rebuild life"
+story_arc,phase_7,"Side-side to yellow, celebrate life"
