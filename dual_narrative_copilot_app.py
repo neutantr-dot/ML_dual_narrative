@@ -6,16 +6,16 @@ from datetime import datetime
 import yaml
 
 # Import the ML engine
-from narrative_engine import generate_storyline
+from narrative_engine import generate_narrative
 
+# === Constants ===
 DELIMITER = "|"
 VOICE_FIELDS = 4
 BACKGROUND_FIELDS = 5
-STORYLINE_LINES = 20
 HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
 COPILOT_CONFIG = "copilot_config.yaml"
 
-# Load headers from GitHub
+# === Load headers from GitHub ===
 @st.cache_data
 def load_headers():
     try:
@@ -28,6 +28,7 @@ def load_headers():
         st.error(f"⚠️ Could not load headers.csv: {e}")
         return pd.DataFrame(columns=["Input_file", "Field", "Label"])
 
+# === File caching ===
 def cache_file(name, uploaded_file):
     if uploaded_file:
         st.session_state[name + "_data"] = uploaded_file.getvalue().decode("utf-8")
@@ -36,6 +37,7 @@ def cache_file(name, uploaded_file):
         st.session_state.setdefault(name + "_data", "")
         st.session_state.setdefault(name + "_obj", None)
 
+# === Transposed file parsing ===
 def parse_transposed_file(file_text):
     if not file_text:
         return {}, []
@@ -58,7 +60,7 @@ def append_column_to_transposed_file(file_text, new_column):
         rows[i].append(value)
     return "\n".join([DELIMITER.join(row) for row in rows])
 
-# --- Load config (optional: for display or advanced settings) ---
+# === Load config ===
 def load_copilot_config(config_path=COPILOT_CONFIG):
     try:
         with open(config_path, "r") as f:
@@ -67,9 +69,7 @@ def load_copilot_config(config_path=COPILOT_CONFIG):
         st.warning(f"Could not load copilot_config.yaml: {e}")
         return {}
 
-copilot_config = load_copilot_config()
-
-# Streamlit UI
+# === UI Setup ===
 st.set_page_config(page_title="Dual Narrative Co-Pilot", layout="wide")
 st.sidebar.title("📁 Upload Files")
 
@@ -82,12 +82,17 @@ cache_file("background_file", background_file)
 cache_file("storyline_file", storyline_file)
 
 prefill_enabled = st.sidebar.toggle("Enable Prefill", value=False)
-headers_df = load_headers()
+use_generative_ai = st.sidebar.toggle("Use Generative AI (Paid)", value=False)
 
+headers_df = load_headers()
+copilot_config = load_copilot_config()
+copilot_config["runtime"]["use_generative_ai"] = use_generative_ai
+
+# === Input Blocks ===
 st.title("🧠 Dual Narrative Co-Pilot Storytelling")
 
 voice_blocks, voice_versions = parse_transposed_file(st.session_state["voice_file_data"])
-background_blocks, background_versions = parse_transposed_file(st.session_state["background_file_data"]) 
+background_blocks, background_versions = parse_transposed_file(st.session_state["background_file_data"])
 
 st.subheader("🗣️ Describe Argument That Happened")
 selected_voice_version = st.selectbox("📅 Voice Input Version", voice_versions) if voice_versions else None
@@ -117,35 +122,30 @@ for i in range(BACKGROUND_FIELDS):
     value = st.text_input(label_text, value=background_prefill[i])
     background_inputs.append(value)
 
-# --- Storyline generation using ML Copilot engine ---
-def copilot_generate_storyline(voice_inputs, background_inputs):
-    """
-    Calls the narrative_engine's generate_storyline function,
-    which uses emotional_grammar.json, reflex_logic.py, and copilot_config.yaml.
-    """
+# === Storyline Generation ===
+def copilot_generate_narrative(actor, user_id, voice_inputs, background_inputs, config):
     try:
-        storyline = generate_storyline(
-            voice_inputs,
-            background_inputs,
-            config_path=COPILOT_CONFIG
-        )
-        return storyline
+        result = generate_narrative(actor, user_id, " ".join(voice_inputs), " ".join(background_inputs), config)
+        return result
     except Exception as e:
-        st.error(f"Error generating storyline: {e}")
-        return ["⚠️ Error generating narrative. See logs for details."]
+        st.error(f"Error generating narrative: {e}")
+        return "[Error] Narrative generation failed."
 
 if st.button("✨ Generate Dual Narrative Storyline"):
-    storyline = copilot_generate_storyline(voice_inputs, background_inputs)
+    actor = "User"
+    user_id = "session_001"
+    result = copilot_generate_narrative(actor, user_id, voice_inputs, background_inputs, copilot_config)
 
     st.subheader("📜 Generated Storyline")
-    st.text_area("Scroll through your story:", value="\n".join(storyline), height=400)
+    st.text_area("Scroll through your story:", value=result, height=400)
 
     timestamp = datetime.now().strftime("%a %b %d, %Y (%H:%M)")
     st.session_state["new_voice_column"] = [timestamp] + voice_inputs
     st.session_state["new_background_column"] = [timestamp] + background_inputs
-    st.session_state["new_storyline_column"] = [timestamp] + storyline
+    st.session_state["new_storyline_column"] = [timestamp] + result.splitlines()
     st.session_state["story_generated"] = True
 
+# === Save Outputs ===
 if st.session_state.get("story_generated"):
     st.download_button("⬇️ Save Updated Voice Input",
         data=append_column_to_transposed_file(
