@@ -78,12 +78,17 @@ def generate_narrative(actor, user_id, voice_input, background, config):
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7,
-                max_tokens=1500
+                max_tokens=min(1500, line_count * 50)
             )
             output = response["choices"][0]["message"]["content"]
             lines = output.splitlines()
-            classification = lines[-1].replace("Classification:", "").strip()
-            narrative = "\n".join(lines[:-1])
+
+            if lines and "Classification:" in lines[-1]:
+                classification = lines[-1].replace("Classification:", "").strip()
+                narrative = "\n".join(lines[:-1])
+            else:
+                classification = config["defaults"].get("fallback_archetype", "none")
+                narrative = "\n".join(lines)
 
         except Exception as e:
             narrative = f"[Error] Failed to generate story: {e}"
