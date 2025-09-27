@@ -1,30 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Poem Generator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dual Narrative Emotional Engine</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    input, button { padding: 10px; width: 100%; margin-top: 10px; }
-    #poemOutput { margin-top: 20px; font-style: italic; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 2em;
+    }
+    h1 {
+      color: #333;
+    }
+    .section {
+      margin-bottom: 2em;
+      padding: 1em;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1em;
+      font-weight: bold;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 0.5em;
+      padding: 0.5em;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+    input[type="file"] {
+      margin-top: 1em;
+    }
+    button {
+      margin-top: 1em;
+      padding: 0.6em 1.2em;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
   </style>
 </head>
 <body>
-  <h2>Poem Generator</h2>
-  <input type="text" id="userInput" placeholder="Enter your inspiration..." />
-  <button onclick="generatePoem()">Generate</button>
-  <p id="poemOutput"></p>
+  <h1>Dual Narrative Emotional Engine</h1>
+
+  <div class="section" id="input-section">
+    <h2>Upload Emotional Inputs</h2>
+    <input type="file" id="voice-upload" accept=".txt" />
+    <input type="file" id="background-upload" accept=".txt" />
+  </div>
+
+  <div class="section" id="form-container">
+    <h2>Describe Your Experience</h2>
+    <!-- Dynamic fields from headers.csv will appear here -->
+  </div>
+
+  <div class="section">
+    <h2>Download Outputs</h2>
+    <button onclick="downloadFile('storyline.txt')">Download Storyline</button>
+    <button onclick="downloadFile('dual_narrative_copilot_app.txt')">Download Session Log</button>
+  </div>
 
   <script>
-    async function generatePoem() {
-      const inputText = document.getElementById('userInput').value;
-      const response = await fetch("https://dc51a0b121f8.ngrok-free.app/generate-response", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText })
+    async function loadHeaders() {
+      const url = 'https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv';
+      const response = await fetch(url);
+      const text = await response.text();
+      const rows = text.trim().split('\n').slice(1); // Skip header
+
+      rows.forEach(row => {
+        const [inputFile, field, label] = row.replace(/"/g, '').split(',');
+        const container = document.getElementById('form-container');
+        const labelEl = document.createElement('label');
+        labelEl.textContent = label;
+        const textarea = document.createElement('textarea');
+        textarea.name = field;
+        container.appendChild(labelEl);
+        container.appendChild(textarea);
       });
-      const data = await response.json();
-      document.getElementById('poemOutput').innerText = data.response;
     }
+
+    function downloadFile(filename) {
+      const link = document.createElement('a');
+      link.href = filename;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    loadHeaders();
   </script>
 </body>
 </html>
