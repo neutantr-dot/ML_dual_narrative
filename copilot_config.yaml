@@ -24,8 +24,9 @@ runtime:
   enable_reframe: true
   enable_dual_narrative: true
   log_session: true
+  use_generative_ai: false  # Modular by default
   story_line_count: 100  # ← Add this line
-
+  
 grammar:
   emotional_grammar: emotional_grammar.json
 
