@@ -42,8 +42,8 @@ def detect_wheel_state(voice_input, background, wheel_codex_path):
 
 def modulate_tone(wheel_state, grammar):
     if wheel_state in grammar:
-        tone = grammar[wheel_state]["tone"]
-        reframe = grammar[wheel_state]["reframe"]
+        tone = grammar[wheel_state].get("tone", "neutral")
+        reframe = grammar[wheel_state].get("reframe", "No reframe available.")
         return f"[Tone: {tone}]\n{reframe}"
     return "[Tone: neutral]\nNo emotional modulation applied."
 
