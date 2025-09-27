@@ -1,47 +1,50 @@
-model:
-  name: "openai-gpt4"
-  temperature: 0.7
-  max_tokens: 800
-  system_prompt: "You are a storytelling assistant."
+# 🧠 Emotional Engine Configuration
 
-storyline:
-  lines: 20
-  format: "dual narrative"
-  include_classification: true
-  classification_labels:
-    - F1
-    - F2
-    - F3
-    - M1
-    - M2
-    - M3
-    - N/A
+paths:
+  input: input_output/
+  output: input_output/storyline.txt
 
-classification:
-  enabled: true
-  output_file: "classification.csv"
-  fallback_label: "N/A"
-  user_tracking: true
-  session_label_format: "%a %b %d, %Y (%H:%M)"
-  label_prefix: "Generated on"
+  modules:
+    engine_boot: engine_boot/
+    os_framework: emotional_os_framework/
+    reflex: narrative_reflex_intelligence/
+    geometry: emotional_geometry_layers/
+    arc: story_line_arc/
+    references: references/
 
-emotional_grammar:
-  enabled: true
-  path: "emotional_grammar.json"
-  grammar_mode: "semantic"
-  use_expectation_map: true
+  files:
+    voice_input: voice_input.txt
+    background: background.txt
+    storyline: storyline.txt
 
-reflex_logic:
-  enabled: true
-  path: "reflex_logic.py"
-  mode: "archetype_shift"
-  strategy: "dual_narrative"
-  intensity: "moderate"
+runtime:
+  enable_archetype: true
+  enable_containment: true
+  enable_somatic: true
+  enable_reframe: true
+  enable_dual_narrative: true
+  log_session: true
+
+grammar:
+  emotional_grammar: emotional_grammar.json
+
+scripts:
+  engine: narrative_engine.py
+  reflex: reflex_logic.py
 
 logging:
-  enabled: true
-  log_file: "copilot_log.txt"
-  log_level: "info"
-  anonymize: true
+  session_log: engine_boot/session_log.csv
+  verbosity: high
+  track_wheel_state: true
+  track_reflex_trigger: true
+  track_archetype_entry: true
+  track_containment_success: true
+
+defaults:
+  fallback_wheel_state: neutral
+  fallback_archetype: none
+  fallback_containment: silent_hold
+  fallback_somatic: breath_and_stillness
+
 
 
