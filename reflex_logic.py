@@ -11,6 +11,21 @@ def load_grammar(path):
     with open(path, encoding='utf-8') as f:
         return json.load(f)
 
+def classify_actor(actor, wheel_state, reflex_type, archetype_entry, classification_path):
+    import csv
+    with open(classification_path, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if (
+                row["actor"] == actor and
+                row["wheel_state"] == wheel_state and
+                row["reflex_type"] == reflex_type and
+                row["archetype_entry"] == archetype_entry
+            ):
+                return row["class_code"]
+    return "M0"  # fallback classification
+
+
 # Detect reflex from wheel state and voice input
 def detect_reflex(wheel_state, voice_input, reflex_logic_path):
     reflex_logic = load_csv(reflex_logic_path)
