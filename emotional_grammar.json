@@ -1,21 +1,12 @@
 {
-  "emotions": {
-    "joy": { "valence": 1.0, "arousal": 0.7 },
-    "fear": { "valence": -0.8, "arousal": 0.9 },
-    "trust": { "valence": 0.6, "arousal": 0.4 },
-    "anger": { "valence": -0.9, "arousal": 0.8 },
-    "sadness": { "valence": -0.7, "arousal": 0.3 },
-    "anticipation": { "valence": 0.4, "arousal": 0.6 }
+  "red": {
+    "tone": "tense",
+    "polarity": "inward",
+    "reframe": "You were trying to care, but it collapsed into control."
   },
-  "archetypes": {
-    "mentor": ["trust", "anticipation"],
-    "rebel": ["anger", "joy"],
-    "orphan": ["sadness", "fear"],
-    "lover": ["joy", "trust"]
-  },
-  "modifiers": {
-    "intensity": ["low", "medium", "high"],
-    "direction": ["self", "other", "abstract"],
-    "truth_bias": ["literal", "symbolic", "projected"]
+  "yellow": {
+    "tone": "drifting",
+    "polarity": "outward",
+    "reframe": "You walked away, but part of you hoped he'd follow."
   }
 }
