@@ -1,0 +1,10 @@
+"os_layer","color","function","description","flow_direction","emotional_role"
+"internal","blue","task execution","Logical, mechanical, flow-driven work","inside-out","masculine flow anchor"
+"internal","red","task control","Time, resources, quality management","inside-out","masculine tension"
+"internal","green","emotional labeling","Internal observer assigns emotional meaning","inside-out","feminine attunement"
+"internal","yellow","external output","Communicated result—mix of blue, red, green","inside-out","expression synthesis"
+
+"external","green","perception","Observer sees the output—tone, style, energy","outside-in","feminine reception"
+"external","red","judgment","Observer evaluates—efficiency, correctness, impact","outside-in","feminine correction"
+"external","blue","processing","Observer integrates—what does this mean for them?","outside-in","masculine calibration"
+"external","yellow","received output","Final interpretation—what the world 'gets' from you","outside-in","social reflection"

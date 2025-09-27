@@ -1,0 +1,10 @@
+action_type,actor,technique,mechanism,emotional_effect,archetype_alignment,phase_reference,trigger_condition,wheel_state_before,wheel_state_after
+containment,male,"Diaphragmatic deep breath + hold +push out belly button/belly expansion+ gluteal squeeze","Diaphragm pulls down, intestines push up against kidneys, adrenal pressure releases cortisol","Instant cortisol release, awakes prefrontol cortex, induces feeling awake, grounds nervous system, restores masculine clarity","Male Stranger","Phase_8A","Male collapse or cortisol need/demand to revert to logical thinking, clarity","red","blue"
+
+containment,female,"Soft exhale + pelvic drop + shoulder release","Activates parasympathetic tone, lowers command tension","Invites co-regulation, exits command mode","Female Wisdom","Phase_4","Crying doesn’t work","blue","green"
+
+containment,male,"Side-by-side walk/activity/chore + silence","Synchronizes rhythm, bypasses verbal recursion","Restores shared flow, reduces tension","Real Man","Phase_3","Post-argument drift","yellow","blue"
+
+containment,female,"Hand on heart + slow breath","Re-engages emotional center, exits observer singularity","Restores vulnerability, opens to we-protocol","Lover","Phase_2","Feeling unseen","red","green"
+
+containment,male,"Eye contact + belly expansion","Signals presence, anchors emotional safety","Rebuilds trust, invites emotional expression","Guardian","Phase_4","Female in collapse","green","blue"
