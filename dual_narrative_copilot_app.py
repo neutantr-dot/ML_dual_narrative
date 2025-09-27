@@ -4,8 +4,6 @@ import requests
 from io import StringIO
 from datetime import datetime
 import yaml
-
-# Import the ML engine
 from narrative_engine import generate_narrative
 
 # === Constants ===
@@ -125,7 +123,13 @@ for i in range(BACKGROUND_FIELDS):
 # === Storyline Generation ===
 def copilot_generate_narrative(actor, user_id, voice_inputs, background_inputs, config):
     try:
-        result = generate_narrative(actor, user_id, " ".join(voice_inputs), " ".join(background_inputs), config)
+        result = generate_narrative(
+            actor,
+            user_id,
+            " ".join(voice_inputs),
+            " ".join(background_inputs),
+            config
+        )
         return result
     except Exception as e:
         st.error(f"Error generating narrative: {e}")
@@ -161,3 +165,5 @@ if st.session_state.get("story_generated"):
         data=append_column_to_transposed_file(
             st.session_state["storyline_file_data"], st.session_state["new_storyline_column"]),
         file_name="storyline.txt", mime="text/plain")
+
+
