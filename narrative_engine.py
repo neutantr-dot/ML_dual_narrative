@@ -137,7 +137,7 @@ def generate_narrative(actor, user_id, voice_input, background, config):
         user_id=user_id,
         actor=actor,
         class_code=classification,
-        log_path=os.path.join(modules["reflex"], "classification.csv")
+        log_path="classification.csv"
     )
 
     return f"[{actor} Narrative]\n{narrative}\n\n[Classification]\nActor: {actor}\nClassification: {classification}"
