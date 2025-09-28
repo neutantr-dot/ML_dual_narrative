@@ -36,8 +36,8 @@ def write_text(path, content):
 def detect_wheel_state(voice_input, background, wheel_codex_path):
     codex = load_csv(wheel_codex_path)
     for row in codex:
-        if row["notes"] in voice_input or row["rupture_trigger"] in background:
-            return row["color"]
+        if row.get("notes", "") in voice_input or row.get("rupture_trigger", "") in background:
+            return row.get("color", "neutral")
     return "neutral"
 
 # === Tone Modulation ===
@@ -117,7 +117,7 @@ def generate_narrative(actor, user_id, voice_input, background, config):
             voice_input=voice_input,
             transmission_map_path=os.path.join(modules["geometry"], "transmission_map.csv"),
             classification_path=os.path.join(modules["reflex"], "classification.csv"),
-            taxonomy_path=os.path.join(modules["reflex"], "reflex_taxonomy.csv")
+            taxonomy_path=os.path.join(modules["reflex"], "7_reflex_taxonomy.csv")
         )
 
         # Containment strategy
@@ -130,14 +130,15 @@ def generate_narrative(actor, user_id, voice_input, background, config):
         # Stitch narrative
         narrative += f"\n\n[Containment Strategy]\n{containment}"
 
-        classification = reflex_bundle["class_code"]
+        classification = reflex_bundle.get("class_code", config["defaults"].get("fallback_archetype", "none"))
 
     # === Logging ===
     log_classification(
         user_id=user_id,
         actor=actor,
         class_code=classification,
-        log_path=os.path.join(config["paths"]["modules"]["reflex"], "classification.csv")
+        log_path=os.path.join(modules["reflex"], "classification.csv")
     )
 
     return f"[{actor} Narrative]\n{narrative}\n\n[Classification]\nActor: {actor}\nClassification: {classification}"
+
