@@ -13,33 +13,42 @@ def load_grammar(path):
 
 def classify_actor(actor, wheel_state, reflex_type, archetype_entry, classification_path):
     import csv
-    with open(classification_path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if (
-                row["actor"] == actor and
-                row["wheel_state"] == wheel_state and
-                row["reflex_type"] == reflex_type and
-                row["archetype_entry"] == archetype_entry
-            ):
-                return row["class_code"]
+
+    try:
+        with open(classification_path, newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if all(key in row for key in ["actor", "wheel_state", "reflex_type", "archetype_entry", "class_code"]):
+                    if (
+                        row["actor"].strip().lower() == actor.strip().lower() and
+                        row["wheel_state"].strip().lower() == wheel_state.strip().lower() and
+                        row["reflex_type"].strip().lower() == reflex_type.strip().lower() and
+                        row["archetype_entry"].strip().lower() == archetype_entry.strip().lower()
+                    ):
+                        return row["class_code"]
+    except Exception as e:
+        print(f"⚠️ Classification error: {e}")
+
     return "M0"  # fallback classification
 
-
 # Detect reflex from wheel state and voice input
-def detect_reflex(wheel_state, voice_input, reflex_logic_path):
-    reflex_logic = load_csv(reflex_logic_path)
-    for row in reflex_logic:
-        if row["wheel_state"] == wheel_state and row["trigger"] in voice_input:
+def detect_reflex(wheel_state, voice_input, transmission_map_path):
+    transmission_map = load_csv(transmission_map_path)
+    for row in transmission_map:
+        if row["wheel_state"] == wheel_state and row["reflex_type"] in voice_input:
             return {
                 "reflex_type": row["reflex_type"],
                 "archetype_entry": row["archetype_entry"],
-                "containment_strategy": row["intervention"]
+                "containment_strategy": row["containment_strategy"],
+                "narrative_branch": row["narrative_branch"],
+                "somatic_protocol": row["somatic_protocol"]
             }
     return {
         "reflex_type": "none",
         "archetype_entry": "none",
-        "containment_strategy": "default silence"
+        "containment_strategy": "default silence",
+        "narrative_branch": "neutral",
+        "somatic_protocol": "breath_and_stillness"
     }
 
 # Get transmission axis and narrative branch
