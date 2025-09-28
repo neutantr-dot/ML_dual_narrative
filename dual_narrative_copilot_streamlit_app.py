@@ -10,6 +10,22 @@ VOICE_FIELDS = 4
 BACKGROUND_FIELDS = 5
 DELIMITER = ","
 
+# === Load headers.csv ===
+HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
+
+@st.cache_data
+def load_headers():
+    try:
+        response = requests.get(HEADERS_URL)
+        response.raise_for_status()
+        df = pd.read_csv(StringIO(response.text), sep=DELIMITER, quotechar='"', engine="python")
+        return df
+    except Exception as e:
+        st.warning(f"⚠️ Could not load headers.csv: {e}")
+        return pd.DataFrame(columns=["Input_file", "Field", "Label"])
+
+headers_df = load_headers()
+
 # === File Uploads ===
 st.set_page_config(page_title="Dual Narrative Co-Pilot", layout="wide")
 st.sidebar.title("📁 Upload Files")
@@ -18,59 +34,117 @@ voice_file = st.sidebar.file_uploader("Upload voice_input.csv", type="csv")
 background_file = st.sidebar.file_uploader("Upload background.csv", type="csv")
 storyline_file = st.sidebar.file_uploader("Upload storyline.csv", type="csv")
 
-# === Parse CSVs and extract first column ===
-def extract_first_column(file_obj, expected_fields):
+def parse_csv_file(file_obj, expected_fields):
     if not file_obj:
-        return [""] * expected_fields
+        return [""] * expected_fields, []
     try:
-        df = pd.read_csv(file_obj, sep=DELIMITER, quotechar='"', engine="python", header=None)
-        first_col = df.iloc[1:expected_fields+1, 0].fillna("").tolist()
-        return first_col
+        df = pd.read_csv(file_obj, sep=DELIMITER, quotechar='"', engine="python")
+        versions = list(df.columns)
+        first = df[versions[0]].fillna("").tolist()
+        return first[:expected_fields], versions
     except Exception as e:
         st.warning(f"⚠️ Could not parse CSV: {e}")
-        return [""] * expected_fields
+        return [""] * expected_fields, []
 
-voice_inputs = extract_first_column(voice_file, VOICE_FIELDS)
-background_inputs = extract_first_column(background_file, BACKGROUND_FIELDS)
+voice_inputs, voice_versions = parse_csv_file(voice_file, VOICE_FIELDS)
+background_inputs, background_versions = parse_csv_file(background_file, BACKGROUND_FIELDS)
+storyline_text = storyline_file.getvalue().decode("utf-8") if storyline_file else ""
 
 # === Input Fields ===
 st.title("🧠 Dual Narrative Emotional OS")
 
 st.subheader("🗣️ Voice Input (Conflict)")
 for i in range(VOICE_FIELDS):
-    voice_inputs[i] = st.text_input(f"Voice Input {i+1}", value=voice_inputs[i], key=f"voice_{i}")
+    label_row = headers_df[
+        (headers_df["Input_file"] == "voice_input") &
+        (headers_df["Field"] == f"input{i+1}")
+    ]
+    label_text = label_row["Label"].values[0] if not label_row.empty else f"Voice Input {i+1}"
+    voice_inputs[i] = st.text_input(label_text, value=voice_inputs[i], key=f"voice_{i}")
 
 st.subheader("🌄 Background Input (Wheel Context)")
 for i in range(BACKGROUND_FIELDS):
-    background_inputs[i] = st.text_input(f"Background Input {i+1}", value=background_inputs[i], key=f"background_{i}")
+    label_row = headers_df[
+        (headers_df["Input_file"] == "background") &
+        (headers_df["Field"] == f"input{i+1}")
+    ]
+    label_text = label_row["Label"].values[0] if not label_row.empty else f"Background Input {i+1}"
+    background_inputs[i] = st.text_input(label_text, value=background_inputs[i], key=f"background_{i}")
+
+# Hardcoded for testing phase
+actor = "Partner"
+user_id = "owner"
 
 # === Generate Narrative ===
-if "story_generated" not in st.session_state:
-    st.session_state.story_generated = False
-
 if st.button("✨ Generate Dual Narrative"):
     payload = {
         "voice_inputs": voice_inputs,
         "background_inputs": background_inputs,
-        "actor": "Partner",
-        "user_id": "owner"
+        "actor": actor,
+        "user_id": user_id
     }
 
     try:
         response = requests.post(FLASK_URL, json=payload)
         if response.status_code == 200:
             result = response.json().get("result", "[No response]")
-            st.session_state.story_generated = True
             st.session_state.story_text = result
+
+            timestamp = datetime.now().strftime("%a %b %d, %Y (%H:%M)")
+            new_voice_column = [timestamp] + voice_inputs
+            new_background_column = [timestamp] + background_inputs
+            new_storyline_column = [timestamp] + result.splitlines()
+
+            def append_column_csv(file_obj, new_column):
+                try:
+                    if file_obj:
+                        df = pd.read_csv(file_obj, sep=DELIMITER, quotechar='"', engine="python")
+                    else:
+                        df = pd.DataFrame()
+                except:
+                    df = pd.DataFrame()
+
+                required_rows = len(new_column) - 1
+                if df.empty:
+                    df = pd.DataFrame(index=range(required_rows))
+                elif len(df) < required_rows:
+                    for _ in range(required_rows - len(df)):
+                        df.loc[len(df)] = ["" for _ in range(len(df.columns))]
+
+                df[timestamp] = new_column[1:]
+                return df.to_csv(index=False, sep=DELIMITER, quotechar='"')
+
+            updated_voice = append_column_csv(voice_file, new_voice_column) if voice_file else ""
+            updated_background = append_column_csv(background_file, new_background_column) if background_file else ""
+
+            storyline_df = pd.DataFrame(index=range(len(new_storyline_column) - 1))
+            storyline_df[timestamp] = new_storyline_column[1:]
+            updated_storyline = storyline_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
+
+            st.session_state.updated_voice = updated_voice
+            st.session_state.updated_background = updated_background
+            st.session_state.updated_storyline = updated_storyline
+
         else:
             st.error(f"❌ Error {response.status_code}: {response.text}")
     except Exception as e:
         st.error(f"⚠️ Failed to connect to Flask backend: {e}")
 
-# === Show Storyline if generated ===
-if st.session_state.story_generated:
+# === Show Storyline if available ===
+if "story_text" in st.session_state:
     st.subheader("📜 Generated Storyline")
     st.text_area("Scroll through your story:", value=st.session_state.story_text, height=400)
+
+# === Persistent Download Buttons ===
+if "updated_voice" in st.session_state:
+    st.download_button("⬇️ Save Updated Voice Input", data=st.session_state.updated_voice, file_name="voice_input.csv", mime="text/csv")
+
+if "updated_background" in st.session_state:
+    st.download_button("⬇️ Save Updated Background", data=st.session_state.updated_background, file_name="background.csv", mime="text/csv")
+
+if "updated_storyline" in st.session_state:
+    st.download_button("⬇️ Save New Storyline", data=st.session_state.updated_storyline, file_name="storyline.csv", mime="text/csv")
+
 
 
 
