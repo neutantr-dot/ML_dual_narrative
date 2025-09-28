@@ -73,8 +73,8 @@ for i in range(BACKGROUND_FIELDS):
     label_text = label_row["Label"].values[0] if not label_row.empty else f"Background Input {i+1}"
     background_inputs[i] = st.text_input(label_text, value=background_inputs[i])
 
-
-actor = st.selectbox("🎭 Actor Perspective", ["User", "Partner"])
+# actor = st.selectbox("🎭 Actor Perspective", ["User", "Partner"])
+actor = "Partner"
 user_id = st.text_input("🆔 Session ID", value="session_001")
 
 # === Generate Narrative ===
