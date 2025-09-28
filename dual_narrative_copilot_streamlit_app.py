@@ -5,7 +5,7 @@ from io import StringIO
 from datetime import datetime
 
 # === Constants ===
-FLASK_URL = "https://bbb6463372d3.ngrok-free.app/generate"  # Replace with your live ngrok URL
+FLASK_URL = "https://49cbb7bc0425.ngrok-free.app/generate"  # Replace with your live ngrok URL
 VOICE_FIELDS = 4
 BACKGROUND_FIELDS = 5
 DELIMITER = ","
