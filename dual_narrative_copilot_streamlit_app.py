@@ -99,33 +99,16 @@ if st.button("✨ Generate Dual Narrative"):
             new_background_column = [timestamp] + background_inputs
             new_storyline_column = [timestamp] + result.splitlines()
 
-           # def append_column_csv(original_file, new_column):
-           #     try:
-           #         df = pd.read_csv(original_file, sep=DELIMITER, quotechar='"', engine="python")
-           #     except:
-           #         df = pd.DataFrame()
-           #     while len(df) < len(new_column) - 1:
-           #         df.loc[len(df)] = ["" for _ in range(len(df.columns))]
-           #     df[timestamp] = new_column[1:]
-           #     return df.to_csv(index=False, sep=DELIMITER, quotechar='"')
-       def append_column_csv(file_obj, new_column, timestamp):
-            try:
-                if file_obj:
-                     df = pd.read_csv(file_obj, sep=DELIMITER, quotechar='"', engine="python")
-                else:
-                     df = pd.DataFrame()
-            except:
-                df = pd.DataFrame()
-
-            required_rows = len(new_column) - 1
-            if df.empty:
-                df = pd.DataFrame(index=range(required_rows))
-            elif len(df) < required_rows:
-                for _ in range(required_rows - len(df)):
-                    df.loc[len(df)] = ["" for _ in range(len(df.columns))]
-
-            df[timestamp] = new_column[1:]
-            return df.to_csv(index=False, sep=DELIMITER, quotechar='"')
+           def append_column_csv(original_file, new_column):
+               try:
+                   df = pd.read_csv(original_file, sep=DELIMITER, quotechar='"', engine="python")
+               except:
+                   df = pd.DataFrame()
+               while len(df) < len(new_column) - 1:
+                   df.loc[len(df)] = ["" for _ in range(len(df.columns))]
+               df[timestamp] = new_column[1:]
+               return df.to_csv(index=False, sep=DELIMITER, quotechar='"')
+       
 
             updated_voice = append_column_csv(voice_file, new_voice_column) if voice_file else ""
             updated_background = append_column_csv(background_file, new_background_column) if background_file else ""
