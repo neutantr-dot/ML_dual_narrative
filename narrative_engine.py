@@ -3,7 +3,7 @@ import yaml
 import json
 import csv
 from datetime import datetime
-from reflex_logic import detect_reflex, apply_containment, classify_actor
+from reflex_logic import process_reflex_bundle, get_containment_strategy
 
 # Optional: Only used if generative AI is enabled
 try:
@@ -32,7 +32,7 @@ def write_text(path, content):
     with open(path, 'w', encoding='utf-8') as f:
         f.write(content)
 
-# === Modular Logic ===
+# === Wheel State Detection ===
 def detect_wheel_state(voice_input, background, wheel_codex_path):
     codex = load_csv(wheel_codex_path)
     for row in codex:
@@ -40,6 +40,7 @@ def detect_wheel_state(voice_input, background, wheel_codex_path):
             return row["color"]
     return "neutral"
 
+# === Tone Modulation ===
 def modulate_tone(wheel_state, grammar):
     if wheel_state in grammar:
         tone = grammar[wheel_state].get("tone", "neutral")
@@ -47,6 +48,7 @@ def modulate_tone(wheel_state, grammar):
         return f"[Tone: {tone}]\n{reframe}"
     return "[Tone: neutral]\nNo emotional modulation applied."
 
+# === Classification Logging ===
 def log_classification(user_id, actor, class_code, log_path):
     timestamp = datetime.now().strftime("%a %b %d %Y (%H:%M)")
     with open(log_path, 'a', encoding='utf-8', newline='') as f:
@@ -95,7 +97,7 @@ def generate_narrative(actor, user_id, voice_input, background, config):
             classification = config["defaults"].get("fallback_archetype", "none")
 
     else:
-        # === Modular Logic Path ===
+        # === Modular Reflex Path ===
         grammar = load_grammar(config["grammar"]["emotional_grammar"])
         modules = config["paths"]["modules"]
 
@@ -105,30 +107,30 @@ def generate_narrative(actor, user_id, voice_input, background, config):
             os.path.join(modules["geometry"], "wheel_codex.csv")
         )
 
+        # Tone modulation
         narrative = modulate_tone(wheel_state, grammar)
 
-        narrative = apply_containment(
-            wheel_state,
-            narrative,
-            os.path.join(modules["reflex"], "6_reflex_logic.csv"),
-            os.path.join(modules["geometry"], "transmission_map.csv"),
-            os.path.join(modules["geometry"], "containment_protocol.csv"),
-            os.path.join(modules["geometry"], "somatic_protocol.csv")
+        # Reflex bundle
+        reflex_bundle = process_reflex_bundle(
+            actor=actor,
+            wheel_state=wheel_state,
+            voice_input=voice_input,
+            transmission_map_path=os.path.join(modules["geometry"], "transmission_map.csv"),
+            classification_path=os.path.join(modules["reflex"], "classification.csv"),
+            taxonomy_path=os.path.join(modules["reflex"], "reflex_taxonomy.csv")
         )
 
-        reflex = detect_reflex(
+        # Containment strategy
+        containment = get_containment_strategy(
             wheel_state,
             voice_input,
-            os.path.join(modules["reflex"], "6_reflex_logic.csv")
+            os.path.join(modules["geometry"], "transmission_map.csv")
         )
 
-        classification = classify_actor(
-            actor,
-            wheel_state,
-            reflex["reflex_type"],
-            reflex["archetype_entry"],
-            os.path.join(modules["reflex"], "classification.csv")
-        )
+        # Stitch narrative
+        narrative += f"\n\n[Containment Strategy]\n{containment}"
+
+        classification = reflex_bundle["class_code"]
 
     # === Logging ===
     log_classification(
@@ -139,4 +141,3 @@ def generate_narrative(actor, user_id, voice_input, background, config):
     )
 
     return f"[{actor} Narrative]\n{narrative}\n\n[Classification]\nActor: {actor}\nClassification: {classification}"
-
