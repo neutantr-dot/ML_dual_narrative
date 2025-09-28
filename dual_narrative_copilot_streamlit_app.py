@@ -10,7 +10,6 @@ VOICE_FIELDS = 4
 BACKGROUND_FIELDS = 5
 DELIMITER = ","
 
-
 # === header.csv upload ===
 HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
 
@@ -19,7 +18,7 @@ def load_headers():
     try:
         response = requests.get(HEADERS_URL)
         response.raise_for_status()
-        df = pd.read_csv(StringIO(response.text), sep=",", quotechar='"', engine="python")
+        df = pd.read_csv(StringIO(response.text), sep=DELIMITER, quotechar='"', engine="python")
         df.columns = df.columns.str.strip()
         return df
     except Exception as e:
@@ -73,9 +72,8 @@ for i in range(BACKGROUND_FIELDS):
     label_text = label_row["Label"].values[0] if not label_row.empty else f"Background Input {i+1}"
     background_inputs[i] = st.text_input(label_text, value=background_inputs[i])
 
-# actor = st.selectbox("🎭 Actor Perspective", ["User", "Partner"])
+# Hardcoded for testing phase
 actor = "Partner"
-# user_id = st.text_input("🆔 Session ID", value="session_001")
 user_id = "owner"
 
 # === Generate Narrative ===
@@ -99,22 +97,28 @@ if st.button("✨ Generate Dual Narrative"):
             new_background_column = [timestamp] + background_inputs
             new_storyline_column = [timestamp] + result.splitlines()
 
-           def append_column_csv(original_file, new_column):
-               try:
-                   df = pd.read_csv(original_file, sep=DELIMITER, quotechar='"', engine="python")
-               except:
-                   df = pd.DataFrame()
-               while len(df) < len(new_column) - 1:
-                   df.loc[len(df)] = ["" for _ in range(len(df.columns))]
-               df[timestamp] = new_column[1:]
-               return df.to_csv(index=False, sep=DELIMITER, quotechar='"')
-       
+            def append_column_csv(file_obj, new_column):
+                try:
+                    if file_obj:
+                        df = pd.read_csv(file_obj, sep=DELIMITER, quotechar='"', engine="python")
+                    else:
+                        df = pd.DataFrame()
+                except:
+                    df = pd.DataFrame()
+
+                required_rows = len(new_column) - 1
+                if df.empty:
+                    df = pd.DataFrame(index=range(required_rows))
+                elif len(df) < required_rows:
+                    for _ in range(required_rows - len(df)):
+                        df.loc[len(df)] = ["" for _ in range(len(df.columns))]
+
+                df[timestamp] = new_column[1:]
+                return df.to_csv(index=False, sep=DELIMITER, quotechar='"')
 
             updated_voice = append_column_csv(voice_file, new_voice_column) if voice_file else ""
             updated_background = append_column_csv(background_file, new_background_column) if background_file else ""
 
-            # storyline_df = pd.DataFrame()
-            # storyline_df[timestamp] = new_storyline_column[1:]
             storyline_df = pd.DataFrame(index=range(len(new_storyline_column) - 1))
             storyline_df[timestamp] = new_storyline_column[1:]
             updated_storyline = storyline_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
@@ -127,5 +131,6 @@ if st.button("✨ Generate Dual Narrative"):
             st.error(f"❌ Error {response.status_code}: {response.text}")
     except Exception as e:
         st.error(f"⚠️ Failed to connect to Flask backend: {e}")
+
 
 
