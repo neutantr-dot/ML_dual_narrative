@@ -112,7 +112,9 @@ if st.button("✨ Generate Dual Narrative"):
             updated_voice = append_column_csv(voice_file, new_voice_column) if voice_file else ""
             updated_background = append_column_csv(background_file, new_background_column) if background_file else ""
 
-            storyline_df = pd.DataFrame()
+            #storyline_df = pd.DataFrame()
+            #storyline_df[timestamp] = new_storyline_column[1:]
+            storyline_df = pd.DataFrame(index=range(len(new_storyline_column) - 1))
             storyline_df[timestamp] = new_storyline_column[1:]
             updated_storyline = storyline_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
 
