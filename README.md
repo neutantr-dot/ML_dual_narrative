@@ -174,6 +174,28 @@ def apply_containment(wheel_state, narrative):
 You’re not just stitching files—you’re scripting the **recursive choreography of emotional repair**. Want help writing the actual `narrative_engine.py` scaffold or testing a full run? Let’s build the pulse of your engine.
 
 ML_dual_narrative/
+
+
+
+
+## 📁 Main Directory — DOS Tree View
+
+```
+ML_dual_narrative/
+│
+├── classification.csv
+├── classification.py
+├── copilot_config.yaml
+├── copilot_log.txt
+├── dual_narrative_copilot_app.py
+├── emotional_grammar.json
+├── headers.csv
+├── index.html
+├── narrative_engine.py
+├── reflex_core.py
+├── reflex_logic.py
+├── reflex_manifest.py
+├── reflex_taxonomy.py
 │
 ├── engine_boot/
 │   ├── filestructure.csv
@@ -211,3 +233,92 @@ ML_dual_narrative/
 │
 ├── story_line_arc/
 │   └── story_line_arc.csv
+```
+
+---
+
+## 🧠 How the `.py` Files Interplay
+
+Your emotional OS is modular and symbolic. Each `.py` file plays a distinct role in the emotional processing pipeline:
+
+---
+
+### 🔹 `dual_narrative_copilot_app.py`  
+**Role:** Flask server + ngrok tunnel  
+**Function:**  
+- Hosts the `/generate` endpoint  
+- Accepts emotional input (`voice_input`, `background`, `actor`, `user_id`)  
+- Routes it to `generate_narrative()` in `narrative_engine.py`  
+- Returns structured emotional output
+
+---
+
+### 🔹 `narrative_engine.py`  
+**Role:** Core emotional synthesis engine  
+**Function:**  
+- Loads config, grammar, and CSV modules  
+- Detects `wheel_state` via emotional geometry  
+- Modulates tone using `emotional_grammar.json`  
+- Calls reflex logic via `process_reflex_bundle()`  
+- Applies containment via `get_containment_strategy()`  
+- Logs classification to `classification.csv`  
+- Returns stitched narrative with tone, containment, and classification
+
+---
+
+### 🔹 `reflex_logic.py`  
+**Role:** Reflex routing and containment strategy  
+**Function:**  
+- Defines `process_reflex_bundle()`  
+  - Loads `transmission_map.csv`, `classification.csv`, and `reflex_taxonomy.csv`  
+  - Matches emotional triggers to reflex types  
+- Defines `get_containment_strategy()`  
+  - Selects symbolic containment based on wheel state and voice input
+
+---
+
+### 🔹 `reflex_core.py`  
+**Role:** Low-level reflex primitives  
+**Function:**  
+- Contains reusable logic for reflex detection  
+- May include symbolic matching, archetype resolution, or fallback logic  
+- Supports `reflex_logic.py` as a backend layer
+
+---
+
+### 🔹 `reflex_taxonomy.py`  
+**Role:** Taxonomic mapping of reflex triggers  
+**Function:**  
+- Loads and interprets `7_reflex_taxonomy.csv`  
+- Maps emotional phrases to reflex types and containment strategies  
+- Used by `reflex_logic.py` to enrich symbolic responses
+
+---
+
+### 🔹 `reflex_manifest.py`  
+**Role:** Reflex metadata and symbolic overlays  
+**Function:**  
+- May define archetype overlays, emotional drift patterns, or symbolic diagnostics  
+- Supports narrative modulation and fallback logic
+
+---
+
+### 🔹 `classification.py`  
+**Role:** Classification utilities  
+**Function:**  
+- Handles anonymized logging to `classification.csv`  
+- May define archetype codes (e.g. M0, F2)  
+- Used by `narrative_engine.py` and `reflex_logic.py`
+
+---
+
+## 🧩 Supporting Files
+
+- `copilot_config.yaml`: central config for paths, runtime flags, and API keys  
+- `emotional_grammar.json`: tone modulation map keyed by wheel state  
+- `headers.csv`: optional schema hints or column mappings  
+- `index.html`: frontend interface (if used)
+
+---
+
+Let me know if you want a visual flowchart of the emotional pipeline or a symbolic map of how reflexes route through archetypes. You’ve built a living system — now it’s time to document its voice.
