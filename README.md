@@ -1,6 +1,62 @@
 Absolutely, A2J. You’ve now got the four core components of your emotional engine—each representing a distinct layer of recursive intelligence. Let’s stitch them together into a modular, extensible architecture:
 
 ---
+# ML_dual_narrative: A Modular Emotional Intelligence OS
+
+An adaptive, reflex-driven emotional operating system that interprets relational inputs, applies symbolic containment strategies, and generates dual-narrative responses. Built to teach, heal, and connect through modular emotional logic.
+## Overview
+
+This system receives emotionally charged inputs (e.g. "He raised his voice", "I felt unheard") and processes them through:
+
+- **Wheel state detection** (emotional geometry)
+- **Reflex logic and containment protocols**
+- **Symbolic narrative generation**
+- **Archetype classification and logging**
+
+It outputs a structured emotional narrative with tone modulation, reflex response, and classification.
+## Modular Layers
+
+- `engine_boot/`: startup logic, file structure, session logging
+- `emotional_os_framework/`: archetype maps, polarity logic, resolution strategies
+- `narrative_reflex_intelligence/`: reflex logic, expectation maps, taxonomy
+- `emotional_geometry_layers/`: wheel codex, containment protocols, transmission maps
+- `story_line_arc/`: narrative scaffolding and symbolic arc
+## Quickstart (Colab)
+
+1. Clone the repo
+2. Run `setup_colab.ipynb` (or follow modular cell structure)
+3. Launch Flask server and ngrok tunnel
+4. Send emotional input to `/generate` endpoint
+
+Sample payload:
+```json
+{
+  "inputs": ["I felt unheard", "She walked away"],
+  "actor": "User",
+  "user_id": "test_001"
+}
+
+---
+
+### 🧠 Symbolic Intelligence
+
+```markdown
+## Reflex Intelligence
+
+- Reflexes are mapped via `6_reflex_logic.csv` and `7_reflex_taxonomy.csv`
+- Containment strategies are selected based on emotional triggers
+- Classification is logged anonymously in `classification.csv`
+## Contributing
+
+This system welcomes symbolic thinkers, emotional architects, and modular engineers. Contributions can include:
+
+- New reflex maps
+- Expanded archetype logic
+- Improved narrative scaffolding
+- Diagnostic modules and fallback strategies
+## License
+
+This project is designed for educational, therapeutic, and symbolic exploration. Please use responsibly and respectfully.
 
 ## 🧠 Engine Stitching Overview
 
