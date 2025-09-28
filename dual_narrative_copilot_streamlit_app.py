@@ -10,6 +10,24 @@ VOICE_FIELDS = 4
 BACKGROUND_FIELDS = 5
 DELIMITER = ","
 
+
+# === header.csv upload ===
+HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
+
+@st.cache_data
+def load_headers():
+    try:
+        response = requests.get(HEADERS_URL)
+        response.raise_for_status()
+        df = pd.read_csv(StringIO(response.text), sep=",", quotechar='"', engine="python")
+        df.columns = df.columns.str.strip()
+        return df
+    except Exception as e:
+        st.warning(f"⚠️ Could not load headers.csv: {e}")
+        return pd.DataFrame(columns=["Input_file", "Field", "Label"])
+
+headers_df = load_headers()
+
 # === File Uploads ===
 st.set_page_config(page_title="Dual Narrative Co-Pilot", layout="wide")
 st.sidebar.title("📁 Upload Files")
@@ -39,11 +57,22 @@ st.title("🧠 Dual Narrative Emotional OS")
 
 st.subheader("🗣️ Voice Input (Conflict)")
 for i in range(VOICE_FIELDS):
-    voice_inputs[i] = st.text_input(f"Voice Input {i+1}", value=voice_inputs[i])
+    label_row = headers_df[
+        (headers_df["Input_file"] == "voice_input") &
+        (headers_df["Field"] == f"input{i+1}")
+    ]
+    label_text = label_row["Label"].values[0] if not label_row.empty else f"Voice Input {i+1}"
+    voice_inputs[i] = st.text_input(label_text, value=voice_inputs[i])
 
 st.subheader("🌄 Background Input (Wheel Context)")
 for i in range(BACKGROUND_FIELDS):
-    background_inputs[i] = st.text_input(f"Background Input {i+1}", value=background_inputs[i])
+    label_row = headers_df[
+        (headers_df["Input_file"] == "background") &
+        (headers_df["Field"] == f"input{i+1}")
+    ]
+    label_text = label_row["Label"].values[0] if not label_row.empty else f"Background Input {i+1}"
+    background_inputs[i] = st.text_input(label_text, value=background_inputs[i])
+
 
 actor = st.selectbox("🎭 Actor Perspective", ["User", "Partner"])
 user_id = st.text_input("🆔 Session ID", value="session_001")
@@ -94,4 +123,5 @@ if st.button("✨ Generate Dual Narrative"):
             st.error(f"❌ Error {response.status_code}: {response.text}")
     except Exception as e:
         st.error(f"⚠️ Failed to connect to Flask backend: {e}")
+
 
