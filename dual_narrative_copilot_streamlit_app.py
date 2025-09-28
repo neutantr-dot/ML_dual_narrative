@@ -37,7 +37,9 @@ storyline_file = st.sidebar.file_uploader("Upload storyline.csv", type="csv")
 
 def load_full_dataframe(file_obj):
     try:
-        return pd.read_csv(file_obj, sep=DELIMITER, quotechar='"', engine="python")
+        df = pd.read_csv(file_obj, sep=DELIMITER, quotechar='"', engine="python")
+        df.columns = df.columns.str.strip()
+        return df
     except:
         return pd.DataFrame()
 
@@ -118,7 +120,11 @@ if st.button("✨ Generate Dual Narrative"):
                 new_data = new_column[1:]
 
                 if df.empty:
-                    df = pd.DataFrame(index=range(required_rows))
+                    df = pd.DataFrame({new_column[0]: new_data})
+                    return df
+
+                if new_column[0] not in df.columns:
+                    df.insert(0, new_column[0], [""] * len(df))
 
                 if len(df) < required_rows:
                     for _ in range(required_rows - len(df)):
@@ -152,6 +158,7 @@ if "updated_background" in st.session_state:
 
 if "updated_storyline" in st.session_state:
     st.download_button("⬇️ Save New Storyline", data=st.session_state.updated_storyline, file_name="storyline.csv", mime="text/csv")
+
 
 
 
