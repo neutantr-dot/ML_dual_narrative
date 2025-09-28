@@ -75,7 +75,8 @@ for i in range(BACKGROUND_FIELDS):
 
 # actor = st.selectbox("🎭 Actor Perspective", ["User", "Partner"])
 actor = "Partner"
-user_id = st.text_input("🆔 Session ID", value="session_001")
+# user_id = st.text_input("🆔 Session ID", value="session_001")
+user_id = "owner"
 
 # === Generate Narrative ===
 if st.button("✨ Generate Dual Narrative"):
