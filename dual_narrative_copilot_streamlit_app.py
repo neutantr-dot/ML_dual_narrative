@@ -116,21 +116,28 @@ if st.button("✨ Generate Dual Narrative"):
                 df[timestamp] = new_column[1:]
                 return df.to_csv(index=False, sep=DELIMITER, quotechar='"')
 
-            updated_voice = append_column_csv(voice_file, new_voice_column) if voice_file else ""
-            updated_background = append_column_csv(background_file, new_background_column) if background_file else ""
+            st.session_state.updated_voice = append_column_csv(voice_file, new_voice_column) if voice_file else ""
+            st.session_state.updated_background = append_column_csv(background_file, new_background_column) if background_file else ""
 
             storyline_df = pd.DataFrame(index=range(len(new_storyline_column) - 1))
             storyline_df[timestamp] = new_storyline_column[1:]
-            updated_storyline = storyline_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
-
-            st.download_button("⬇️ Save Updated Voice Input", data=updated_voice, file_name="voice_input.csv", mime="text/csv")
-            st.download_button("⬇️ Save Updated Background", data=updated_background, file_name="background.csv", mime="text/csv")
-            st.download_button("⬇️ Save New Storyline", data=updated_storyline, file_name="storyline.csv", mime="text/csv")
+            st.session_state.updated_storyline = storyline_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
 
         else:
             st.error(f"❌ Error {response.status_code}: {response.text}")
     except Exception as e:
         st.error(f"⚠️ Failed to connect to Flask backend: {e}")
+
+# === Persistent Download Buttons ===
+if "updated_voice" in st.session_state:
+    st.download_button("⬇️ Save Updated Voice Input", data=st.session_state.updated_voice, file_name="voice_input.csv", mime="text/csv")
+
+if "updated_background" in st.session_state:
+    st.download_button("⬇️ Save Updated Background", data=st.session_state.updated_background, file_name="background.csv", mime="text/csv")
+
+if "updated_storyline" in st.session_state:
+    st.download_button("⬇️ Save New Storyline", data=st.session_state.updated_storyline, file_name="storyline.csv", mime="text/csv")
+
 
 
 
