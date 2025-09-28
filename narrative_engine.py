@@ -116,7 +116,7 @@ def generate_narrative(actor, user_id, voice_input, background, config):
             wheel_state=wheel_state,
             voice_input=voice_input,
             transmission_map_path=os.path.join(modules["geometry"], "transmission_map.csv"),
-            classification_path = "classification.csv"
+            classification_path = "classification.csv",
             taxonomy_path=os.path.join(modules["reflex"], "7_reflex_taxonomy.csv")
         )
 
