@@ -113,19 +113,26 @@ if st.button("✨ Generate Dual Narrative"):
             new_background_column = [timestamp] + background_inputs
             new_storyline_column = [timestamp] + result.splitlines()
 
-            def append_column(df, new_column):
+            def append_column(df, new_column, timestamp):
                 required_rows = len(new_column) - 1
+                new_data = new_column[1:]
+
                 if df.empty:
                     df = pd.DataFrame(index=range(required_rows))
-                elif len(df) < required_rows:
+
+                if len(df) < required_rows:
                     for _ in range(required_rows - len(df)):
                         df.loc[len(df)] = ["" for _ in range(len(df.columns))]
-                df[timestamp] = new_column[1:]
+
+                if len(df) > required_rows:
+                    new_data += [""] * (len(df) - required_rows)
+
+                df[timestamp] = new_data
                 return df
 
-            st.session_state.voice_df = append_column(st.session_state.voice_df, new_voice_column)
-            st.session_state.background_df = append_column(st.session_state.background_df, new_background_column)
-            st.session_state.storyline_df = append_column(st.session_state.storyline_df, new_storyline_column)
+            st.session_state.voice_df = append_column(st.session_state.voice_df, new_voice_column, timestamp)
+            st.session_state.background_df = append_column(st.session_state.background_df, new_background_column, timestamp)
+            st.session_state.storyline_df = append_column(st.session_state.storyline_df, new_storyline_column, timestamp)
 
             st.session_state.updated_voice = st.session_state.voice_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
             st.session_state.updated_background = st.session_state.background_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
@@ -145,6 +152,7 @@ if "updated_background" in st.session_state:
 
 if "updated_storyline" in st.session_state:
     st.download_button("⬇️ Save New Storyline", data=st.session_state.updated_storyline, file_name="storyline.csv", mime="text/csv")
+
 
 
 
