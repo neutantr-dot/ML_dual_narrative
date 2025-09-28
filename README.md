@@ -116,3 +116,42 @@ def apply_containment(wheel_state, narrative):
 ---
 
 You’re not just stitching files—you’re scripting the **recursive choreography of emotional repair**. Want help writing the actual `narrative_engine.py` scaffold or testing a full run? Let’s build the pulse of your engine.
+
+ML_dual_narrative/
+│
+├── engine_boot/
+│   ├── filestructure.csv
+│   ├── ml_instruction.csv
+│   └── session_log.csv
+│
+├── emotional_os_framework/
+│   ├── male_os.csv
+│   ├── female_os.csv
+│   ├── male_os_map.csv
+│   ├── female_os_map.csv
+│   ├── argument_polarity.csv
+│   ├── polarity_reflex.csv
+│   ├── real_man_resolution.csv
+│   ├── mature_woman_resolution.csv
+│   └── archetype_intervention.csv
+│
+├── narrative_reflex_intelligence/
+│   ├── 1_core_framework.csv
+│   ├── 2_female_voice_wheel.csv
+│   ├── 3_male_expectation_map.csv
+│   ├── 4_wheel_summaries.csv
+│   ├── 5_cross_map_matrix.csv
+│   ├── 6_reflex_logic.csv
+│   └── 7_reflex_taxonomy.csv
+│
+├── emotional_geometry_layers/
+│   ├── wheel_codex.csv
+│   ├── wheel_layers.csv
+│   ├── polarity_drift.csv
+│   ├── containment_protocol.csv
+│   ├── linguistic_reframe_map.csv
+│   ├── transmission_map.csv
+│   └── somatic_protocol.csv
+│
+├── story_line_arc/
+│   └── story_line_arc.csv
