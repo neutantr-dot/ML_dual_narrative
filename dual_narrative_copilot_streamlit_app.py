@@ -5,7 +5,7 @@ from io import StringIO
 from datetime import datetime
 
 # === Constants ===
-FLASK_URL = "https://49cbb7bc0425.ngrok-free.app/generate"  # Replace with your live ngrok URL
+FLASK_URL = "https://49cbb7bc0425.ngrok-free.app/generate"
 VOICE_FIELDS = 4
 BACKGROUND_FIELDS = 5
 DELIMITER = ","
@@ -50,6 +50,14 @@ def parse_csv_file(file_obj, expected_fields):
 voice_inputs, voice_versions = parse_csv_file(voice_file, VOICE_FIELDS)
 background_inputs, background_versions = parse_csv_file(background_file, BACKGROUND_FIELDS)
 storyline_text = storyline_file.getvalue().decode("utf-8") if storyline_file else ""
+
+# === Initialize session memory ===
+if "voice_df" not in st.session_state:
+    st.session_state.voice_df = None
+if "background_df" not in st.session_state:
+    st.session_state.background_df = None
+if "storyline_df" not in st.session_state:
+    st.session_state.storyline_df = None
 
 # === Input Fields ===
 st.title("🧠 Dual Narrative Emotional OS")
@@ -97,31 +105,23 @@ if st.button("✨ Generate Dual Narrative"):
             new_background_column = [timestamp] + background_inputs
             new_storyline_column = [timestamp] + result.splitlines()
 
-            def append_column_csv(file_obj, new_column):
-                try:
-                    if file_obj:
-                        df = pd.read_csv(file_obj, sep=DELIMITER, quotechar='"', engine="python")
-                    else:
-                        df = pd.DataFrame()
-                except:
-                    df = pd.DataFrame()
-
+            def append_column(df, new_column):
                 required_rows = len(new_column) - 1
-                if df.empty:
+                if df is None or df.empty:
                     df = pd.DataFrame(index=range(required_rows))
                 elif len(df) < required_rows:
                     for _ in range(required_rows - len(df)):
                         df.loc[len(df)] = ["" for _ in range(len(df.columns))]
-
                 df[timestamp] = new_column[1:]
-                return df.to_csv(index=False, sep=DELIMITER, quotechar='"')
+                return df
 
-            st.session_state.updated_voice = append_column_csv(voice_file, new_voice_column) if voice_file else ""
-            st.session_state.updated_background = append_column_csv(background_file, new_background_column) if background_file else ""
+            st.session_state.voice_df = append_column(st.session_state.voice_df, new_voice_column)
+            st.session_state.background_df = append_column(st.session_state.background_df, new_background_column)
+            st.session_state.storyline_df = append_column(st.session_state.storyline_df, new_storyline_column)
 
-            storyline_df = pd.DataFrame(index=range(len(new_storyline_column) - 1))
-            storyline_df[timestamp] = new_storyline_column[1:]
-            st.session_state.updated_storyline = storyline_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
+            st.session_state.updated_voice = st.session_state.voice_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
+            st.session_state.updated_background = st.session_state.background_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
+            st.session_state.updated_storyline = st.session_state.storyline_df.to_csv(index=False, sep=DELIMITER, quotechar='"')
 
         else:
             st.error(f"❌ Error {response.status_code}: {response.text}")
@@ -137,6 +137,7 @@ if "updated_background" in st.session_state:
 
 if "updated_storyline" in st.session_state:
     st.download_button("⬇️ Save New Storyline", data=st.session_state.updated_storyline, file_name="storyline.csv", mime="text/csv")
+
 
 
 
