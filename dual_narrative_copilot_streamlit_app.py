@@ -5,6 +5,7 @@ from io import StringIO
 from datetime import datetime
 import yaml  # Required for config loading
 import csv
+import uuid
 
 # === Constants ===
 DELIMITER = ","
@@ -142,7 +143,11 @@ for i in range(BACKGROUND_FIELDS):
     background_inputs.append(value)
 
 #====# Block 7&8: Storyline Generation (.txt construct, Flask-compatible with actor and user_id)
-
+# === Actor and User ID ===
+actor = st.sidebar.text_input("🎭 Actor Name", value="default_actor")
+user_id = st.sidebar.text_input("🆔 User ID", value="user_001"
+# user_id = st.sidebar.text_input("🆔 User ID", value=str(uuid.uuid4())[:8])
+								
 FLASK_URL = "http://localhost:5000/generate"  # or your ngrok tunnel endpoint
 
 if st.button("✨ Generate Dual Narrative Storyline"):
