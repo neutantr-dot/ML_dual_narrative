@@ -14,6 +14,18 @@ BACKGROUND_FIELDS = 5
 HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
 # COPILOT_CONFIG = "copilot_config.yaml" #using flask backend
 
+# === Endpoint Configuration ===
+DEFAULT_FLASK_URL = "http://localhost:5000/generate"
+NGROK_FLASK_URL = "https://49fa598f41ce.ngrok-free.app/generate" # or your ngrok tunnel endpoint
+flask_mode = st.sidebar.radio("Flask Mode", ["Local", "Ngrok"])
+FLASK_URL = NGROK_FLASK_URL if flask_mode == "Ngrok" else DEFAULT_FLASK_URL
+
+try:
+    status_check = requests.get(FLASK_URL.replace("/generate", "/status")).json()
+    st.sidebar.success(f"Flask server live: {status_check['url']}")
+except Exception as e:
+    st.sidebar.error(f"Flask unreachable: {e}")
+
 #====# Block 2 Load headers from GitHub
 # === Load Header Definitions ===
 @st.cache_data
@@ -147,8 +159,6 @@ for i in range(BACKGROUND_FIELDS):
 actor = st.sidebar.text_input("🎭 Actor Name", value="default_actor")
 user_id = st.sidebar.text_input("🆔 User ID", value="user_001")
 # user_id = st.sidebar.text_input("🆔 User ID", value=str(uuid.uuid4())[:8])
-								
-FLASK_URL = "http://localhost:5000/generate"  # or your ngrok tunnel endpoint
 
 if st.button("✨ Generate Dual Narrative Storyline"):
     payload = {
