@@ -4,6 +4,7 @@ import requests
 from io import StringIO
 from datetime import datetime
 import yaml  # Required for config loading
+import csv
 
 # === Constants ===
 DELIMITER = ","
@@ -74,6 +75,10 @@ def parse_transposed_file(file_text):
 # === Parse and flatten ===
 voice_blocks, voice_versions, voice_recursive_string = parse_transposed_file(st.session_state["voice_file_data"])
 background_blocks, background_versions, background_recursive_string = parse_transposed_file(st.session_state["background_file_data"])
+
+# === Validation (optional during testing) ===
+st.write("Voice Versions:", voice_versions)
+st.write("Voice Blocks:", voice_blocks)
 
 # === Flatten all columns into a single recursive string ===
 # def flatten_all_versions(file_text, delimiter="|"):
