@@ -3,92 +3,94 @@ import pandas as pd
 import requests
 from io import StringIO
 from datetime import datetime
-import yaml
+import yaml  # Required for config loading
 
-# Import the ML engine
-from narrative_engine import generate_storyline
-
-DELIMITER = "|"
+# === Constants ===
+DELIMITER = ","
 VOICE_FIELDS = 4
 BACKGROUND_FIELDS = 5
-STORYLINE_LINES = 20
 HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/main/headers.csv"
-COPILOT_CONFIG = "copilot_config.yaml"
+# COPILOT_CONFIG = "copilot_config.yaml" #using flask backend
 
-# Load headers from GitHub
+#====# Block 2 Load headers from GitHub
+
 @st.cache_data
 def load_headers():
     try:
         response = requests.get(HEADERS_URL)
         response.raise_for_status()
-        df = pd.read_csv(StringIO(response.text), sep=DELIMITER, engine="python", quotechar='"', on_bad_lines='skip')
+        df = pd.read_csv(StringIO(response.text), sep=",", quotechar='"', engine="python")
         df.columns = df.columns.str.strip()
         return df
     except Exception as e:
-        st.error(f"⚠️ Could not load headers.csv: {e}")
+        st.warning(f"⚠️ Could not load headers.csv: {e}")
         return pd.DataFrame(columns=["Input_file", "Field", "Label"])
+		
+#====# Block 3: File upload and caching (.txt with round 1 and round 2 support)
+# === File Uploads ===
+st.sidebar.title("📁 Upload .txt Files")
 
+voice_file = st.sidebar.file_uploader("Upload voice_input.txt", type="txt")
+background_file = st.sidebar.file_uploader("Upload background.txt", type="txt")
+storyline_file = st.sidebar.file_uploader("Upload storyline.txt", type="txt")
+
+# === Cache file content in session state ===
 def cache_file(name, uploaded_file):
     if uploaded_file:
-        st.session_state[name + "_data"] = uploaded_file.getvalue().decode("utf-8")
+        text = uploaded_file.getvalue().decode("utf-8")
+        st.session_state[name + "_data"] = text
         st.session_state[name + "_obj"] = uploaded_file
     else:
         st.session_state.setdefault(name + "_data", "")
         st.session_state.setdefault(name + "_obj", None)
 
+cache_file("voice_file", voice_file)
+cache_file("background_file", background_file)
+cache_file("storyline_file", storyline_file)
+
+#====# Block 4: File parsing (.txt with round 1 and round 2 support, comma-delimited with quoted text)
+# === Parse transposed .txt file into versioned blocks ===
+
 def parse_transposed_file(file_text):
     if not file_text:
-        return {}, []
-    rows = [line.split(DELIMITER) for line in file_text.splitlines()]
+        return {}, [], ""
+    reader = csv.reader(file_text.splitlines(), delimiter=",", quotechar='"')
+    rows = list(reader)
     if not rows or len(rows) < 2:
-        return {}, []
+        return {}, [], ""
     versions = rows[0]
     data_by_version = {version: [] for version in versions}
     for row in rows[1:]:
         for i, value in enumerate(row):
             if i < len(versions):
                 data_by_version[versions[i]].append(value)
-    return data_by_version, versions
+    full_string = " ".join([" ".join(data_by_version[v]) for v in versions])
+    return data_by_version, versions, full_string
+
+# === Parse and flatten ===
+voice_blocks, voice_versions, voice_recursive_string = parse_transposed_file(st.session_state["voice_file_data"])
+background_blocks, background_versions, background_recursive_string = parse_transposed_file(st.session_state["background_file_data"])
+
+# === Flatten all columns into a single recursive string ===
+# def flatten_all_versions(file_text, delimiter="|"):
+#     if not file_text:
+#         return ""
+#     rows = [line.split(delimiter) for line in file_text.splitlines()]
+#     return " ".join([" ".join(row[1:]) for row in rows[1:]])
+#
+# voice_recursive_string = flatten_all_versions(st.session_state["voice_file_data"])
+# background_recursive_string = flatten_all_versions(st.session_state["background_file_data"])
+
+#====# Block 5: Appending (comma-delimited with quoted "text,text")
 
 def append_column_to_transposed_file(file_text, new_column):
-    rows = [line.split(DELIMITER) for line in file_text.splitlines()] if file_text else []
+    rows = [line.split(",") for line in file_text.splitlines()] if file_text else []
     while len(rows) < len(new_column):
         rows.append([])
     for i, value in enumerate(new_column):
-        rows[i].append(value)
-    return "\n".join([DELIMITER.join(row) for row in rows])
-
-# --- Load config (optional: for display or advanced settings) ---
-def load_copilot_config(config_path=COPILOT_CONFIG):
-    try:
-        with open(config_path, "r") as f:
-            return yaml.safe_load(f)
-    except Exception as e:
-        st.warning(f"Could not load copilot_config.yaml: {e}")
-        return {}
-
-copilot_config = load_copilot_config()
-
-# Streamlit UI
-st.set_page_config(page_title="Dual Narrative Co-Pilot", layout="wide")
-st.sidebar.title("📁 Upload Files")
-
-voice_file = st.sidebar.file_uploader("Upload voice_input.txt", type="txt")
-background_file = st.sidebar.file_uploader("Upload background.txt", type="txt")
-storyline_file = st.sidebar.file_uploader("Upload storyline.txt", type="txt")
-
-cache_file("voice_file", voice_file)
-cache_file("background_file", background_file)
-cache_file("storyline_file", storyline_file)
-
-prefill_enabled = st.sidebar.toggle("Enable Prefill", value=False)
-headers_df = load_headers()
-
-st.title("🧠 Dual Narrative Co-Pilot Storytelling")
-
-voice_blocks, voice_versions = parse_transposed_file(st.session_state["voice_file_data"])
-background_blocks, background_versions = parse_transposed_file(st.session_state["background_file_data"]) 
-
+        rows[i].append(f'"{value}"')
+    return "\n".join([",".join(row) for row in rows])
+#====# Block 6: Input Field Construction
 st.subheader("🗣️ Describe Argument That Happened")
 selected_voice_version = st.selectbox("📅 Voice Input Version", voice_versions) if voice_versions else None
 voice_prefill = voice_blocks.get(selected_voice_version, [""] * VOICE_FIELDS) if prefill_enabled else [""] * VOICE_FIELDS
@@ -117,50 +119,63 @@ for i in range(BACKGROUND_FIELDS):
     value = st.text_input(label_text, value=background_prefill[i])
     background_inputs.append(value)
 
-# --- Storyline generation using ML Copilot engine ---
-def copilot_generate_storyline(voice_inputs, background_inputs):
-    """
-    Calls the narrative_engine's generate_storyline function,
-    which uses emotional_grammar.json, reflex_logic.py, and copilot_config.yaml.
-    """
-    try:
-        storyline = generate_storyline(
-            voice_inputs,
-            background_inputs,
-            config_path=COPILOT_CONFIG
-        )
-        return storyline
-    except Exception as e:
-        st.error(f"Error generating storyline: {e}")
-        return ["⚠️ Error generating narrative. See logs for details."]
+#====# Block 7&8: Storyline Generation (.txt construct, Flask-compatible with actor and user_id)
+
+FLASK_URL = "http://localhost:5000/generate"  # or your ngrok tunnel endpoint
 
 if st.button("✨ Generate Dual Narrative Storyline"):
-    storyline = copilot_generate_storyline(voice_inputs, background_inputs)
+    payload = {
+        "inputs": voice_inputs,
+        "background": " ".join(background_inputs),
+        "actor": actor,
+        "user_id": user_id
+    }
+
+    try:
+        response = requests.post(FLASK_URL, json=payload)
+        if response.status_code == 200:
+            result = response.json().get("result", "[No response]")
+        else:
+            result = f"⚠️ Error {response.status_code}: {response.text}"
+    except Exception as e:
+        result = f"⚠️ Request failed: {e}"
 
     st.subheader("📜 Generated Storyline")
-    st.text_area("Scroll through your story:", value="\n".join(storyline), height=400)
+    st.text_area("Scroll through your story:", value=result, height=400)
 
+    # Cache for appending
     timestamp = datetime.now().strftime("%a %b %d, %Y (%H:%M)")
     st.session_state["new_voice_column"] = [timestamp] + voice_inputs
     st.session_state["new_background_column"] = [timestamp] + background_inputs
-    st.session_state["new_storyline_column"] = [timestamp] + storyline
+    st.session_state["new_storyline_column"] = [timestamp] + result.splitlines()
     st.session_state["story_generated"] = True
+	
+#====# Block 9: Download Buttons (prepend new column as column 1)
+
+def prepend_column_to_transposed_file(file_text, new_column):
+    rows = [line.split(",") for line in file_text.splitlines()] if file_text else []
+    while len(rows) < len(new_column):
+        rows.append([])
+    for i, value in enumerate(new_column):
+        rows[i].insert(1, f'"{value}"')  # insert after timestamp header
+    return "\n".join([",".join(row) for row in rows])
 
 if st.session_state.get("story_generated"):
     st.download_button("⬇️ Save Updated Voice Input",
-        data=append_column_to_transposed_file(
+        data=prepend_column_to_transposed_file(
             st.session_state["voice_file_data"], st.session_state["new_voice_column"]),
         file_name="voice_input.txt", mime="text/plain")
 
     st.download_button("⬇️ Save Updated Background",
-        data=append_column_to_transposed_file(
+        data=prepend_column_to_transposed_file(
             st.session_state["background_file_data"], st.session_state["new_background_column"]),
         file_name="background.txt", mime="text/plain")
 
     st.download_button("⬇️ Save New Storyline",
-        data=append_column_to_transposed_file(
+        data=prepend_column_to_transposed_file(
             st.session_state["storyline_file_data"], st.session_state["new_storyline_column"]),
         file_name="storyline.txt", mime="text/plain")
+
 
 
 
