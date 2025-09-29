@@ -13,7 +13,7 @@ HEADERS_URL = "https://raw.githubusercontent.com/neutantr-dot/ML_dual_narrative/
 # COPILOT_CONFIG = "copilot_config.yaml" #using flask backend
 
 #====# Block 2 Load headers from GitHub
-
+# === Load Header Definitions ===
 @st.cache_data
 def load_headers():
     try:
@@ -25,6 +25,10 @@ def load_headers():
     except Exception as e:
         st.warning(f"⚠️ Could not load headers.csv: {e}")
         return pd.DataFrame(columns=["Input_file", "Field", "Label"])
+
+headers_df = load_headers()
+if headers_df.empty:
+    st.warning("⚠️ Header definitions are missing or failed to load.")
 		
 #====# Block 3: File upload and caching (.txt with round 1 and round 2 support)
 # === File Uploads ===
