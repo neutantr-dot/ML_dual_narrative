@@ -90,6 +90,19 @@ def append_column_to_transposed_file(file_text, new_column):
     for i, value in enumerate(new_column):
         rows[i].append(f'"{value}"')
     return "\n".join([",".join(row) for row in rows])
+
+# === Prefill Mode Toggle ===
+prefill_mode = st.sidebar.radio("Prefill Source", ["Latest (Column 1)", "Select Version"])
+
+if prefill_mode == "Latest (Column 1)":
+    selected_voice_version = voice_versions[0] if voice_versions else None
+    selected_background_version = background_versions[0] if background_versions else None
+else:
+    selected_voice_version = st.selectbox("📅 Voice Input Version", voice_versions) if voice_versions else None
+    selected_background_version = st.selectbox("📅 Background Version", background_versions) if background_versions else None
+
+prefill_enabled = selected_voice_version is not None and selected_background_version is not None
+
 #====# Block 6: Input Field Construction
 st.subheader("🗣️ Describe Argument That Happened")
 selected_voice_version = st.selectbox("📅 Voice Input Version", voice_versions) if voice_versions else None
