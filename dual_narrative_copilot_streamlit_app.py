@@ -41,8 +41,28 @@ def load_headers():
         return pd.DataFrame(columns=["Input_file", "Field", "Label"])
 
 headers_df = load_headers()
+
 if headers_df.empty:
     st.warning("⚠️ Header definitions are missing or failed to load.")
+else:
+    # Build actor role mapping from header labels
+    header_map = {}
+    for _, row in headers_df.iterrows():
+        label = row["Label"].strip().lower()
+        if "user said" in label:
+            header_map[row["Field"]] = "user_voice"
+        elif "user thought" in label:
+            header_map[row["Field"]] = "user_thought"
+        elif "partner said" in label:
+            header_map[row["Field"]] = "partner_voice"
+
+    # Validate required fields
+    required_roles = ["user_voice", "user_thought", "partner_voice"]
+    missing_roles = [role for role in required_roles if role not in header_map.values()]
+    if missing_roles:
+        st.error(f"❌ Missing required narrative roles in headers.csv: {', '.join(missing_roles)}")
+
+
 		
 #====# Block 3: File upload and caching (.txt with round 1 and round 2 support)
 # === File Uploads ===
@@ -66,32 +86,50 @@ cache_file("voice_file", voice_file)
 cache_file("background_file", background_file)
 cache_file("storyline_file", storyline_file)
 
-#====# Block 4: File parsing (.txt with round 1 and round 2 support, comma-delimited with quoted text)
-# === Parse transposed .txt file into versioned blocks ===
+
+#====# Block 4: File parsing (.txt with transposed structure, comma-delimited with quoted text)
+import csv
 
 def parse_transposed_file(file_text):
+    """
+    Parses a transposed .txt file where:
+    - First row contains version labels (e.g. dates)
+    - Subsequent rows contain input fields (input1–input9)
+    Returns:
+    - blocks: dict mapping version → list of field values
+    - versions: list of version labels (column headers)
+    - full_string: concatenated string of all values across all versions
+    """
     if not file_text:
         return {}, [], ""
+
     reader = csv.reader(file_text.splitlines(), delimiter=",", quotechar='"')
     rows = list(reader)
+
     if not rows or len(rows) < 2:
         return {}, [], ""
+
     versions = rows[0]
-    data_by_version = {version: [] for version in versions}
+    blocks = {version: [] for version in versions}
+
     for row in rows[1:]:
         for i, value in enumerate(row):
             if i < len(versions):
-                data_by_version[versions[i]].append(value)
-    full_string = " ".join([" ".join(data_by_version[v]) for v in versions])
-    return data_by_version, versions, full_string
+                blocks[versions[i]].append(value.strip())
 
-# === Parse and flatten ===
+    full_string = " ".join([" ".join(blocks[v]) for v in versions])
+    return blocks, versions, full_string
+
+# === Parse voice and background files ===
 voice_blocks, voice_versions, voice_recursive_string = parse_transposed_file(st.session_state["voice_file_data"])
 background_blocks, background_versions, background_recursive_string = parse_transposed_file(st.session_state["background_file_data"])
 
 # === Validation (optional during testing) ===
-st.write("Voice Versions:", voice_versions)
-st.write("Voice Blocks:", voice_blocks)
+st.write("🧾 Voice Versions:", voice_versions)
+st.write("📦 Voice Blocks:", voice_blocks)
+st.write("🧾 Background Versions:", background_versions)
+st.write("📦 Background Blocks:", background_blocks)
+
 
 # === Flatten all columns into a single recursive string ===
 # def flatten_all_versions(file_text, delimiter="|"):
@@ -104,7 +142,6 @@ st.write("Voice Blocks:", voice_blocks)
 # background_recursive_string = flatten_all_versions(st.session_state["background_file_data"])
 
 #====# Block 5: Appending (comma-delimited with quoted "text,text")
-
 def append_column_to_transposed_file(file_text, new_column):
     rows = [line.split(",") for line in file_text.splitlines()] if file_text else []
     while len(rows) < len(new_column):
@@ -112,7 +149,7 @@ def append_column_to_transposed_file(file_text, new_column):
     for i, value in enumerate(new_column):
         rows[i].append(f'"{value}"')
     return "\n".join([",".join(row) for row in rows])
-
+	
 # === Prefill Mode Toggle ===
 prefill_mode = st.sidebar.radio("Prefill Source", ["Latest (Column 1)", "Select Version"])
 
@@ -159,6 +196,7 @@ for i in range(BACKGROUND_FIELDS):
 actor = st.sidebar.text_input("🎭 Actor Name", value="default_actor")
 user_id = st.sidebar.text_input("🆔 User ID", value="user_001")
 # user_id = st.sidebar.text_input("🆔 User ID", value=str(uuid.uuid4())[:8])
+
 
 if st.button("✨ Generate Dual Narrative Storyline"):
     payload = {
@@ -212,7 +250,6 @@ if st.session_state.get("story_generated"):
         data=prepend_column_to_transposed_file(
             st.session_state["storyline_file_data"], st.session_state["new_storyline_column"]),
         file_name="storyline.txt", mime="text/plain")
-
 
 
 
