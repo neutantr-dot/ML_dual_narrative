@@ -55,17 +55,52 @@ def log_classification(user_id, actor, class_code, log_path):
         writer = csv.writer(f)
         writer.writerow([timestamp, user_id, actor, class_code])
 
+# === Input Flattening ===
+def flatten_inputs(inputs):
+    return " ".join([i.strip() for i in inputs if i])
+
+# === Default Classifier ===
+def classify_user(inputs, actor):
+    # Future: Add symbolic triggers for M2/M3 and F2/F3
+    return "F1" if actor.upper() == "F" else "M1"
+
+# === Narrative Construction ===
+def build_story(inputs, classification):
+    input1, input2, input3, input4 = inputs[:4]
+    wheel_inputs = inputs[4:]
+
+    return f"""
+🧍 What you said: "{input1}"
+💭 What you thought: "{input2}"
+🧑‍🤝‍🧑 What your partner said: "{input3}"
+📍 Context: "{input4}"
+
+🌀 Emotional Background:
+- Blue (action): {wheel_inputs[0]}
+- Red (control): {wheel_inputs[1]}
+- Green (emotion): {wheel_inputs[2]}
+- Yellow (expression): {wheel_inputs[3]}
+- Centre (wellbeing): {wheel_inputs[4]}
+
+🔍 Classification: {classification}
+""".strip()
+
 # === Main Narrative Engine ===
-def generate_narrative(actor, user_id, voice_input, background, config):
-    use_generative = config["runtime"].get("use_generative_ai", False)
-    line_count = config["runtime"].get("story_line_count", 20)
+def generate_narrative(inputs, actor, user_id, background="", config={}):
+    if len(inputs) != 9:
+        return "❌ Error: Expected 9 inputs."
+
+    use_generative = config.get("runtime", {}).get("use_generative_ai", False)
+    line_count = config.get("runtime", {}).get("story_line_count", 20)
+    voice_input = flatten_inputs(inputs[:4])
+    background_input = flatten_inputs(inputs[4:])
 
     if use_generative and openai:
         # === Generative AI Path ===
         prompt = (
             f"You are a storytelling assistant.\n\n"
             f"Voice Input:\n{voice_input}\n\n"
-            f"Background:\n{background}\n\n"
+            f"Background:\n{background_input}\n\n"
             f"Generate a dual narrative story in {line_count} lines.\n"
             f"Return the story first, then the classification label on a new line prefixed with 'Classification:'"
         )
@@ -89,12 +124,12 @@ def generate_narrative(actor, user_id, voice_input, background, config):
                 classification = lines[-1].replace("Classification:", "").strip()
                 narrative = "\n".join(lines[:-1])
             else:
-                classification = config["defaults"].get("fallback_archetype", "none")
+                classification = config.get("defaults", {}).get("fallback_archetype", "none")
                 narrative = "\n".join(lines)
 
         except Exception as e:
             narrative = f"[Error] Failed to generate story: {e}"
-            classification = config["defaults"].get("fallback_archetype", "none")
+            classification = config.get("defaults", {}).get("fallback_archetype", "none")
 
     else:
         # === Modular Reflex Path ===
@@ -103,7 +138,7 @@ def generate_narrative(actor, user_id, voice_input, background, config):
 
         wheel_state = detect_wheel_state(
             voice_input,
-            background,
+            background_input,
             os.path.join(modules["geometry"], "wheel_codex.csv")
         )
 
@@ -116,7 +151,7 @@ def generate_narrative(actor, user_id, voice_input, background, config):
             wheel_state=wheel_state,
             voice_input=voice_input,
             transmission_map_path=os.path.join(modules["geometry"], "transmission_map.csv"),
-            classification_path = "classification.csv",
+            classification_path="classification.csv",
             taxonomy_path=os.path.join(modules["reflex"], "7_reflex_taxonomy.csv")
         )
 
@@ -130,7 +165,7 @@ def generate_narrative(actor, user_id, voice_input, background, config):
         # Stitch narrative
         narrative += f"\n\n[Containment Strategy]\n{containment}"
 
-        classification = reflex_bundle.get("class_code", config["defaults"].get("fallback_archetype", "none"))
+        classification = reflex_bundle.get("class_code", config.get("defaults", {}).get("fallback_archetype", "none"))
 
     # === Logging ===
     log_classification(
@@ -140,5 +175,6 @@ def generate_narrative(actor, user_id, voice_input, background, config):
         log_path="classification.csv"
     )
 
-    return f"[{actor} Narrative]\n{narrative}\n\n[Classification]\nActor: {actor}\nClassification: {classification}"
-
+    # === Final Output ===
+    story_block = build_story(inputs, classification)
+    return f"[{actor} Narrative]\n{story_block}\n\n{narrative}\n\n[Classification]\nActor: {actor}\nClassification: {classification}"
