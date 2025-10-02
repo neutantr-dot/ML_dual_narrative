@@ -33,12 +33,11 @@ def classify_actor_from_wheel(actor, wheel_state, reflex_type, classification_pa
 
     # Fallback if no match found
     return {
-        "class_code": "N/A",
-        "archetype_variant": "unknown",
+        "class_code": "0",
+        "archetype_variant": "unmapped",
         "containment_required": False,
         "progressive": False
     }
-
 
 def preview_classification(classification_path):
     """
@@ -59,3 +58,4 @@ def preview_classification(classification_path):
         containment = row.get("containment_required", "FALSE")
         progressive = row.get("progressive", "FALSE")
         print(f"  • {actor} → {reflex} @ {wheel} → {code} ({variant}) | Containment: {containment} | Progressive: {progressive}")
+
