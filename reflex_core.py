@@ -41,28 +41,11 @@ def apply_containment(wheel_state, voice_input, transmission_map_path):
     reflex = detect_reflex(wheel_state, voice_input, transmission_map_path)
     return reflex.get("containment_strategy", "default silence")
 
-def classify_actor(actor, wheel_state, reflex_type, archetype_entry, classification_path):
+def classify_actor(actor, wheel_state, reflex_type, classification_path):
     """
-    Classifies actor identity based on emotional context.
-    Returns a class code (e.g. M1, F2, etc.).
+    Uses CSV-driven classification engine to return symbolic bundle.
     """
-    try:
-        classification_data = load_csv(classification_path)
-        for row in classification_data:
-            if all(key in row for key in [
-                "actor", "wheel_state", "reflex_type", "archetype_entry", "class_code"
-            ]):
-                if (
-                    row["actor"].strip().lower() == actor.strip().lower() and
-                    row["wheel_state"].strip().lower() == wheel_state.strip().lower() and
-                    row["reflex_type"].strip().lower() == reflex_type.strip().lower() and
-                    row["archetype_entry"].strip().lower() == archetype_entry.strip().lower()
-                ):
-                    return row["class_code"]
-    except Exception as e:
-        print(f"⚠️ Actor classification failed: {e}")
-
-    return "M0"  # fallback classification
+    return classify_actor_from_wheel(actor, wheel_state, reflex_type, classification_path)
 
 def default_reflex_bundle():
     """Returns fallback reflex bundle when no match is found."""
@@ -73,3 +56,4 @@ def default_reflex_bundle():
         "narrative_branch": "neutral",
         "somatic_protocol": "breath_and_stillness"
     }
+
