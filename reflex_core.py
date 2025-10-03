@@ -36,7 +36,10 @@ def apply_containment(wheel_state, voice_input, transmission_map_path):
     """
     transmission_map = load_csv(transmission_map_path)
     for row in transmission_map:
-        if row.get("trigger") in voice_input and row.get("wheel_state") == wheel_state:
+        trigger = row.get("trigger", "")
+        wheel = row.get("wheel_state", "")
+        if trigger and trigger in voice_input and wheel == wheel_state:
+        # if row.get("trigger") in voice_input and row.get("wheel_state") == wheel_state:
             return row.get("containment", "No containment strategy found.")
     return "No containment strategy found."
 
@@ -59,6 +62,7 @@ def default_reflex_bundle():
         "narrative_branch": "neutral",
         "somatic_protocol": "breath_and_stillness"
     }
+
 
 
 
