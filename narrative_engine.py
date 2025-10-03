@@ -197,3 +197,5 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
     # === Final Output ===
     story_block = build_story(inputs, classification)
     return f"[{actor} Narrative]\n{story_block}\n\n{narrative}\n\n[Classification]\nActor: {actor}\nClassification: {classification}"
+
+
