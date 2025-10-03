@@ -131,7 +131,7 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
 
     else:
         # === Modular Reflex Path ===
-        grammar = load_grammar(config["grammar"]["emotional_grammar"])
+        grammar = load_grammar(config["emotional_grammar"]["path"])
         modules = config["paths"]["modules"]
 
         wheel_state = detect_wheel_state(
