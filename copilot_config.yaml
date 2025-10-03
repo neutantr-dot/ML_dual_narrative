@@ -1,52 +1,56 @@
 # 🧠 Emotional Engine Configuration
 
+model:
+  name: "openai-gpt4"
+  temperature: 0.7
+  max_tokens: 800
+  system_prompt: "You are a storytelling assistant."
 paths:
-  input: input_output/
-  output: input_output/storyline.txt
-
   modules:
-    engine_boot: engine_boot/
-    os_framework: emotional_os_framework/
-    reflex: narrative_reflex_intelligence/
-    geometry: emotional_geometry_layers/
-    arc: story_line_arc/
-    references: references/
+    classification: "classification"
+    geometry: "emotional_geometry_layers"
+    reflex: "narrative_reflex_intelligence"
 
-  files:
-    voice_input: voice_input.txt
-    background: background.txt
-    storyline: storyline.txt
+storyline:
+  lines: 100
+  format: "dual narrative"
+  include_classification: true
+  classification_labels:
+    - F0
+    - F1
+    - F2
+    - F3
+    - M0
+    - M1
+    - M2
+    - M3
+    - N/A
 
-runtime:
-  enable_archetype: true
-  enable_containment: true
-  enable_somatic: true
-  enable_reframe: true
-  enable_dual_narrative: true
-  log_session: true
-  use_generative_ai: false  # Modular by default
-  story_line_count: 100  # ← Add this line
-  
-grammar:
-  emotional_grammar: emotional_grammar.json
+classification:
+  enabled: true
+  output_file: "classification.csv"
+  fallback_label: "N/A"
+  user_tracking: true
+  session_label_format: "%a %b %d, %Y (%H:%M)"
+  label_prefix: "Generated on"
 
-scripts:
-  engine: narrative_engine.py
-  reflex: reflex_logic.py
+emotional_grammar:
+  enabled: true
+  path: "emotional_grammar.json"
+  grammar_mode: "semantic"
+  use_expectation_map: true
+
+reflex_logic:
+  enabled: true
+  path: "reflex_logic.py"
+  mode: "archetype_shift"
+  strategy: "dual_narrative"
+  intensity: "moderate"
 
 logging:
-  session_log: engine_boot/session_log.csv
-  verbosity: high
-  track_wheel_state: true
-  track_reflex_trigger: true
-  track_archetype_entry: true
-  track_containment_success: true
-
-defaults:
-  fallback_wheel_state: neutral
-  fallback_archetype: none
-  fallback_containment: silent_hold
-  fallback_somatic: breath_and_stillness
-
+  enabled: true
+  log_file: "copilot_log.txt"
+  log_level: "info"
+  anonymize: true
 
 
