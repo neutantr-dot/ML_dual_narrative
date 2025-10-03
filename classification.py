@@ -25,7 +25,7 @@ STORYLINE_CONFIG = {
     "lines": 20,
     "format": "dual narrative",
     "include_classification": True,
-    "classification_labels": ["0","F0", "F1", "F2", "F3", "M0", "M1", "M2", "M3", "N/A"]
+    "classification_labels": ["F0", "F1", "F2", "F3", "M0", "M1", "M2", "M3", "N/A"]
 }
 
 LOGGING_CONFIG = {
