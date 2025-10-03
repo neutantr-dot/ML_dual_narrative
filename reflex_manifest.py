@@ -14,7 +14,7 @@ def get_reflex_manifest(transmission_map_path):
             manifest[wheel] = []
         manifest[wheel].append(reflex)
     return manifest
-
+	
 def preview_manifest(manifest):
     """
     Prints a readable preview of the reflex manifest.
@@ -24,3 +24,4 @@ def preview_manifest(manifest):
         print(f"  • {wheel_state.capitalize()}:")
         for reflex in reflexes:
             print(f"     - {reflex}")
+
