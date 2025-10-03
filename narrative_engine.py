@@ -4,6 +4,7 @@ import json
 import csv
 from datetime import datetime
 from reflex_logic import process_reflex_bundle, get_containment_strategy
+from classification import classify_and_embed
 
 # Optional: Only used if generative AI is enabled
 try:
@@ -41,12 +42,14 @@ def detect_wheel_state(voice_input, background, wheel_codex_path):
     return "neutral"
 
 # === Tone Modulation ===
-def modulate_tone(wheel_state, grammar):
+def modulate_tone(wheel_state, grammar, archetype_variant=None, geometry_alert=None):
+    tone_prefix = f"[Archetype: {archetype_variant}]" if archetype_variant else ""
+    alert_prefix = f"\n[Symbolic Overlay]\nAlert: {geometry_alert}" if geometry_alert and geometry_alert != "stable" else ""
     if wheel_state in grammar:
         tone = grammar[wheel_state].get("tone", "neutral")
         reframe = grammar[wheel_state].get("reframe", "No reframe available.")
-        return f"[Tone: {tone}]\n{reframe}"
-    return "[Tone: neutral]\nNo emotional modulation applied."
+        return f"{tone_prefix}\n[Tone: {tone}]{alert_prefix}\n{reframe}"
+    return f"{tone_prefix}\n[Tone: neutral]{alert_prefix}\nNo emotional modulation applied."
 
 # === Classification Logging ===
 def log_classification(user_id, actor, class_code, log_path):
@@ -58,11 +61,6 @@ def log_classification(user_id, actor, class_code, log_path):
 # === Input Flattening ===
 def flatten_inputs(inputs):
     return " ".join([i.strip() for i in inputs if i])
-
-# === Default Classifier ===
-def classify_user(inputs, actor):
-    # Future: Add symbolic triggers for M2/M3 and F2/F3
-    return "F1" if actor.upper() == "F" else "M1"
 
 # === Narrative Construction ===
 def build_story(inputs, classification):
@@ -142,30 +140,51 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
             os.path.join(modules["geometry"], "wheel_codex.csv")
         )
 
-        # Tone modulation
-        narrative = modulate_tone(wheel_state, grammar)
-
-        # Reflex bundle
+        # Reflex bundle with geometry enrichment
         reflex_bundle = process_reflex_bundle(
             actor=actor,
             wheel_state=wheel_state,
             voice_input=voice_input,
             transmission_map_path=os.path.join(modules["geometry"], "transmission_map.csv"),
-            classification_path="classification.csv",
-            taxonomy_path=os.path.join(modules["reflex"], "7_reflex_taxonomy.csv")
+            classification_path=os.path.join(modules["classification"], "archetype_classification.csv"),
+            taxonomy_path=os.path.join(modules["reflex"], "7_reflex_taxonomy.csv"),
+            wheel_domains={
+                "blue": inputs[4],
+                "red": inputs[5],
+                "yellow": inputs[6],
+                "green": inputs[7],
+                "centre": inputs[8]
+            },
+            wheel_layers_path=os.path.join(modules["geometry"], "wheel_layers.csv"),
+            polarity_drift_path=os.path.join(modules["geometry"], "polarity_drift.csv")
         )
+
+        classification_data = classify_and_embed(
+            actor=actor,
+            wheel_state=wheel_state,
+            reflex_type=reflex_bundle["reflex_type"]
+        )
+
+        classification = classification_data.get("class_code", config.get("defaults", {}).get("fallback_archetype", "none"))
+        variant = classification_data.get("archetype_variant", "unknown")
+        geometry_alert = reflex_bundle.get("geometry_alert", None)
+
+        # Tone modulation
+        narrative = modulate_tone(wheel_state, grammar, archetype_variant=variant, geometry_alert=geometry_alert)
 
         # Containment strategy
         containment = get_containment_strategy(
             wheel_state,
             voice_input,
-            os.path.join(modules["geometry"], "transmission_map.csv")
+            os.path.join(modules["geometry"], "transmission_map.csv"),
+            wheel_domains=reflex_bundle.get("wheel_domains", {})
         )
 
-        # Stitch narrative
         narrative += f"\n\n[Containment Strategy]\n{containment}"
 
-        classification = reflex_bundle.get("class_code", config.get("defaults", {}).get("fallback_archetype", "none"))
+        # Optional symbolic action
+        if "suggested_action" in reflex_bundle:
+            narrative += f"\n\n[Suggested Action]\n{reflex_bundle['suggested_action']}"
 
     # === Logging ===
     log_classification(
