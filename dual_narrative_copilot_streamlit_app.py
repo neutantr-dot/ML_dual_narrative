@@ -17,7 +17,7 @@ TRANSMISSION_MAP_PATH = "transmission_map.csv"
 
 # === Endpoint Configuration ===
 DEFAULT_FLASK_URL = "http://localhost:5000/generate"
-NGROK_FLASK_URL = "https://c8e5a154ceff.ngrok-free.app"
+NGROK_FLASK_URL = "https://9f6413e4376e.ngrok-free.app"
 flask_mode = st.sidebar.radio("Flask Mode", ["Local", "Ngrok"])
 FLASK_URL = NGROK_FLASK_URL if flask_mode == "Ngrok" else DEFAULT_FLASK_URL
 
