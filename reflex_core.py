@@ -1,46 +1,49 @@
 import csv
 
+# === CSV Loader ===
 def load_csv(path):
-    """Loads a CSV file and returns a list of dictionaries."""
     with open(path, newline='', encoding='utf-8') as f:
         return list(csv.DictReader(f))
 
+# === Reflex Detection ===
 def detect_reflex(wheel_state, voice_input, transmission_map_path):
     """
-    Detects reflex based on wheel state and voice input.
-    Returns a semantic bundle: reflex_type, archetype_entry, containment_strategy, narrative_branch, somatic_protocol.
+    Detects symbolic reflex from transmission map.
+    Returns reflex_type, archetype_entry, containment_strategy, narrative_branch, somatic_protocol.
     """
-    try:
-        transmission_map = load_csv(transmission_map_path)
-        voice_text = " ".join(voice_input).lower()
+    transmission_map = load_csv(transmission_map_path)
+    for row in transmission_map:
+        if row.get("trigger") in voice_input and row.get("wheel_state") == wheel_state:
+            return {
+                "reflex_type": row.get("reflex_type", "neutral"),
+                "archetype_entry": row.get("archetype_entry", "M1"),
+                "containment_strategy": row.get("containment", "No containment strategy found."),
+                "narrative_branch": row.get("narrative_branch", "default"),
+                "somatic_protocol": row.get("somatic_protocol", "none")
+            }
+    return {
+        "reflex_type": "neutral",
+        "archetype_entry": "M1",
+        "containment_strategy": "No containment strategy found.",
+        "narrative_branch": "default",
+        "somatic_protocol": "none"
+    }
 
-        for row in transmission_map:
-            if all(key in row for key in [
-                "wheel_state", "reflex_type", "archetype_entry",
-                "containment_strategy", "narrative_branch", "somatic_protocol"
-            ]):
-                if row["wheel_state"].strip().lower() == wheel_state.strip().lower() and \
-                   row["reflex_type"].strip().lower() in voice_text:
-                    return {
-                        "reflex_type": row["reflex_type"],
-                        "archetype_entry": row["archetype_entry"],
-                        "containment_strategy": row["containment_strategy"],
-                        "narrative_branch": row["narrative_branch"],
-                        "somatic_protocol": row["somatic_protocol"]
-                    }
-    except Exception as e:
-        print(f"⚠️ Reflex detection failed: {e}")
-
-    return default_reflex_bundle()
-
+# === Containment Strategy ===
 def apply_containment(wheel_state, voice_input, transmission_map_path):
     """
-    Applies containment strategy based on detected reflex.
-    Returns the containment strategy string.
+    Returns symbolic containment strategy based on wheel state and voice input.
     """
-    reflex = detect_reflex(wheel_state, voice_input, transmission_map_path)
-    return reflex.get("containment_strategy", "default silence")
+    transmission_map = load_csv(transmission_map_path)
+    for row in transmission_map:
+        if row.get("trigger") in voice_input and row.get("wheel_state") == wheel_state:
+            return row.get("containment", "No containment strategy found.")
+    return "No containment strategy found."
 
+# === Actor Classification ===
+from classification_engine import classify_actor_from_wheel
+
+# === Actor Classification ===
 def classify_actor(actor, wheel_state, reflex_type, classification_path):
     """
     Uses CSV-driven classification engine to return symbolic bundle.
@@ -56,4 +59,6 @@ def default_reflex_bundle():
         "narrative_branch": "neutral",
         "somatic_protocol": "breath_and_stillness"
     }
+
+
 
