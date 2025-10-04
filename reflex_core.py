@@ -18,7 +18,8 @@ def detect_reflex(wheel_state, voice_input, transmission_map_path):
     for row in transmission_map:
         if "wheel_state" in row:
             row["reflex_wheel_state"] = row["wheel_state"]
-        if row.get("trigger") in voice_input and row.get("reflex_wheel_state") == wheel_state:
+        trigger = row.get("trigger")
+        if trigger and trigger in voice_input and row.get("reflex_wheel_state") == wheel_state:
             return {
                 "reflex_type": row.get("reflex_type", "neutral"),
                 "archetype_entry": row.get("archetype_entry", "M1"),
@@ -40,15 +41,13 @@ def apply_containment(wheel_state, voice_input, transmission_map_path):
     for row in transmission_map:
         if "wheel_state" in row:
             row["reflex_wheel_state"] = row["wheel_state"]
-        if row.get("trigger") in voice_input and row.get("reflex_wheel_state") == wheel_state:
+        trigger = row.get("trigger")
+        if trigger and trigger in voice_input and row.get("reflex_wheel_state") == wheel_state:
             return row.get("containment", "No containment strategy found.")
     return "No containment strategy found."
 
 # === Actor Classification ===
 def classify_actor(actor, wheel_state, reflex_type, classification_path):
-    """
-    Uses CSV-driven classification engine to return symbolic bundle.
-    """
     return classify_actor_from_wheel(actor, wheel_state, reflex_type, classification_path)
 
 # === Reflex Bundle Constructor ===
@@ -84,7 +83,6 @@ def process_reflex_bundle(actor, wheel_state, voice_input, transmission_map_path
 
 # === Fallback Reflex Bundle ===
 def default_reflex_bundle():
-    """Returns fallback reflex bundle when no match is found."""
     return {
         "reflex_type": "none",
         "archetype_entry": "none",
@@ -92,6 +90,8 @@ def default_reflex_bundle():
         "narrative_branch": "neutral",
         "somatic_protocol": "breath_and_stillness"
     }
+
+
 
 
 
