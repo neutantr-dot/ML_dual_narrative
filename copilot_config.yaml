@@ -1,22 +1,29 @@
 # 🧠 Emotional Engine Configuration
+
 model:
-  name: "openai-gpt4"
+  name: openai-gpt4
   temperature: 0.7
   max_tokens: 800
   system_prompt: "You are a storytelling assistant."
 
 paths:
+  input: input_output/
+  output: input_output/storyline.txt
   modules:
-    classification: "classification"
-    classification_file: "archetype_classification_csv.txt"
-    geometry: "emotional_geometry_layers"
-    reflex: "narrative_reflex_intelligence"
-    trainer: "dual_narrative_trainer"
-    storyline: "story_line_arc.csv"
+    classification: classification/
+    classification_file: archetype_classification_csv.txt
+    geometry: emotional_geometry_layers/
+    reflex: narrative_reflex_intelligence/
+    trainer: dual_narrative_trainer/
+    os_framework: emotional_os_framework/
+    arc: story_line_arc/
+
+grammar:
+  emotional_grammar: emotional_grammar.json
 
 storyline:
-  lines: 100  # Default line count, override via Streamlit UI
-  format: "dual narrative"
+  lines: 100
+  format: dual narrative
   include_classification: true
   classification_labels:
     - M0
@@ -33,24 +40,24 @@ storyline:
 
 classification:
   enabled: true
-  output_file: "classification.csv"
-  fallback_label: "N/A"
+  output_file: classification.csv
+  fallback_label: N/A
   user_tracking: true
   session_label_format: "%a %b %d, %Y (%H:%M)"
   label_prefix: "Generated on"
 
 emotional_grammar:
   enabled: true
-  path: "emotional_grammar.json"
-  grammar_mode: "semantic"
+  path: emotional_grammar.json
+  grammar_mode: semantic
   use_expectation_map: true
 
 reflex_logic:
   enabled: true
-  path: "reflex_logic.py"
-  mode: "archetype_shift"
-  strategy: "dual_narrative"
-  intensity: "moderate"
+  path: reflex_logic.py
+  mode: archetype_shift
+  strategy: dual_narrative
+  intensity: moderate
 
 wheel_domains:
   schema:
@@ -62,9 +69,11 @@ wheel_domains:
 
 logging:
   enabled: true
-  log_file: "copilot_log.txt"
-  log_level: "info"
+  log_file: copilot_log.txt
+  log_level: info
   anonymize: true
+
+
 
 
 
