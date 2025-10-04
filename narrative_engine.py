@@ -5,14 +5,16 @@ import csv
 from datetime import datetime
 from reflex_logic import process_reflex_bundle, get_containment_strategy
 from classification import classify_and_embed
+from geometry_resolver import resolve_geometry_state
+from dual_narrative_trainer import inject_trainer_stage, inject_recentering_stage
 
-# Optional: Only used if generative AI is enabled
+# === Optional: Generative AI ===
 try:
     import openai
 except ImportError:
     openai = None
 
-# === Utility Loaders ===
+# === Loaders ===
 def load_config(path):
     with open(path, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
@@ -32,6 +34,10 @@ def read_text(path):
 def write_text(path, content):
     with open(path, 'w', encoding='utf-8') as f:
         f.write(content)
+
+def load_transmission_profile(path="classification_transmission_map.csv"):
+    rows = load_csv(path)
+    return {row["code"]: row for row in rows}
 
 # === Wheel State Detection ===
 def detect_wheel_state(voice_input, background, wheel_codex_path):
@@ -94,7 +100,6 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
     background_input = flatten_inputs(inputs[4:])
 
     if use_generative and openai:
-        # === Generative AI Path ===
         prompt = (
             f"You are a storytelling assistant.\n\n"
             f"Voice Input:\n{voice_input}\n\n"
@@ -130,9 +135,7 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
             classification = config.get("defaults", {}).get("fallback_archetype", "none")
 
     else:
-        # === Modular Reflex Path ===
-        grammar_path = config.get("emotional_grammar", {}).get("path", "emotional_grammar.json")
-        grammar = load_grammar(grammar_path)
+        grammar = load_grammar(config["grammar"]["emotional_grammar"])
         modules = config["paths"]["modules"]
 
         wheel_state = detect_wheel_state(
@@ -141,7 +144,14 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
             os.path.join(modules["geometry"], "wheel_codex.csv")
         )
 
-        # Reflex bundle with geometry enrichment
+        wheel_domains = {
+            "blue": inputs[4],
+            "red": inputs[5],
+            "yellow": inputs[6],
+            "green": inputs[7],
+            "centre": inputs[8]
+        }
+
         reflex_bundle = process_reflex_bundle(
             actor=actor,
             wheel_state=wheel_state,
@@ -149,54 +159,60 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
             transmission_map_path=os.path.join(modules["geometry"], "transmission_map.csv"),
             classification_path=os.path.join(modules["classification"], "archetype_classification.csv"),
             taxonomy_path=os.path.join(modules["reflex"], "7_reflex_taxonomy.csv"),
-            wheel_domains={
-                "blue": inputs[4],
-                "red": inputs[5],
-                "yellow": inputs[6],
-                "green": inputs[7],
-                "centre": inputs[8]
-            },
+            wheel_domains=wheel_domains,
             wheel_layers_path=os.path.join(modules["geometry"], "wheel_layers.csv"),
             polarity_drift_path=os.path.join(modules["geometry"], "polarity_drift.csv")
         )
 
+        geometry_overlay = resolve_geometry_state(
+            wheel_domains=wheel_domains,
+            layers_path=os.path.join(modules["geometry"], "wheel_layers.csv"),
+            codex_path=os.path.join(modules["geometry"], "wheel_codex.csv"),
+            drift_path=os.path.join(modules["geometry"], "polarity_drift.csv"),
+            ml_instruction_path=os.path.join(modules["engine_boot"], "ml_instruction.csv")
+        )
+
+        reflex_bundle.update(geometry_overlay)
+
         classification_data = classify_and_embed(
             actor=actor,
-            wheel_state=wheel_state,
+            actor_wheel_state=wheel_state,
             reflex_type=reflex_bundle["reflex_type"]
         )
 
         classification = classification_data.get("class_code", config.get("defaults", {}).get("fallback_archetype", "none"))
         variant = classification_data.get("archetype_variant", "unknown")
         geometry_alert = reflex_bundle.get("geometry_alert", None)
+        containment_strategy = reflex_bundle.get("containment_strategy", "default silence")
+        reflex_type = reflex_bundle.get("reflex_type", "neutral")
 
-        # Tone modulation
+        # === Trainer Injection Logic ===
+        trainer_stage_id, trainer_stage_name = inject_trainer_stage(actor, wheel_domains, reflex_type, containment_strategy)
+        recentre_stage_id, recentre_stage_name = inject_recentering_stage(actor, wheel_domains)
+
+        transmission_map = load_transmission_profile()
+        transmission = transmission_map.get(classification, {})
+
         narrative = modulate_tone(wheel_state, grammar, archetype_variant=variant, geometry_alert=geometry_alert)
 
-        # Containment strategy
+        narrative += (
+            f"\n\n[Transmission Profile]"
+            f"\nDirection: {transmission.get('direction', 'unspecified')}"
+            f"\nMode: {transmission.get('mode', 'unspecified')}"
+            f"\nDescription: {transmission.get('description', 'unspecified')}"
+        )
+
         containment = get_containment_strategy(
             wheel_state,
             voice_input,
             os.path.join(modules["geometry"], "transmission_map.csv"),
-            wheel_domains=reflex_bundle.get("wheel_domains", {})
+            wheel_domains=wheel_domains
         )
 
         narrative += f"\n\n[Containment Strategy]\n{containment}"
 
-        # Optional symbolic action
-        if "suggested_action" in reflex_bundle:
+        if transmission.get("mode") == "tantra spectacle":
+            narrative += "\n\n[Suggested Action]\nNo action suggested — spectacle path not supported."
+        elif "suggested_action" in reflex_bundle:
             narrative += f"\n\n[Suggested Action]\n{reflex_bundle['suggested_action']}"
-
-    # === Logging ===
-    log_classification(
-        user_id=user_id,
-        actor=actor,
-        class_code=classification,
-        log_path="classification.csv"
-    )
-
-    # === Final Output ===
-    story_block = build_story(inputs, classification)
-    return f"[{actor} Narrative]\n{story_block}\n\n{narrative}\n\n[Classification]\nActor: {actor}\nClassification: {classification}"
-
 
