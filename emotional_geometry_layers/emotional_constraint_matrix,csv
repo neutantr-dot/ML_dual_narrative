@@ -1,0 +1,12 @@
+"layer","actor","tension_type","color_axis","description","collapse_trigger","modulation_gate","containment_required"
+"Real Life","Male","Within","blue-red","Logistics vs emotional bandwidth","blue overload","soften logistics","yes"
+"Real Life","Female","Within","green-red","Safety vs spice","green collapse","restore sanctuary","yes"
+"Real Life","Male↔Female","Between","blue-green","Flow ownership vs emotional reception","role mismatch","we-protocol","yes"
+
+"Internal","Male","Within","green-red","Collapse vs control","green stuck","pause and reset","yes"
+"Internal","Female","Within","green-red","Attunement vs correction","red pushback","soften stance","yes"
+"Internal","Male↔Female","Between","red-green","Felt tension vs felt response","containment mismatch","mirror emotional state","yes"
+
+"External","Male","Within","yellow-blue","Spectacle vs calibration","yellow drift","withdraw from optics","yes"
+"External","Female","Within","green-red","Reception vs judgment","judgment overload","co-regulate","yes"
+"External","Male↔Female","Between","blue-green","Perceived collapse vs mirrored containment","unmirrored collapse","contain with presence","yes"
