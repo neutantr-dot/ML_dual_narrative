@@ -32,6 +32,9 @@ female_os_map.csv,voice_input.txt,female_phase_mapping,female_os.csv
 4_wheel_summaries.csv,wheel_codex.csv,wheel_state_summary,containment_protocol.csv
 5_cross_map_matrix.csv,archetype_classification.csv,actor_reflex_mapping,polarity_reflex.csv
 
+geometry_resolver.py,wheel_domains,symbolic_constraint_engine,emotional_constraint_matrix.csv
+emotional_constraint_matrix.csv,geometry_resolver.py,constraint_lattice,wheel_layers.csv;wheel_codex.csv;polarity_drift.csv;ML_instruction.csv
+
 story_line_arc.csv,containment_protocol.csv,narrative_branching,wheel_layers.csv
 storyline.txt,voice_input.txt,narrative_output,story_line_arc.csv
 session_log.csv,storyline.txt,historical_tracking,classification.csv
