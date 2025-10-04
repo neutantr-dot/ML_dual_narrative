@@ -1,122 +1,121 @@
-﻿"Voice_ID","Expectation_ID","Mismatch_Type","Reflex_Triggered","Narrative_Tension","Qualifier","Reflex_Complexity"
-"F001","M002","Emotional misread","Withdrawal","She’s quiet but hurting","Green","meta — guilt about expressing pain"
-"F002","M014","Labor imbalance","Explosion","He sees chores as love, she sees them as burden","Blue","somatic — tension stored in jaw and shoulders"
-"F003","M037","Symbolic vs. practical future","Hopeful projection","She dreams aloud, he plans silently","Centre","drift — future vision diverges over time"
-"F004","M024","Emotional avoidance","Anxiety spiral","She seeks clarity, he avoids depth","Red","loop — her anxiety feeds his withdrawal"
-"F005","M071","Invisible labor","Resentment","She’s exhausted, he assumes stability","Red","compound — resentment + fatigue + silence"
-"F006","M011","Emotional gap","Disappointment","She wants words, he offers achievements","Green","meta — disappointment masked by politeness"
-"F007","M025","Erotic mismatch","Desire spike","She wants emotional intimacy, he wants spontaneity","Green","loop — her longing triggers his detachment"
-"F008","M014","Mental load mismatch","Frustration","She plans everything, he assumes it’s handled","Blue","somatic — cognitive overload, clenched jaw"
-"F009","M051","Emotional vs. logistical priority","Confusion","She wants clarity, he wants routine","Yellow","compound — emotional need + practical neglect"
-"F010","M072","Abandonment trauma","Sadness","She feels discarded, he thinks silence is loyalty","Centre","drift — sadness deepens after silence"
-"F011","M027","Cognitive overload","Irritation","She’s mentally taxed, he sees her as easygoing","Blue","somatic — mental fatigue expressed physically"
-"F012","M030","Emotional delay","Longing","She waits for connection, he thinks laughter is enough","Green","drift — delayed emotional need vs. surface bonding"
-"F013","M043","Moral betrayal","Rage","She feels violated, he expects public loyalty","Red","compound — rage + moral injury + silencing"
-"F014","M017","Emotional attunement","Tenderness","She opens up, he responds with humor","Green","loop — vulnerability met with deflection"
-"F015","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — bitterness from unacknowledged effort"
-"F016","M052","Emotional synchrony","Joy","She feels seen, he feels bonded","Centre","compound — mutual validation through intimacy"
-"F017","M005","Emotional absenteeism","Isolation","She carries the emotional weight, he detaches","Red","loop — her emotional labor feeds his withdrawal"
-"F018","M038","Intellectual match","Admiration","She feels alive, he feels valued","Blue","compound — mutual stimulation and respect"
-"F019","M055","Clarity mismatch","Doubt","She wants answers, he wants peace","Yellow","meta — doubt triggered by avoidance"
-"F020","M015","Repair attempt","Relief","She feels heard, he feels forgiven","Green","loop — vulnerability met with empathy"
-"F021","M084","Self-neglect praised","Guilt spiral","She’s exhausted, he sees her strength","Red","meta — guilt for needing care"
-"F022","M017","Emotional mismatch","Tenderness","She opens emotionally, he responds with humor","Green","loop — emotional mismatch in tone"
-"F023","M058","Social comparison","Jealousy spike","She sees him admire others, he sees status","Yellow","somatic — jealousy felt in body"
-"F024","M074","Recognition gap","Disappointment","She wants celebration, he expects praise","Blue","meta — disappointment from unmet emotional need"
-"F025","M063","Planning avoidance","Insecurity","She seeks clarity, he avoids future talk","Green","drift — future anxiety grows over time"
-"F026","M078","Betrayal minimization","Rage","She’s devastated, he wants to move on","Red","compound — rage + invalidation"
-"F027","M096","Emotional nostalgia","Hope","She revisits memories, he plans ahead","Centre","drift — emotional time lag"
-"F028","M037","Emotional alignment","Gratitude","She feels seen, he feels secure","Green","compound — mutual emotional attunement"
-"F029","M066","Intellectual boredom","Frustration","She wants depth, he wants distraction","Blue","loop — depth-seeking met with avoidance"
-"F030","M070","Safety mismatch","Fear","She feels unsafe, he sees strength in silence","Red","meta — fear masked by restraint"
-"F031","M083","Leadership moment","Admiration","She feels protected, he feels respected","Centre","compound — mutual reinforcement of roles"
-"F032","M086","Moral misalignment","Disgust","She feels betrayed, he avoids accountability","Yellow","meta — disgust layered over unmet ethical need"
-"F033","M045","Emotional rebirth","Hope","She seeks renewal, he seeks direction","Green","drift — emotional reset vs. practical planning"
-"F034","M094","Body shame","Withdrawal","She feels judged, he avoids emotion","Red","somatic — shame stored in posture and breath"
-"F035","M069","Shared adventure","Excitement","She feels alive, he feels in control","Blue","loop — her spontaneity feeds his dominance"
-"F036","M087","Emotional avoidance","Sadness","She grieves, he suppresses","Green","loop — grief met with emotional shutdown"
-"F037","M075","Time imbalance","Frustration","She wants equity, he wants peace","Yellow","compound — frustration + unmet logistical need"
-"F038","M076","Erotic connection","Desire","She feels intimacy, he feels routine","Green","loop — longing met with habituation"
-"F039","M067","Mixed signals","Confusion","She seeks clarity, he seeks space","Yellow","drift — emotional ambiguity over time"
-"F040","M015","Emotional safety","Relief","She feels accepted, he feels forgiven","Centre","compound — mutual repair reflex"
-"F041","M030","Emotional mismatch","Vulnerability","She opens gently, he responds with humor","Green","loop — vulnerability met with deflection"
-"F042","M066","Planning gap","Disappointment","She wants shared planning, he wants distraction","Blue","meta — disappointment masked by irritation"
-"F043","M078","Betrayal minimization","Explosion","She’s devastated, he wants to move on","Red","compound — rage + invalidation"
-"F044","M025","Emotional depth vs. spontaneity","Excitement","She seeks meaning, he seeks thrill","Centre","loop — depth-seeking met with impulsivity"
-"F045","M076","Intimacy mismatch","Emptiness","She wants connection, he wants routine","Green","drift — emotional erosion over time"
-"F046","M058","Social comparison","Shame","She feels judged, he seeks status","Yellow","somatic — shame felt in body and posture"
-"F047","M045","Emotional renewal","Hope","She seeks rebirth, he seeks direction","Green","drift — emotional reset vs. practical planning"
-"F048","M014","Labor imbalance","Frustration","She plans everything, he assumes it’s handled","Blue","somatic — cognitive overload, clenched jaw"
-"F049","M002","Emotional neglect","Sadness","She’s hurting, he thinks silence is peace","Red","meta — sadness masked by withdrawal"
-"F050","M052","Emotional synchrony","Joy","She feels seen, he feels bonded","Centre","compound"
-"F051","M055","Clarity mismatch","Doubt","She wants answers, he wants peace","Yellow","meta — doubt triggered by avoidance of clarity"
-"F052","M038","Emotional match","Admiration","She feels alive, he feels valued","Green","compound — mutual validation through stimulation"
-"F053","M075","Planning avoidance","Anxiety","She seeks clarity, he avoids future talk","Red","drift — anxiety intensifies as avoidance persists"
-"F054","M037","Emotional support","Gratitude","She feels cared for, he feels aligned","Green","compound — emotional and practical attunement"
-"F055","M027","Mental load mismatch","Irritation","She’s mentally taxed, he sees her as easygoing","Blue","somatic — cognitive overload expressed physically"
-"F056","M063","Dream alignment","Longing","She seeks shared vision, he seeks agreement","Centre","drift — longing grows as vision remains unspoken"
-"F057","M067","Mixed signals","Confusion","She seeks clarity, he seeks space","Yellow","loop — her pursuit triggers his retreat"
-"F058","M015","Emotional safety","Relief","She feels accepted, he feels forgiven","Green","compound — mutual repair and emotional grounding"
-"F059","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — bitterness from unacknowledged effort"
-"F060","M004","Erotic mismatch","Desire","She wants emotional intimacy, he wants spontaneity","Green","loop — her longing met with impulsivity"
-"F061","M076","Depth vs. routine","Disappointment","She wants emotional intimacy, he wants consistency","Green","drift — emotional erosion through repetition"
-"F062","M059","Labor mismatch","Gratitude","She feels supported, he sees fairness","Blue","compound — gratitude layered over logistical tension"
-"F063","M075","Planning avoidance","Anxiety","She seeks predictability, he avoids emotional stress","Yellow","loop — her need for structure triggers his withdrawal"
-"F064","M015","Emotional safety","Relief","She feels heard, he feels forgiven","Green","compound — mutual emotional repair"
-"F065","M027","Mental load mismatch","Frustration","She plans everything, he assumes simplicity","Blue","somatic — tension from cognitive overfunctioning"
-"F066","M072","Abandonment trauma","Sadness","She feels discarded, he thinks silence is loyalty","Centre","drift — sadness deepens as silence persists"
-"F067","M045","Emotional renewal","Hope","She seeks rebirth, he seeks direction","Green","drift — emotional reset vs. practical planning"
-"F068","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — emotional depletion from lack of recognition"
-"F069","M052","Emotional synchrony","Joy","She feels seen, he feels bonded","Blue","compound — mutual intimacy through emotional attunement"
-"F070","M094","Body shame","Withdrawal","She feels judged, he avoids emotion","Red","somatic — shame stored in posture and breath"
-"F071","M004","Erotic mismatch","Desire","She wants emotional intimacy, he wants spontaneity","Green","loop — longing met with impulsivity"
-"F072","M067","Mixed signals","Confusion","She seeks clarity, he seeks space","Yellow","loop — pursuit triggers retreat"
-"F073","M083","Leadership moment","Admiration","She feels protected, he feels respected","Centre","compound — mutual reinforcement of roles"
-"F074","M063","Dream alignment","Longing","She seeks shared vision, he seeks agreement","Centre","drift — emotional vision diverges over time"
-"F075","M078","Betrayal minimization","Explosion","She’s devastated, he wants to move on","Red","compound — rage + invalidation"
-"F076","M096","Emotional nostalgia","Hope","She revisits memories, he plans ahead","Centre","drift — emotional time lag"
-"F077","M017","Emotional mismatch","Tenderness","She opens emotionally, he responds with humor","Green","loop — vulnerability met with deflection"
-"F078","M084","Self-neglect praised","Guilt spiral","She’s exhausted, he sees her strength","Red","meta — guilt for needing care"
-"F079","M025","Emotional depth vs. spontaneity","Excitement","She seeks meaning, he seeks thrill","Centre","loop — depth-seeking met with impulsivity"
-"F080","M076","Intimacy mismatch","Emptiness","She wants connection, he wants routine","Green","drift — emotional erosion through repetition"
-"Voice_ID","Expectation_ID","Mismatch_Type","Reflex_Triggered","Narrative_Tension","Qualifier","Reflex_Complexity"
-"F081","M004","Depth vs. physicality","Vulnerability","She seeks safety, he seeks validation","Green","meta — vulnerability masked by performance"
-"F082","M014","Labor imbalance","Disappointment","She wants shared responsibility, he sees domestic support","Blue","somatic — tension from unequal effort"
-"F083","M063","Future avoidance","Anxiety","She seeks clarity, he avoids planning","Red","drift — anxiety intensifies with avoidance"
-"F084","M015","Emotional safety","Relief","She feels heard, he feels forgiven","Green","compound — mutual emotional repair"
-"F085","M027","Mental load mismatch","Frustration","She plans everything, he assumes simplicity","Yellow","somatic — cognitive overload expressed physically"
-"F086","M002","Emotional neglect","Sadness","She’s hurting, he thinks silence is peace","Centre","meta — sadness masked by withdrawal"
-"F087","M045","Emotional renewal","Hope","She seeks rebirth, he seeks direction","Green","drift — emotional reset vs. practical planning"
-"F088","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — emotional depletion from lack of recognition"
-"F089","M052","Emotional synchrony","Joy","She feels seen, he feels bonded","Blue","compound — mutual intimacy through attunement"
-"F090","M094","Body shame","Withdrawal","She feels judged, he avoids emotion","Red","somatic — shame stored in posture and breath"
-"F091","M004","Erotic mismatch","Desire","She wants emotional intimacy, he wants spontaneity","Green","loop — longing met with impulsivity"
-"F092","M067","Mixed signals","Confusion","She seeks clarity, he seeks space","Yellow","loop — pursuit triggers retreat"
-"F093","M083","Leadership moment","Admiration","She feels protected, he feels respected","Centre","compound — mutual reinforcement of roles"
-"F094","M063","Dream alignment","Longing","She seeks shared vision, he seeks agreement","Centre","drift — emotional vision diverges over time"
-"F095","M078","Betrayal minimization","Explosion","She’s devastated, he wants to move on","Red","compound — rage + invalidation"
-"F096","M096","Emotional nostalgia","Hope","She revisits memories, he plans ahead","Centre","drift — emotional time lag"
-"F097","M017","Emotional mismatch","Tenderness","She opens emotionally, he responds with humor","Green","loop — vulnerability met with deflection"
-"F098","M084","Self-neglect praised","Guilt spiral","She’s exhausted, he sees her strength","Red","meta — guilt for needing care"
-"F099","M025","Emotional depth vs. spontaneity","Excitement","She seeks meaning, he seeks thrill","Centre","loop — depth-seeking met with impulsivity"
-"F100","M076","Intimacy mismatch","Emptiness","She wants connection, he wants routine","Green","drift — emotional erosion through repetition"
-"F101","M105","Emotional suppression","Guilt spiral","She feels wrong for expressing anger, he sees silence as maturity","Red","meta — guilt about emotional expression"
-"F102","M115","Emotional growth match","Pride surge","She feels evolved, he sees her strength without prompting","Green","compound — mutual growth recognition"
-"F103","M076","Erotic mismatch","Shame retreat","She wants emotional depth, he wants routine physicality","Red","somatic — shame felt in body"
-"F104","M092","Depth mismatch","Longing","She craves connection, he thinks jokes are closeness","Green","drift — emotional need unmet over time"
-"F105","M015","Repair attempt","Gratitude","She feels seen, he feels forgiven","Green","compound — mutual repair reflex"
-"F106","M072","Emotional neglect","Insecurity spike","She feels invisible, he sees silence as loyalty","Yellow","loop — her insecurity feeds his withdrawal"
-"F107","M015","Emotional safety","Relief","She feels held, he feels forgiven","Green","compound — mutual emotional grounding"
-"F108","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — emotional depletion from lack of recognition"
-"F109","M052","Emotional synchrony","Joy","She feels playful, he feels validated","Green","compound — mutual intimacy through attunement"
-"F110","M072","Abandonment trauma","Sadness","She feels discarded, he thinks silence is loyalty","Centre","drift — sadness deepens as silence persists"
-"F111","M045","Emotional renewal","Hope","She seeks rebirth, he seeks direction","Green","drift — emotional reset vs. practical planning"
-"F112","M014","Labor imbalance","Frustration","She plans everything, he assumes it’s handled","Blue","somatic — tension from unequal effort"
-"F113","M076","Erotic mismatch","Desire fade","She wants novelty, he wants routine","Green","loop — longing met with habituation"
-"F114","M002","Emotional misread","Shame spiral","She feels too much, he thinks silence is peace","Red","meta — shame triggered by emotional invalidation"
-"F115","M083","Leadership moment","Admiration","She feels protected, he feels respected","Centre","compound — mutual reinforcement of roles"
-"F116","M064","Financial avoidance","Anxiety spiral","She feels alone, he sees autonomy","Red","loop — her anxiety feeds his detachment"
-"F117","M017","Emotional mismatch","Tenderness","She opens emotionally, he responds with humor","Green","loop — vulnerability met with deflection"
-"F118","M076","Depth mismatch","Emptiness","She wants connection, he wants routine","Green","drift — emotional erosion through repetition"
-"F119","M078","Betrayal minimization","Rage","She’s devastated, he wants to move on","Red","compound — rage + invalidation"
-"F120","M096","Symbolic drift","Longing","She offers meaning, he moves ahead","Centre","drift — emotional symbolism vs. pragmatic momentum"
+"Voice_ID","Expectation_ID","Mismatch_Type","Reflex_Triggered","Narrative_Tension","Qualifier","Reflex_Complexity","Repair_Protocol_ID"
+"F001","M002","Emotional misread","Withdrawal","She’s quiet but hurting","Green","meta — guilt about expressing pain",RP001
+"F002","M014","Labor imbalance","Explosion","He sees chores as love, she sees them as burden","Blue","somatic — tension stored in jaw and shoulders",RP002
+"F003","M037","Symbolic vs. practical future","Hopeful projection","She dreams aloud, he plans silently","Centre","drift — future vision diverges over time",RP003
+"F004","M024","Emotional avoidance","Anxiety spiral","She seeks clarity, he avoids depth","Red","loop — her anxiety feeds his withdrawal",RP004
+"F005","M071","Invisible labor","Resentment","She’s exhausted, he assumes stability","Red","compound — resentment + fatigue + silence",RP005
+"F006","M011","Emotional gap","Disappointment","She wants words, he offers achievements","Green","meta — disappointment masked by politeness",RP006
+"F007","M025","Erotic mismatch","Desire spike","She wants emotional intimacy, he wants spontaneity","Green","loop — her longing triggers his detachment",RP007
+"F008","M014","Mental load mismatch","Frustration","She plans everything, he assumes it’s handled","Blue","somatic — cognitive overload, clenched jaw",RP008
+"F009","M051","Emotional vs. logistical priority","Confusion","She wants clarity, he wants routine","Yellow","compound — emotional need + practical neglect",RP009
+"F010","M072","Abandonment trauma","Sadness","She feels discarded, he thinks silence is loyalty","Centre","drift — sadness deepens after silence",RP010
+"F011","M027","Cognitive overload","Irritation","She’s mentally taxed, he sees her as easygoing","Blue","somatic — mental fatigue expressed physically",RP011
+"F012","M030","Emotional delay","Longing","She waits for connection, he thinks laughter is enough","Green","drift — delayed emotional need vs. surface bonding",RP012
+"F013","M043","Moral betrayal","Rage","She feels violated, he expects public loyalty","Red","compound — rage + moral injury + silencing",RP013
+"F014","M017","Emotional attunement","Tenderness","She opens up, he responds with humor","Green","loop — vulnerability met with deflection",RP014
+"F015","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — bitterness from unacknowledged effort",RP015
+"F016","M052","Emotional synchrony","Joy","She feels seen, he feels bonded","Centre","compound — mutual validation through intimacy",RP016
+"F017","M005","Emotional absenteeism","Isolation","She carries the emotional weight, he detaches","Red","loop — her emotional labor feeds his withdrawal",RP017
+"F018","M038","Intellectual match","Admiration","She feels alive, he feels valued","Blue","compound — mutual stimulation and respect",RP018
+"F019","M055","Clarity mismatch","Doubt","She wants answers, he wants peace","Yellow","meta — doubt triggered by avoidance",RP019
+"F020","M015","Repair attempt","Relief","She feels heard, he feels forgiven","Green","loop — vulnerability met with empathy",RP020
+"F021","M084","Self-neglect praised","Guilt spiral","She’s exhausted, he sees her strength","Red","meta — guilt for needing care",RP021
+"F022","M017","Emotional mismatch","Tenderness","She opens emotionally, he responds with humor","Green","loop — emotional mismatch in tone",RP022
+"F023","M058","Social comparison","Jealousy spike","She sees him admire others, he sees status","Yellow","somatic — jealousy felt in body",RP023
+"F024","M074","Recognition gap","Disappointment","She wants celebration, he expects praise","Blue","meta — disappointment from unmet emotional need",RP024
+"F025","M063","Planning avoidance","Insecurity","She seeks clarity, he avoids future talk","Green","drift — future anxiety grows over time",RP025
+"F026","M078","Betrayal minimization","Rage","She’s devastated, he wants to move on","Red","compound — rage + invalidation",RP026
+"F027","M096","Emotional nostalgia","Hope","She revisits memories, he plans ahead","Centre","drift — emotional time lag",RP027
+"F028","M037","Emotional alignment","Gratitude","She feels seen, he feels secure","Green","compound — mutual emotional attunement",RP028
+"F029","M066","Intellectual boredom","Frustration","She wants depth, he wants distraction","Blue","loop — depth-seeking met with avoidance",RP029
+"F030","M070","Safety mismatch","Fear","She feels unsafe, he sees strength in silence","Red","meta — fear masked by restraint",RP030
+"F031","M083","Leadership moment","Admiration","She feels protected, he feels respected","Centre","compound — mutual reinforcement of roles",RP031
+"F032","M086","Moral misalignment","Disgust","She feels betrayed, he avoids accountability","Yellow","meta — disgust layered over unmet ethical need",RP032
+"F033","M045","Emotional rebirth","Hope","She seeks renewal, he seeks direction","Green","drift — emotional reset vs. practical planning",RP033
+"F034","M094","Body shame","Withdrawal","She feels judged, he avoids emotion","Red","somatic — shame stored in posture and breath",RP034
+"F035","M069","Shared adventure","Excitement","She feels alive, he feels in control","Blue","loop — her spontaneity feeds his dominance",RP035
+"F036","M087","Emotional avoidance","Sadness","She grieves, he suppresses","Green","loop — grief met with emotional shutdown",RP036
+"F037","M075","Time imbalance","Frustration","She wants equity, he wants peace","Yellow","compound — frustration + unmet logistical need",RP037
+"F038","M076","Erotic connection","Desire","She feels intimacy, he feels routine","Green","loop — longing met with habituation",RP038
+"F039","M067","Mixed signals","Confusion","She seeks clarity, he seeks space","Yellow","drift — emotional ambiguity over time",RP039
+"F040","M015","Emotional safety","Relief","She feels accepted, he feels forgiven","Centre","compound — mutual repair reflex",RP040
+"F041","M030","Emotional mismatch","Vulnerability","She opens gently, he responds with humor","Green","loop — vulnerability met with deflection",RP041
+"F042","M066","Planning gap","Disappointment","She wants shared planning, he wants distraction","Blue","meta — disappointment masked by irritation",RP042
+"F043","M078","Betrayal minimization","Explosion","She’s devastated, he wants to move on","Red","compound — rage + invalidation",RP043
+"F044","M025","Emotional depth vs. spontaneity","Excitement","She seeks meaning, he seeks thrill","Centre","loop — depth-seeking met with impulsivity",RP044
+"F045","M076","Intimacy mismatch","Emptiness","She wants connection, he wants routine","Green","drift — emotional erosion over time",RP045
+"F046","M058","Social comparison","Shame","She feels judged, he seeks status","Yellow","somatic — shame felt in body and posture",RP046
+"F047","M045","Emotional renewal","Hope","She seeks rebirth, he seeks direction","Green","drift — emotional reset vs. practical planning",RP047
+"F048","M014","Labor imbalance","Frustration","She plans everything, he assumes it’s handled","Blue","somatic — cognitive overload, clenched jaw",RP048
+"F049","M002","Emotional neglect","Sadness","She’s hurting, he thinks silence is peace","Red","meta — sadness masked by withdrawal",RP049
+"F050","M052","Emotional synchrony","Joy","She feels seen, he feels bonded","Centre","compound",RP050
+"F051","M055","Clarity mismatch","Doubt","She wants answers, he wants peace","Yellow","meta — doubt triggered by avoidance of clarity",RP051
+"F052","M038","Emotional match","Admiration","She feels alive, he feels valued","Green","compound — mutual validation through stimulation",RP052
+"F053","M075","Planning avoidance","Anxiety","She seeks clarity, he avoids future talk","Red","drift — anxiety intensifies as avoidance persists",RP053
+"F054","M037","Emotional support","Gratitude","She feels cared for, he feels aligned","Green","compound — emotional and practical attunement",RP054
+"F055","M027","Mental load mismatch","Irritation","She’s mentally taxed, he sees her as easygoing","Blue","somatic — cognitive overload expressed physically",RP055
+"F056","M063","Dream alignment","Longing","She seeks shared vision, he seeks agreement","Centre","drift — longing grows as vision remains unspoken",RP056
+"F057","M067","Mixed signals","Confusion","She seeks clarity, he seeks space","Yellow","loop — her pursuit triggers his retreat",RP057
+"F058","M015","Emotional safety","Relief","She feels accepted, he feels forgiven","Green","compound — mutual repair and emotional grounding",RP058
+"F059","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — bitterness from unacknowledged effort",RP059
+"F060","M004","Erotic mismatch","Desire","She wants emotional intimacy, he wants spontaneity","Green","loop — her longing met with impulsivity",RP060
+"F061","M076","Depth vs. routine","Disappointment","She wants emotional intimacy, he wants consistency","Green","drift — emotional erosion through repetition",RP061
+"F062","M059","Labor mismatch","Gratitude","She feels supported, he sees fairness","Blue","compound — gratitude layered over logistical tension",RP062
+"F063","M075","Planning avoidance","Anxiety","She seeks predictability, he avoids emotional stress","Yellow","loop — her need for structure triggers his withdrawal",RP063
+"F064","M015","Emotional safety","Relief","She feels heard, he feels forgiven","Green","compound — mutual emotional repair",RP064
+"F065","M027","Mental load mismatch","Frustration","She plans everything, he assumes simplicity","Blue","somatic — tension from cognitive overfunctioning",RP065
+"F066","M072","Abandonment trauma","Sadness","She feels discarded, he thinks silence is loyalty","Centre","drift — sadness deepens as silence persists",RP066
+"F067","M045","Emotional renewal","Hope","She seeks rebirth, he seeks direction","Green","drift — emotional reset vs. practical planning",RP067
+"F068","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — emotional depletion from lack of recognition",RP068
+"F069","M052","Emotional synchrony","Joy","She feels seen, he feels bonded","Blue","compound — mutual intimacy through emotional attunement",RP069
+"F070","M094","Body shame","Withdrawal","She feels judged, he avoids emotion","Red","somatic — shame stored in posture and breath",RP070
+"F071","M004","Erotic mismatch","Desire","She wants emotional intimacy, he wants spontaneity","Green","loop — longing met with impulsivity",RP071
+"F072","M067","Mixed signals","Confusion","She seeks clarity, he seeks space","Yellow","loop — pursuit triggers retreat",RP072
+"F073","M083","Leadership moment","Admiration","She feels protected, he feels respected","Centre","compound — mutual reinforcement of roles",RP073
+"F074","M063","Dream alignment","Longing","She seeks shared vision, he seeks agreement","Centre","drift — emotional vision diverges over time",RP074
+"F075","M078","Betrayal minimization","Explosion","She’s devastated, he wants to move on","Red","compound — rage + invalidation",RP075
+"F076","M096","Emotional nostalgia","Hope","She revisits memories, he plans ahead","Centre","drift — emotional time lag",RP076
+"F077","M017","Emotional mismatch","Tenderness","She opens emotionally, he responds with humor","Green","loop — vulnerability met with deflection",RP077
+"F078","M084","Self-neglect praised","Guilt spiral","She’s exhausted, he sees her strength","Red","meta — guilt for needing care",RP078
+"F079","M025","Emotional depth vs. spontaneity","Excitement","She seeks meaning, he seeks thrill","Centre","loop — depth-seeking met with impulsivity",RP079
+"F080","M076","Intimacy mismatch","Emptiness","She wants connection, he wants routine","Green","drift — emotional erosion through repetition",RP080
+"F081","M004","Depth vs. physicality","Vulnerability","She seeks safety, he seeks validation","Green","meta — vulnerability masked by performance",RP081
+"F082","M014","Labor imbalance","Disappointment","She wants shared responsibility, he sees domestic support","Blue","somatic — tension from unequal effort",RP082
+"F083","M063","Future avoidance","Anxiety","She seeks clarity, he avoids planning","Red","drift — anxiety intensifies with avoidance",RP083
+"F084","M015","Emotional safety","Relief","She feels heard, he feels forgiven","Green","compound — mutual emotional repair",RP085
+"F086","M002","Emotional neglect","Sadness","She’s hurting, he thinks silence is peace","Centre","meta — sadness masked by withdrawal",RP086
+"F087","M045","Emotional renewal","Hope","She seeks rebirth, he seeks direction","Green","drift — emotional reset vs. practical planning",RP087
+"F088","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — emotional depletion from lack of recognition",RP088
+"F089","M052","Emotional synchrony","Joy","She feels seen, he feels bonded","Blue","compound — mutual intimacy through attunement",RP089
+"F090","M094","Body shame","Withdrawal","She feels judged, he avoids emotion","Red","somatic — shame stored in posture and breath",RP090
+"F091","M004","Erotic mismatch","Desire","She wants emotional intimacy, he wants spontaneity","Green","loop — longing met with impulsivity",RP091
+"F092","M067","Mixed signals","Confusion","She seeks clarity, he seeks space","Yellow","loop — pursuit triggers retreat",RP092
+"F093","M083","Leadership moment","Admiration","She feels protected, he feels respected","Centre","compound — mutual reinforcement of roles",RP093
+"F094","M063","Dream alignment","Longing","She seeks shared vision, he seeks agreement","Centre","drift — emotional vision diverges over time",RP094
+"F095","M078","Betrayal minimization","Explosion","She’s devastated, he wants to move on","Red","compound — rage + invalidation",RP095
+"F096","M096","Emotional nostalgia","Hope","She revisits memories, he plans ahead","Centre","drift — emotional time lag",RP096
+"F097","M017","Emotional mismatch","Tenderness","She opens emotionally, he responds with humor","Green","loop — vulnerability met with deflection",RP097
+"F098","M084","Self-neglect praised","Guilt spiral","She’s exhausted, he sees her strength","Red","meta — guilt for needing care",RP098
+"F099","M025","Emotional depth vs. spontaneity","Excitement","She seeks meaning, he seeks thrill","Centre","loop — depth-seeking met with impulsivity",RP099
+"F100","M076","Intimacy mismatch","Emptiness","She wants connection, he wants routine","Green","drift — emotional erosion through repetition",RP100
+"F101","M105","Emotional suppression","Guilt spiral","She feels wrong for expressing anger, he sees silence as maturity","Red","meta — guilt about emotional expression",RP101
+"F102","M115","Emotional growth match","Pride surge","She feels evolved, he sees her strength without prompting","Green","compound — mutual growth recognition",RP102
+"F103","M076","Erotic mismatch","Shame retreat","She wants emotional depth, he wants routine physicality","Red","somatic — shame felt in body",RP103
+"F104","M092","Depth mismatch","Longing","She craves connection, he thinks jokes are closeness","Green","drift — emotional need unmet over time",RP104
+"F105","M015","Repair attempt","Gratitude","She feels seen, he feels forgiven","Green","compound — mutual repair reflex",RP105
+"F106","M072","Emotional neglect","Insecurity spike","She feels invisible, he sees silence as loyalty","Yellow","loop — her insecurity feeds his withdrawal",RP106
+"F107","M015","Emotional safety","Relief","She feels held, he feels forgiven","Green","compound — mutual emotional grounding",RP107
+"F108","M007","Recognition gap","Bitterness","She gives endlessly, he expects gratitude","Blue","meta — emotional depletion from lack of recognition",RP108
+"F109","M052","Emotional synchrony","Joy","She feels playful, he feels validated","Green","compound — mutual intimacy through attunement",RP109
+"F110","M072","Abandonment trauma","Sadness","She feels discarded, he thinks silence is loyalty","Centre","drift — sadness deepens as silence persists",RP110
+"F111","M045","Emotional renewal","Hope","She seeks rebirth, he seeks direction","Green","drift — emotional reset vs. practical planning",RP111
+"F112","M014","Labor imbalance","Frustration","She plans everything, he assumes it’s handled","Blue","somatic — tension from unequal effort",RP112
+"F113","M076","Erotic mismatch","Desire fade","She wants novelty, he wants routine","Green","loop — longing met with habituation",RP113
+"F114","M002","Emotional misread","Shame spiral","She feels too much, he thinks silence is peace","Red","meta — shame triggered by emotional invalidation",RP114
+"F115","M083","Leadership moment","Admiration","She feels protected, he feels respected","Centre","compound — mutual reinforcement of roles",RP115
+"F116","M064","Financial avoidance","Anxiety spiral","She feels alone, he sees autonomy","Red","loop — her anxiety feeds his detachment",RP116
+"F117","M017","Emotional mismatch","Tenderness","She opens emotionally, he responds with humor","Green","loop — vulnerability met with deflection",RP117
+"F118","M076","Depth mismatch","Emptiness","She wants connection, he wants routine","Green","drift — emotional erosion through repetition",RP118
+"F119","M078","Betrayal minimization","Rage","She’s devastated, he wants to move on","Red","compound — rage + invalidation",RP119
+"F120","M096","Symbolic drift","Longing","She offers meaning, he moves ahead","Centre","drift — emotional symbolism vs. pragmatic momentum",RP120
+
