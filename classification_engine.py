@@ -40,7 +40,9 @@ def classify_actor_from_wheel(actor, actor_wheel_state, reflex_type, classificat
                 "progressive": row.get("progressive", "FALSE").strip().upper() == "TRUE"
             }
 
-    # Fallback if no match found
+    # Debug trace for unmatched classification
+    print(f"⚠️ No classification match for actor='{actor}', wheel_state='{actor_wheel_state}', reflex_type='{reflex_type}'")
+
     return {
         "class_code": "N/A",
         "archetype_variant": "unknown",
@@ -92,3 +94,5 @@ def preview_classification(classification_path):
 
         print(f"     ↪ Geometry Alert: {geometry_overlay['geometry_alert']}")
         print(f"     ↪ Suggested Action: {geometry_overlay['suggested_action']}")
+
+
