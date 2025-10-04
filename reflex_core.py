@@ -13,20 +13,23 @@ def load_csv(path):
         return []
 
 # === Reflex Detection ===
-def detect_reflex(wheel_state, voice_input, transmission_map_path):
+def detect_reflex(actor_wheel_state, voice_input, transmission_map_path):
     transmission_map = load_csv(transmission_map_path)
     for row in transmission_map:
-        if "wheel_state" in row:
-            row["reflex_wheel_state"] = row["wheel_state"]
-        trigger = row.get("trigger")
-        if trigger and trigger in voice_input and row.get("reflex_wheel_state") == wheel_state:
+        reflex_state = row.get("reflex_wheel_state", "").strip().lower()
+        trigger = row.get("trigger", "").strip().lower()
+        if trigger and trigger in voice_input.lower() and reflex_state == actor_wheel_state.strip().lower():
             return {
                 "reflex_type": row.get("reflex_type", "neutral"),
                 "archetype_entry": row.get("archetype_entry", "M1"),
-                "containment_strategy": row.get("containment", "No containment strategy found."),
+                "containment_strategy": row.get("containment_strategy", "No containment strategy found."),
                 "narrative_branch": row.get("narrative_branch", "default"),
                 "somatic_protocol": row.get("somatic_protocol", "none")
             }
+
+    # Debug trace for unmatched reflex
+    print(f"⚠️ No reflex match for actor_wheel_state='{actor_wheel_state}' and input='{voice_input}'")
+
     return {
         "reflex_type": "neutral",
         "archetype_entry": "M1",
@@ -36,26 +39,25 @@ def detect_reflex(wheel_state, voice_input, transmission_map_path):
     }
 
 # === Containment Strategy ===
-def apply_containment(wheel_state, voice_input, transmission_map_path):
+def apply_containment(actor_wheel_state, voice_input, transmission_map_path):
     transmission_map = load_csv(transmission_map_path)
     for row in transmission_map:
-        if "wheel_state" in row:
-            row["reflex_wheel_state"] = row["wheel_state"]
-        trigger = row.get("trigger")
-        if trigger and trigger in voice_input and row.get("reflex_wheel_state") == wheel_state:
-            return row.get("containment", "No containment strategy found.")
+        reflex_state = row.get("reflex_wheel_state", "").strip().lower()
+        trigger = row.get("trigger", "").strip().lower()
+        if trigger and trigger in voice_input.lower() and reflex_state == actor_wheel_state.strip().lower():
+            return row.get("containment_strategy", "No containment strategy found.")
     return "No containment strategy found."
 
 # === Actor Classification ===
-def classify_actor(actor, wheel_state, reflex_type, classification_path):
-    return classify_actor_from_wheel(actor, wheel_state, reflex_type, classification_path)
+def classify_actor(actor, actor_wheel_state, reflex_type, classification_path):
+    return classify_actor_from_wheel(actor, actor_wheel_state, reflex_type, classification_path)
 
 # === Reflex Bundle Constructor ===
-def process_reflex_bundle(actor, wheel_state, voice_input, transmission_map_path,
+def process_reflex_bundle(actor, actor_wheel_state, voice_input, transmission_map_path,
                           classification_path, taxonomy_path, wheel_domains,
                           wheel_layers_path, polarity_drift_path):
-    reflex = detect_reflex(wheel_state, voice_input, transmission_map_path)
-    classification = classify_actor(actor, wheel_state, reflex["reflex_type"], classification_path)
+    reflex = detect_reflex(actor_wheel_state, voice_input, transmission_map_path)
+    classification = classify_actor(actor, actor_wheel_state, reflex["reflex_type"], classification_path)
 
     geometry_overlay = resolve_geometry_state(
         wheel_domains=wheel_domains,
@@ -66,6 +68,7 @@ def process_reflex_bundle(actor, wheel_state, voice_input, transmission_map_path
     )
 
     bundle = {
+        "actor_wheel_state": actor_wheel_state,
         "reflex_type": reflex["reflex_type"],
         "archetype_entry": reflex["archetype_entry"],
         "containment_strategy": reflex["containment_strategy"],
