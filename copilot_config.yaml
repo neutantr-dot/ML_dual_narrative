@@ -1,30 +1,34 @@
 # 🧠 Emotional Engine Configuration
-
 model:
   name: "openai-gpt4"
   temperature: 0.7
   max_tokens: 800
   system_prompt: "You are a storytelling assistant."
+
 paths:
   modules:
     classification: "classification"
     geometry: "emotional_geometry_layers"
     reflex: "narrative_reflex_intelligence"
+    trainer: "dual_narrative_trainer"
+    storyline: "story_line_arc.csv"
 
 storyline:
-  lines: 100
+  lines: 100  # Default line count, override via Streamlit UI
   format: "dual narrative"
   include_classification: true
   classification_labels:
-    - F0
-    - F1
-    - F2
-    - F3
     - M0
     - M1
     - M2
     - M3
+    - F0
+    - F1
+    - F2
+    - F3
     - N/A
+  trainer_injection: true
+  recenter_logic: true
 
 classification:
   enabled: true
@@ -47,10 +51,19 @@ reflex_logic:
   strategy: "dual_narrative"
   intensity: "moderate"
 
+wheel_domains:
+  schema:
+    - blue
+    - red
+    - green
+    - yellow
+    - centre
+
 logging:
   enabled: true
   log_file: "copilot_log.txt"
   log_level: "info"
   anonymize: true
+
 
 
