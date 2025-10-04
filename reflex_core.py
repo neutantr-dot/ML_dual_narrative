@@ -1,21 +1,24 @@
 import csv
+import os
+from classification_engine import classify_actor_from_wheel
+from geometry_resolver import resolve_geometry_state
 
 # === CSV Loader ===
 def load_csv(path):
-    with open(path, newline='', encoding='utf-8') as f:
-        return list(csv.DictReader(f))
+    try:
+        with open(path, newline='', encoding='utf-8') as f:
+            return list(csv.DictReader(f))
+    except Exception as e:
+        print(f"⚠️ Failed to load CSV: {e}")
+        return []
 
 # === Reflex Detection ===
 def detect_reflex(wheel_state, voice_input, transmission_map_path):
-    """
-    Detects symbolic reflex from transmission map.
-    Returns reflex_type, archetype_entry, containment_strategy, narrative_branch, somatic_protocol.
-    """
     transmission_map = load_csv(transmission_map_path)
     for row in transmission_map:
-        trigger = row.get("trigger", "")
-        wheel = row.get("wheel_state", "")
-        if trigger and trigger in voice_input and wheel == wheel_state:
+        if "wheel_state" in row:
+            row["reflex_wheel_state"] = row["wheel_state"]
+        if row.get("trigger") in voice_input and row.get("reflex_wheel_state") == wheel_state:
             return {
                 "reflex_type": row.get("reflex_type", "neutral"),
                 "archetype_entry": row.get("archetype_entry", "M1"),
@@ -33,26 +36,53 @@ def detect_reflex(wheel_state, voice_input, transmission_map_path):
 
 # === Containment Strategy ===
 def apply_containment(wheel_state, voice_input, transmission_map_path):
-    """
-    Returns symbolic containment strategy based on wheel state and voice input.
-    """
     transmission_map = load_csv(transmission_map_path)
     for row in transmission_map:
-        trigger = row.get("trigger", "")
-        wheel = row.get("wheel_state", "")
-        if trigger and trigger in voice_input and wheel == wheel_state:
+        if "wheel_state" in row:
+            row["reflex_wheel_state"] = row["wheel_state"]
+        if row.get("trigger") in voice_input and row.get("reflex_wheel_state") == wheel_state:
             return row.get("containment", "No containment strategy found.")
     return "No containment strategy found."
 
 # === Actor Classification ===
-from classification_engine import classify_actor_from_wheel
-
 def classify_actor(actor, wheel_state, reflex_type, classification_path):
     """
     Uses CSV-driven classification engine to return symbolic bundle.
     """
     return classify_actor_from_wheel(actor, wheel_state, reflex_type, classification_path)
 
+# === Reflex Bundle Constructor ===
+def process_reflex_bundle(actor, wheel_state, voice_input, transmission_map_path,
+                          classification_path, taxonomy_path, wheel_domains,
+                          wheel_layers_path, polarity_drift_path):
+    reflex = detect_reflex(wheel_state, voice_input, transmission_map_path)
+    classification = classify_actor(actor, wheel_state, reflex["reflex_type"], classification_path)
+
+    geometry_overlay = resolve_geometry_state(
+        wheel_domains=wheel_domains,
+        layers_path=wheel_layers_path,
+        codex_path=os.path.join(os.path.dirname(wheel_layers_path), "wheel_codex.csv"),
+        drift_path=polarity_drift_path,
+        ml_instruction_path=os.path.join("engine_boot", "ml_instruction.csv")
+    )
+
+    bundle = {
+        "reflex_type": reflex["reflex_type"],
+        "archetype_entry": reflex["archetype_entry"],
+        "containment_strategy": reflex["containment_strategy"],
+        "narrative_branch": reflex["narrative_branch"],
+        "somatic_protocol": reflex["somatic_protocol"],
+        "wheel_domains": wheel_domains,
+        "class_code": classification.get("class_code", "N/A"),
+        "archetype_variant": classification.get("archetype_variant", "unknown"),
+        "containment_required": classification.get("containment_required", False),
+        "progressive": classification.get("progressive", False)
+    }
+
+    bundle.update(geometry_overlay)
+    return bundle
+
+# === Fallback Reflex Bundle ===
 def default_reflex_bundle():
     """Returns fallback reflex bundle when no match is found."""
     return {
@@ -62,6 +92,7 @@ def default_reflex_bundle():
         "narrative_branch": "neutral",
         "somatic_protocol": "breath_and_stillness"
     }
+
 
 
 
