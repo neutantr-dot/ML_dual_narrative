@@ -6,3 +6,9 @@ stage_id,stage_name,description,male_state,female_state,archetype_entry,narrativ
 4b,Female 'I Was Right',"Female confirms her interpretation, Older Woman enters",red,green,Female Wisdom,Containment trigger,reflex_logic.csv
 5,Silent Hug,"Male reaches out, no apology, silent containment",blue,green,None,Containment success,storyline.txt
 6,Male Leads,"Side-by-side walk, leads to blue or yellow depending on location",blue or yellow,green,None,Resolution path,storyline.txt
+7a,Stranger Teaches We,"M3 teaches M1 to shift from I-centric to we-logic",blue,green,M3,Trainer injection,reflex_logic.csv
+7b,Wisdom Mirrors Self,"F3 teaches F1 to see herself and the couple’s path",red,green,F3,Trainer injection,reflex_logic.csv
+8a,Male Re-Centres,"M1 restores inner smile, reclaims flow ownership",blue,green,M1,Re-centering arc,storyline.txt
+8b,Female Re-Centres,"F1 restores we-ness feeling, invites sanctuary",blue,green,F1,Re-centering arc,storyline.txt
+9a,We Protocol Begins,"M2 and F2 begin to tolerate and integrate",blue,green,M2/F2,We-protocol initiation,storyline.txt
+10a,We Protocol Mastery,"M3 and F3 navigate flow and tantrum safely",blue,green,M3/F3,We-protocol mastery,storyline.txt
