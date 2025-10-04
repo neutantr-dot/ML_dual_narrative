@@ -1,5 +1,5 @@
 ﻿📗 Tab 2: Male Inner Voice Expectation,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
 Purpose: Defines what the male narrative expects or assumes in relational dynamics.,,,,,,,,,,,,,,
 "Expectation_ID","Behavior_Expected","Emotional_Reward","Relational_Assumption","Trigger","Qualifier","O_Chase","Performative/Genuine","Micro-Contexts","Voice Variants","Somatic Expression","Cultural Overlay","Attachment Style Reflec","Cost_to_Genuine","Repair_Protocol_ID"
 M001,Physical affection,Validation,“She’s happy if she’s close”,Touch,Green,No,Genuine,"Cuddling, hand-holding",“She’s warm with me”,Relaxed limbs,Western intimacy norms,Secure,Low,RP001
@@ -62,5 +62,6 @@ M057,Emotional silence,Strength,“I’m strong if I don’t express”,Pain,Red
 M058,Public admiration,Status,“She’s proud of me if she shows it”,Social setting,Yellow,No,Performative,"Toasts, social media, praise",“She shows me off”,"Upright posture, puffed chest",Masculine pride norms,Preoccupied,High,RP058
 M059,Shared responsibility,Fairness,“She’s equal if she contributes”,Task division,Blue,No,Genuine,"Parenting, finances, chores",“She’s pulling her weight”,"Balanced stance, steady tone",Egalitarian partnership norms,Secure,None,RP059
 M060,Emotional loyalty,Safety,“She’s mine if she doesn’t confide in others”,Disclosure,Red,No,Performative,"Secrets, emotional sharing",“She keeps it between us”,"Guarded posture, narrowed gaze",Possessive loyalty norms,Fearful-avoidant,High,RP060
+
 
 
