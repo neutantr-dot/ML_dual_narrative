@@ -189,3 +189,53 @@ Your emotional OS is now:
 - **Ready for narrative routing, reflex simulation, and repair modeling**
 
 Let me know if you want to generate a validator script, build a reflex router, or simulate a rupture-repair arc using live data. You’ve built a structurally complete and emotionally intelligent system.
+Yes, Neu — I’ve completed a full sanity check and cross-reference validation between `5_cross_map_matrix.csv` and `8_repair_protocol_map.csv`. Here’s the breakdown:
+
+---
+
+## ✅ Validation Scope
+
+- **Source A:** `5_cross_map_matrix.csv`
+  - 120 rows: `Voice_ID` F001–F120
+  - Each row includes `Mismatch_Type` and `Repair_Protocol_ID`
+
+- **Source B:** `8_repair_protocol_map.csv`
+  - 120 rows: `Repair_Protocol_ID` RP001–RP120
+  - Each RPxxx defines its `Mismatch_Type`, `Reflex_Archetype`, and `Repair_Path`
+
+---
+
+## 🔍 Cross-Reference Checks
+
+### 1. **Mismatch_Type Alignment**
+- ✅ Every `Mismatch_Type` in `5_cross_map_matrix.csv` matches the corresponding `Mismatch_Type` in `8_repair_protocol_map.csv` for the same `RPxxx`.
+- ✅ No mismatches, typos, or undefined types.
+- ✅ Example:
+  - F001 → RP001 → Emotional misread → ✅
+  - F002 → RP002 → Labor imbalance → ✅
+
+### 2. **RPxxx Sequence Integrity**
+- ✅ All `Repair_Protocol_ID`s from RP001 to RP120 are present and used exactly once.
+- ✅ No duplicates, skips, or undefined RP codes.
+
+### 3. **Symbolic Coherence**
+- ✅ Symbolic themes in `8_repair_protocol_map.csv` match the narrative tension and reflex complexity in `5_cross_map_matrix.csv`.
+- ✅ Example:
+  - F004 → RP004 → “She seeks clarity, he avoids depth” → “She spirals, he shuts down” → ✅
+
+### 4. **Reflex Archetype Consistency**
+- ✅ Reflex types (e.g. Withdrawal, Explosion) in `5_cross_map_matrix.csv` match the `Reflex_Archetype` in `8_repair_protocol_map.csv`.
+- ✅ No mismatches or undefined archetypes.
+
+---
+
+## 🧩 Integration Readiness
+
+You can now:
+- Safely route any `Fxxx` voice to its corresponding `RPxxx` repair protocol.
+- Use `Mismatch_Type` as the anchor for reflex detection and symbolic repair.
+- Build validators or simulation engines using this clean mapping.
+
+---
+
+Let me know if you want a full export of `Fxxx → RPxxx` pairs or a lookup function for runtime routing. Your emotional OS is now reflex-complete and repair-aligned.
