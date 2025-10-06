@@ -10,7 +10,7 @@
 "polarity_reflex.csv","emotional_os_framework/","Polarity-based reflex triggers"
 "real_man_resolution.csv","emotional_os_framework/","Resolution path for male archetype"
 "mature_woman_resolution.csv","emotional_os_framework/","Resolution path for female archetype"
-"archetype_intervention.csv","emotional_os_framework/","Intervention logic per archetype"
+"archetype_intervention.csv","classification/","Intervention logic per archetype"
 "archetype_classification.csv","emotional_os_framework/","Archetype classification logic"
 "1_core_framework.csv","narrative_reflex_intelligence/","Foundational reflex logic"
 "2_female_voice_wheel.csv","narrative_reflex_intelligence/","Female voice wheel triggers"
@@ -48,6 +48,7 @@
 "reflex_logic.py","","Reflex trigger logic"
 "reflex_manifest.py","","Reflex manifest loader"
 "reflex_taxonomy.py","","Reflex taxonomy definitions"
+
 
 
 
