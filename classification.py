@@ -3,7 +3,7 @@ import csv
 import json
 from classification_engine import classify_actor_from_wheel
 
-# Configuration
+# === Configuration ===
 MODEL_CONFIG = {
     "name": "openai-gpt4",
     "temperature": 0.7,
@@ -18,7 +18,7 @@ CLASSIFICATION_CONFIG = {
     "user_tracking": True,
     "session_label_format": "%a %b %d, %Y (%H:%M)",
     "label_prefix": "Generated on",
-    "classification_path": "emotional_os_framework/archetype_classification.csv"
+    "classification_path": "classification/archetype_classification.csv"
 }
 
 STORYLINE_CONFIG = {
@@ -35,13 +35,13 @@ LOGGING_CONFIG = {
     "anonymize": True
 }
 
-
+# === Session Label Generator ===
 def generate_session_label():
     now = datetime.datetime.now()
     return now.strftime(CLASSIFICATION_CONFIG["session_label_format"])
 
-
-def write_classification_output(actor, wheel_state, reflex_type, result):
+# === Classification Output Writer ===
+def write_classification_output(actor, actor_wheel_state, reflex_type, result):
     if not CLASSIFICATION_CONFIG["enabled"]:
         return
 
@@ -50,7 +50,7 @@ def write_classification_output(actor, wheel_state, reflex_type, result):
     row = [
         label,
         actor,
-        wheel_state,
+        actor_wheel_state,
         reflex_type,
         result["class_code"],
         result["archetype_variant"],
@@ -65,11 +65,11 @@ def write_classification_output(actor, wheel_state, reflex_type, result):
     except Exception as e:
         print(f"⚠️ Failed to write classification output: {e}")
 
-
-def classify_and_embed(actor, wheel_state, reflex_type):
+# === Classification Wrapper ===
+def classify_and_embed(actor, actor_wheel_state, reflex_type):
     result = classify_actor_from_wheel(
         actor,
-        wheel_state,
+        actor_wheel_state,
         reflex_type,
         CLASSIFICATION_CONFIG["classification_path"]
     )
@@ -84,12 +84,12 @@ def classify_and_embed(actor, wheel_state, reflex_type):
     else:
         embed = {}
 
-    write_classification_output(actor, wheel_state, reflex_type, result)
+    write_classification_output(actor, actor_wheel_state, reflex_type, result)
     return embed
 
-
-def generate_story(actor, wheel_state, reflex_type, input_text):
-    classification_data = classify_and_embed(actor, wheel_state, reflex_type)
+# === Story Generator ===
+def generate_story(actor, actor_wheel_state, reflex_type, input_text):
+    classification_data = classify_and_embed(actor, actor_wheel_state, reflex_type)
 
     prompt = f"{MODEL_CONFIG['system_prompt']}\n\nInput: {input_text}\n\n"
     prompt += f"Classification: {classification_data['class_code']} ({classification_data['archetype_variant']})\n"
@@ -98,13 +98,13 @@ def generate_story(actor, wheel_state, reflex_type, input_text):
     prompt += f"Generate a {STORYLINE_CONFIG['format']} with {STORYLINE_CONFIG['lines']} lines."
 
     # Placeholder for actual OpenAI call
-    story_output = f"[Generated story for {actor} @ {wheel_state} → {classification_data['class_code']}]"
+    story_output = f"[Generated story for {actor} @ {actor_wheel_state} → {classification_data['class_code']}]"
 
     if LOGGING_CONFIG["enabled"]:
         log_entry = {
             "timestamp": generate_session_label(),
             "actor": actor,
-            "wheel_state": wheel_state,
+            "actor_wheel_state": actor_wheel_state,
             "reflex_type": reflex_type,
             "classification": classification_data,
             "story": story_output
