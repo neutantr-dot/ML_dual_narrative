@@ -154,7 +154,8 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
 
         reflex_bundle = process_reflex_bundle(
             actor=actor,
-            wheel_state=wheel_state,
+            actor_wheel_state=actor_wheel_state,
+            reflex_wheel_state=reflex_wheel_state,
             voice_input=voice_input,
             transmission_map_path=os.path.join(modules["geometry"], "transmission_map.csv"),
             classification_path=os.path.join(modules["classification"], "archetype_classification.csv"),
