@@ -11,7 +11,8 @@ paths:
   output: input_output/storyline.txt
   modules:
     classification: classification/
-    classification_file: archetype_classification_csv.txt
+    engine_boot: engine_boot
+    classification_file: archetype_classification_csv
     geometry: emotional_geometry_layers/
     reflex: narrative_reflex_intelligence/
     trainer: dual_narrative_trainer/
