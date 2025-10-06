@@ -1,0 +1,12 @@
+actor,reflex_type,actor_wheel_state,class_code,archetype_variant,progressive,containment_required
+M,bad_guy,collapsed,M0,bad guy,FALSE,TRUE
+M,neutral,open,M1,nice guy,TRUE,FALSE
+M,dominant,rigid,M2,assertive man,TRUE,FALSE
+M,strategic,tense,M3,real man,TRUE,FALSE
+
+F,manipulative,collapsed,F0,manipulative woman,FALSE,TRUE
+F,neutral,open,F1,naive girl,TRUE,FALSE
+F,avoidant,numb,F2,conflicted woman,TRUE,FALSE
+F,strategic,tense,F3,mature woman,TRUE,FALSE
+F,strategic,tense,F3,social media manipulator,FALSE,TRUE
+
