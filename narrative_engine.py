@@ -135,14 +135,16 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
             classification = config.get("defaults", {}).get("fallback_archetype", "none")
 
     else:
-        grammar = load_grammar(config["grammar"]["emotional_grammar"])
+        grammar = load_grammar(config["emotional_grammar"]["path"])
         modules = config["paths"]["modules"]
 
-        wheel_state = detect_wheel_state(
+        reflex_wheel_state = detect_wheel_state(
             voice_input,
             background_input,
             os.path.join(modules["geometry"], "wheel_codex.csv")
         )
+
+        actor_wheel_state = inputs[8]
 
         wheel_domains = {
             "blue": inputs[4],
@@ -177,7 +179,7 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
 
         classification_data = classify_and_embed(
             actor=actor,
-            actor_wheel_state=wheel_state,
+            actor_wheel_state=actor_wheel_state,
             reflex_type=reflex_bundle["reflex_type"]
         )
 
@@ -187,14 +189,13 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
         containment_strategy = reflex_bundle.get("containment_strategy", "default silence")
         reflex_type = reflex_bundle.get("reflex_type", "neutral")
 
-        # === Trainer Injection Logic ===
         trainer_stage_id, trainer_stage_name = inject_trainer_stage(actor, wheel_domains, reflex_type, containment_strategy)
         recentre_stage_id, recentre_stage_name = inject_recentering_stage(actor, wheel_domains)
 
         transmission_map = load_transmission_profile()
         transmission = transmission_map.get(classification, {})
 
-        narrative = modulate_tone(wheel_state, grammar, archetype_variant=variant, geometry_alert=geometry_alert)
+        narrative = modulate_tone(reflex_wheel_state, grammar, archetype_variant=variant, geometry_alert=geometry_alert)
 
         narrative += (
             f"\n\n[Transmission Profile]"
@@ -204,7 +205,7 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
         )
 
         containment = get_containment_strategy(
-            wheel_state,
+            reflex_wheel_state,
             voice_input,
             os.path.join(modules["geometry"], "transmission_map.csv"),
             wheel_domains=wheel_domains
@@ -216,4 +217,7 @@ def generate_narrative(inputs, actor, user_id, background="", config={}):
             narrative += "\n\n[Suggested Action]\nNo action suggested — spectacle path not supported."
         elif "suggested_action" in reflex_bundle:
             narrative += f"\n\n[Suggested Action]\n{reflex_bundle['suggested_action']}"
+
+    return narrative
+
 
