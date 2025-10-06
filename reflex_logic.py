@@ -44,13 +44,13 @@ def enrich_with_geometry(wheel_domains, wheel_layers_path, polarity_drift_path):
     }
 
 # === Reflex Bundle Processor ===
-def process_reflex_bundle(actor, actor_wheel_state, voice_input,
+def process_reflex_bundle(actor, actor_wheel_state, reflex_wheel_state, voice_input,
                           transmission_map_path, classification_path, taxonomy_path,
                           wheel_domains=None,
                           wheel_layers_path=None,
                           polarity_drift_path=None,
                           session_log_path="classification_copilot_0210.csv"):
-    reflex = detect_reflex(actor_wheel_state, voice_input, transmission_map_path)
+    reflex = detect_reflex(reflex_wheel_state, voice_input, transmission_map_path)
 
     classification = classify_actor_from_wheel(
         actor,
@@ -80,6 +80,7 @@ def process_reflex_bundle(actor, actor_wheel_state, voice_input,
 
     bundle = {
         "actor_wheel_state": actor_wheel_state,
+        "reflex_wheel_state": reflex_wheel_state,
         "reflex_type": reflex["reflex_type"],
         "archetype_entry": reflex["archetype_entry"],
         "containment_strategy": reflex["containment_strategy"],
@@ -113,12 +114,12 @@ def process_reflex_bundle(actor, actor_wheel_state, voice_input,
         writer = csv.writer(f)
         if f.tell() == 0:
             writer.writerow([
-                "timestamp", "session_id", "actor", "actor_wheel_state",
+                "timestamp", "session_id", "actor", "actor_wheel_state", "reflex_wheel_state",
                 "reflex_type", "class_code", "archetype_variant",
                 "containment_required", "progressive"
             ])
         writer.writerow([
-            timestamp, session_id, actor, actor_wheel_state,
+            timestamp, session_id, actor, actor_wheel_state, reflex_wheel_state,
             reflex["reflex_type"], classification["class_code"],
             classification["archetype_variant"],
             classification["containment_required"],
@@ -130,8 +131,8 @@ def process_reflex_bundle(actor, actor_wheel_state, voice_input,
     return bundle
 
 # === Containment Strategy ===
-def get_containment_strategy(actor_wheel_state, voice_input, transmission_map_path, wheel_domains=None):
-    strategy = apply_containment(actor_wheel_state, voice_input, transmission_map_path)
+def get_containment_strategy(reflex_wheel_state, voice_input, transmission_map_path, wheel_domains=None):
+    strategy = apply_containment(reflex_wheel_state, voice_input, transmission_map_path)
 
     if wheel_domains:
         centre = wheel_domains.get("centre", "").lower()
@@ -143,3 +144,4 @@ def get_containment_strategy(actor_wheel_state, voice_input, transmission_map_pa
 # === Reflex Manifest Preview ===
 def preview_available_reflexes(transmission_map_path):
     return get_reflex_manifest(transmission_map_path)
+
